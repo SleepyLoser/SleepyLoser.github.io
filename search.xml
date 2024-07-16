@@ -4,11 +4,36 @@
   
     
     <entry>
+      <title>进程、线程、协程之间的区别</title>
+      <link href="/2024/07/16/Eight-Part_Essay/Computer_Operating_System/Process_Thread_Coroutine/PTC/"/>
+      <url>/2024/07/16/Eight-Part_Essay/Computer_Operating_System/Process_Thread_Coroutine/PTC/</url>
+      
+        <content type="html"><![CDATA[<h2 id="简述进程、线程、协程的概念"><a href="#简述进程、线程、协程的概念" class="headerlink" title="简述进程、线程、协程的概念"></a>简述进程、线程、协程的概念</h2><h3 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h3><ul><li>保存在硬盘上的程序运行以后，会在内存空间里形成一个独立的内存体，这个内存体有自己独立的地址空间，有自己的堆，不同进程间可以进行进程间通信，上级挂靠单位是操作系统。一个应用程序相当于一个进程，操作系统会以进程为单位，分配系统资源（CPU 时间片、内存等资源），进程是资源分配的最小单位。</li></ul><h3 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h3><ul><li><p>线程从属于进程，也被称为轻量级进程，是程序的实际执行者。线程是操作系统能够进行运算调度的最小单位。它被包含在进程之中，是进程中的实际运作单位。一条线程指的是进程中一个单一顺序的控制流，一个进程中可以并发多个线程，每条- 线程并行执行不同的任务。一个线程只有一个进程。</p></li><li><p>每个独立的线程有一个程序运行的入口、顺序执行序列和程序的出口，但是线程不能够独立执行，必须依存在应用程序中，由应用程序提供多个线程执行控制。</p></li><li><p>线程拥有自己独立的栈和共享的堆，共享堆，不共享栈，线程亦由操作系统调度(标准线程是的)。</p></li></ul><h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><ul><li><p>协程是伴随着主线程一起运行的一段程序。</p></li><li><p>协程与协程之间是并行执行，与主线程也是并行执行，同一时间只能执行一个协程提起协程，自然是要想到线程，因为协程的定义就是伴随主线程来运行的。</p></li><li><p>一个线程可以拥有多个协程，协程不是被操作系统内核所管理，而完全是由程序所控制。</p></li><li><p>协程和线程一样共享堆，不共享栈，协程由程序员在协程的代码里显示调度。</p></li><li><p>协成是单线程下由应用程序级别实现的并发。</p></li></ul><h2 id="简述协程的作用"><a href="#简述协程的作用" class="headerlink" title="简述协程的作用"></a>简述协程的作用</h2><ul><li><p>在Unity中只有主线程才能访问Unity3D的对象、方法、组件。当主线程在执行一个对资源消耗很大的操作时，在这一帧我们的程序就会出现帧率下降，画面卡顿的现象!</p></li><li><p>那这个时候我们就可以利用协程来做这件事，因为协程是伴随着主线程运行的，主线程依旧可以丝滑轻松的工作，把脏活累活交给协程处理就好了！简单来说：协程是辅助主线程的操作，避免游戏卡顿。</p></li></ul><h2 id="简述协程的底层原理"><a href="#简述协程的底层原理" class="headerlink" title="简述协程的底层原理"></a>简述协程的底层原理</h2><ul><li><p>协程是通过迭代器来实现功能的，通过关键字IEnumerator来定义一个迭代方法。</p></li><li><p>StartCoroutine 接受到的是一个 IEnumerator ，这是个接口，并且是枚举器或迭代器的意思。</p></li><li><p>yield 是 C#的一个关键字，也是一个语法糖，背后的原理会生成一个类，并且也是一个枚举器，而且不同于 return，yield 可以出现多次。</p></li><li><p>yield 实际上就是返回一次结果，因为我们要一次一次枚举一个值出来，所以多个 yield 其实是个状态模式，第一个 yield 是状态 1，第二个 yield 是状态 2，每次访问时会基于状态知道当前应该执行哪一个 yield，取得哪一个值。</p></li></ul><blockquote><p>从程序的角度讲，协程的核心就是迭代器。 想要定义一个协程方法有两个因素:<br>第一: 方法的返回值为 IEnumerator 。<br>第二: 方法中有 yield 关键字。 当代码满足以上两个条件时，此方法的执行就具有了迭代器的特质，其核心就是 MoveNext方法。</p><p>方法内的内容将会被分成两部分：yield 之前的代码和 yield 之后的代码。<br>yield之前的代码会在第一次执行MoveNext时执行， yield之后的代码会在第二次执行MoveNext方法时执行。</p><p>而在Unity中，MoveNext 的执行时机是以帧为单位的，无论你是设置了延迟时间，还是通过按钮调用 MoveNext ，亦或是根本没有设置执行条件，Unity都会在每一帧的生命周期中判断当前帧是否满足当前协程所定义的条件，一旦满足，当前帧就会抽出CPU时间执行你所定义的协程迭代器的 MoveNext 。</p><p>注意，只要方法中有 yield 语句，那么方法的返回值就必须是 IEnumerator ，不然无法通过编译。</p></blockquote><h2 id="线程与协程的区别"><a href="#线程与协程的区别" class="headerlink" title="线程与协程的区别"></a>线程与协程的区别</h2><ul><li><p>协程：即协作式程序，其思想是，一系列互相依赖的协程间依次使用CPU，每次只有一个协程工作，而其他协程处于休眠状态。协程实际上是在一个线程中，只不过每个协程对CPU进行分时，协程可以访问和使用unity的所有方法和component。同一时间只能执行某个协程。开辟多个协程开销不大。协程适合对某任务进行分时处理。</p></li><li><p>线程：多线程是阻塞式的，每个IO都必须开启一个新的线程，但是对于多CPU的系统应该使用thread，尤其是有大量数据运算的时刻，但是IO密集型就不适合；而且thread中不能操作unity的很多方法和component。同一时间可以同时执行多个线程。开辟多条线程开销很大。线程适合多任务同时处理。</p></li><li><p>线程和协同程序的主要不同在于：在多处理器情况下，从概念上来讲多线程程序同时运行多个线程；而协同程序是通过协作来完成，在任一指定时刻只有一个协同程序在运行，并且这个正在运行的协同程序只在必要时才会被挂起。</p></li></ul><h2 id="协同程序-有何用处-有何缺点"><a href="#协同程序-有何用处-有何缺点" class="headerlink" title="协同程序 有何用处? 有何缺点?"></a>协同程序 有何用处? 有何缺点?</h2><h3 id="作用"><a href="#作用" class="headerlink" title="作用"></a>作用</h3><ol><li>一个协同程序在执行过程中,可以在任意位置使用 yield 语句。</li><li>yield 的返回值控制何时恢复协同程序向下执行。</li><li>协同程序在对象自有帧执行过程中堪称优秀。</li><li>协同程序在性能上没有更多的开销。</li></ol><h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul><li>协同程序并非真线程，可能会发生堵塞。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机操作系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Unity Texture</title>
       <link href="/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/"/>
       <url>/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/</url>
       
-        <content type="html"><![CDATA[<h2 id="Unity-Texture-基础"><a href="#Unity-Texture-基础" class="headerlink" title="Unity Texture 基础"></a>Unity Texture 基础</h2><h3 id="纹理"><a href="#纹理" class="headerlink" title="纹理"></a>纹理</h3><p>纹理 Texture 用于覆盖在 3D 物体上, 其本质是一张图片, 用于替代物体上渲染的颜色。</p><ul><li><strong>网格 Mesh</strong>只能表示 3D 模型的形状</li><li><strong>材质 Material</strong>只能进行 3D 模型的纯色渲染</li><li><strong>纹理 Texture</strong> 可以进行 3D 模型的图片渲染</li></ul><p>纹理贴图是在建模软件中制作完成的, 是建模的相关工作</p><h3 id="为-3D-模型设置纹理贴图"><a href="#为-3D-模型设置纹理贴图" class="headerlink" title="为 3D 模型设置纹理贴图"></a>为 3D 模型设置纹理贴图</h3><p>在 Project 文件窗口中的 Assets 目录下, 创建<code>Texture</code>目录（文件夹名称随意）, 将图片拖动到该目录下 , 可以直接从文件系统中拖动到 Unity 编辑器的 Project 窗口或者手动复制到相应的文件夹下。<br><img src="TextureFolder.png" alt="创建 Texture 目录并加入图片" style="zoom:50%;"></p><p>选中 Project 文件窗口中的 Assets/Materials 目录下的<code>Texture_Material</code>文件, 在 Inspector 检查器窗口会显示该材质的属性, 然后直接将 Textures 中的材质图片拖动到 Inspector 检查器窗口中的 Albedo 左侧的方框中即可, 操作完成后的效果如下：<br><img src="TextureSphere.png" alt="将纹理挂载到材质上后为Sphere挂载材质" style="zoom:50%;"><br>附纹理图片：<br><img src="Weapon.png" alt="纹理图片" style="zoom:50%;"></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="Unity-Texture-基础"><a href="#Unity-Texture-基础" class="headerlink" title="Unity Texture 基础"></a>Unity Texture 基础</h2><h3 id="纹理"><a href="#纹理" class="headerlink" title="纹理"></a>纹理</h3><ul><li><p>纹理 Texture 用于覆盖在 3D 物体上, 其本质是一张图片, 用于替代物体上渲染的颜色。</p></li><li><p>它可以用来添加物体的细节，我们可以在一张图片上插入非常多的细节，这样就可以让物体非常精细而不用指定额外的顶点。</p></li><li><p>为了能够把纹理映射(Map)到三角形上，我们需要指定三角形的每个顶点各自对应纹理的哪个部分，这样每个顶点就会关联着一个<strong>纹理坐标(Texture Coordinate)</strong>，用来标明该从纹理图像的哪个部分采样，之后在图形的其它片段上进行<strong>片段插值(Fragment Interpolation)</strong>。</p></li><li><p>纹理坐标在x和y轴上，范围为0到1之间（注意我们现在使用的是2D纹理图像），使用纹理坐标获取纹理颜色叫做<strong>采样(Sampling)</strong>，<emp>纹理坐标起始于(0, 0)，也就是纹理图片的左下角，结束于(1, 1)，即纹理图片的右上角</emp>。</p></li><li><p>下图是把纹理坐标映射到三角形上<br><img src="TextureEffect.png" alt="纹理坐标起始于(0, 0)，也就是纹理图片的左下角，结束于(1, 1)，即纹理图片的右上角" style="zoom:50%;"></p></li></ul><ol><li><strong>网格 Mesh</strong>只能表示 3D 模型的形状</li><li><strong>材质 Material</strong>只能进行 3D 模型的纯色渲染</li><li><strong>纹理 Texture</strong> 可以进行 3D 模型的图片渲染</li></ol><ul><li>纹理贴图是在建模软件中制作完成的, 是建模的相关工作</li></ul><h3 id="为-3D-模型设置纹理贴图"><a href="#为-3D-模型设置纹理贴图" class="headerlink" title="为 3D 模型设置纹理贴图"></a>为 3D 模型设置纹理贴图</h3><ul><li><p>在 Project 文件窗口中的 Assets 目录下, 创建<code>Texture</code>目录（文件夹名称随意）, 将图片拖动到该目录下 , 可以直接从文件系统中拖动到 Unity 编辑器的 Project 窗口或者手动复制到相应的文件夹下。<br><img src="TextureFolder.png" alt="创建 Texture 目录并加入图片" style="zoom:50%;"></p></li><li><p>选中 Project 文件窗口中的 Assets/Materials 目录下的<code>Texture_Material</code>材质文件（材质名称随意）<br><img src="Texture_Material.png" alt="选中材质" style="zoom:50%;"></p></li><li><p>在 Inspector 检查器窗口会显示该材质的属性, 然后直接将 Textures 中的材质图片拖动到 Inspector 检查器窗口中的 Albedo 左侧的方框中即可, 操作完成后的效果如下：<br><img src="Albedo.png" alt="将纹理挂载到材质上后为Sphere挂载材质" style="zoom:50%;"></p></li></ul><p><img src="TextureSphere.png" alt="将纹理挂载到材质上后为Sphere挂载材质" style="zoom:50%;"></p><ul><li>附纹理图片：<br><img src="Weapon.png" alt="纹理图片" style="zoom:50%;"></li></ul><h3 id="纹理类型"><a href="#纹理类型" class="headerlink" title="纹理类型"></a>纹理类型</h3><ul><li><a href="https://docs.unity.cn/cn/2020.3/Manual/TextureTypes.html">Unity官方文档</a></li></ul>]]></content>
       
       
       <categories>
@@ -20,9 +45,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -84,8 +109,8 @@
     
     <entry>
       <title>通过纹理提取图片的优化方案(图片提取工具的性能优化)</title>
-      <link href="/2024/07/11/Unity/Performance%20Optimization/Extract_Images_Through_Textures/Texture_Extraction/"/>
-      <url>/2024/07/11/Unity/Performance%20Optimization/Extract_Images_Through_Textures/Texture_Extraction/</url>
+      <link href="/2024/07/11/Unity/Performance%20Optimization/Efficient_Access_To_Texture_Data/Efficient_Access_To_Texture/"/>
+      <url>/2024/07/11/Unity/Performance%20Optimization/Efficient_Access_To_Texture_Data/Efficient_Access_To_Texture/</url>
       
         <content type="html"><![CDATA[<h2 id="通过纹理提取图片的优化方案-图片提取工具的性能优化"><a href="#通过纹理提取图片的优化方案-图片提取工具的性能优化" class="headerlink" title="通过纹理提取图片的优化方案(图片提取工具的性能优化)"></a>通过纹理提取图片的优化方案(图片提取工具的性能优化)</h2>]]></content>
       
@@ -113,6 +138,39 @@
     
     
     <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
@@ -135,77 +193,11 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
@@ -223,11 +215,44 @@
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
