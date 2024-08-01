@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>AssetBundle内存、资源管理机制</title>
+      <link href="/2024/08/01/Unity/Utils/Asset_Bundle/AssetBundle/"/>
+      <url>/2024/08/01/Unity/Utils/Asset_Bundle/AssetBundle/</url>
+      
+        <content type="html"><![CDATA[<p><img src="48d2b7e150144a7b9bfa5b1e3b4e2e08.png" alt="AB包内存管理" style="zoom:50%;"><br><img src="dc6960fad0f44c909f1ef4855917cd9a.png" alt="AB包内存管理" style="zoom:50%;"></p><h2 id="管理已加载的Asset"><a href="#管理已加载的Asset" class="headerlink" title="管理已加载的Asset"></a>管理已加载的Asset</h2><ul><li>在调用[AssetBundle.Unload]方法时，传入的 unloadAllLoadedObjects 参数（true或false）会导致不同的行为，这对于管理资源和AssetBundle来说非常重要。</li><li>例如，假设材质M加载自AssetBundle AB，并且M目前正在活动Scene中。</li></ul><p><img src="c5d5060e40b483213d61b1b86c6b1b55.jpg" alt="AB包内存管理" style="zoom:50%;"></p><ul><li>如果调用了 AssetBundle.Unload(true)，那么M会被从Scene中移除、销毁并卸载。然而，如果调用了 AssetBundle.Unload(false)，AB的数据头信息会被卸载，但是M仍然会留在Scene中而且有效。调用 AssetBundle.Unload(false) 会破坏M和AB之间的链接关系。如果之后又加载了AB，会将AB中的Object的新的副本加载到内存中。</li></ul><p><img src="33857a99b94e524f8da873d2510e590a.jpg" alt="AB包内存管理" style="zoom:50%;"></p><ul><li>如果之后又加载了AB，那么会重新加载一份新的AssetBundle数据头信息副本，但是不会在新的AB副本中加载M。Unity不会再新的AB和M之间建立任何链接关系。</li></ul><p><img src="d05c5311dcf219e5f1d043425cbcb080.jpg" alt="AB包内存管理" style="zoom:50%;"></p><ul><li>如果调用 AssetBundle.LoadAsset() 重新加载M，Unity不会将已有的M副本作为AB中的数据的实例，因此，Unity会加载一个新的M的副本，这样，Scene中就会有两个不同的M的副本。</li></ul><p><img src="646eeff5fc5d3d30c01cf6f13de9475e.jpg" alt="AB包内存管理" style="zoom:50%;"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 工具类 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> AB包 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>LQA全流程自动化</title>
+      <link href="/2024/08/01/Unity/Utils/LQA_Full_Process_Automation/LQA/"/>
+      <url>/2024/08/01/Unity/Utils/LQA_Full_Process_Automation/LQA/</url>
+      
+        <content type="html"><![CDATA[<h2 id="LQA"><a href="#LQA" class="headerlink" title="LQA"></a>LQA</h2><ul><li>LQA测试包括常见的<strong>超框，漏译，漏key，以及语义</strong>问题，LQA测试涉及游戏所有语种，所有文本，每增加一个语种都会让测试量加倍。此外游戏从翻译，到语义测试都需要专业团队来操作，整体流程非常冗长</li><li>而LQA自动化测试方法，<strong>无需出多语言包即可自动化</strong>，<strong>且工作量与多少语种无关</strong>。此外还通过自训练模型进行翻译，以及语义测试，将整个LQA从翻译到测试行程完整的研发内自动化闭环。为项目节省了极大的时间成本和经济成本。</li></ul><h2 id="LQA全流程自动化"><a href="#LQA全流程自动化" class="headerlink" title="LQA全流程自动化"></a>LQA全流程自动化</h2><h3 id="游戏本地化测试"><a href="#游戏本地化测试" class="headerlink" title="游戏本地化测试"></a>游戏本地化测试</h3><ul><li>游戏LQA（本地化测试）是针对游戏出海场景中出现的超框，漏译，漏Key，翻译错误等问题进行的测试</li></ul><blockquote><p><strong>超框检查</strong></p><blockquote><p><strong>检查项</strong>: 翻译后文字过长、个别语种字形问题导致的<strong>字体截断、超框、重合</strong></p></blockquote><p><strong>漏译</strong></p><blockquote><p><strong>检查项</strong>: 游戏文本中key值缺失，导致文本出现默认文本</p></blockquote><p><strong>语义检查</strong></p><blockquote><p><strong>检查项</strong>: 翻译语义是否准确、译文是否符合游戏场景</p></blockquote></blockquote><h3 id="面临的挑战"><a href="#面临的挑战" class="headerlink" title="面临的挑战"></a>面临的挑战</h3><ul><li>多语种，涉及游戏所有文本，动辄几十上百万文字，测试工作量非常庞大，任务工时消耗非常高。</li><li>翻译合入通常到版本末期，测试任务时间相对集中，不能达到长期CI运行自动化检测的状态，<strong>发现问题相对滞后</strong>，<strong>经常需要热更发很多翻译问题</strong>。</li><li>目前本地化翻译属于全球化作业，从发现问题到修复，再到出包，验证通常涉及到<strong>多个国家多个区域协作，流程非常漫长，效率低下</strong>。</li><li>目前市面上的自动化是通过截图所有语言所有页面，<strong>自动化程度较低效率比较低，节省成本有限</strong>。</li></ul><h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><blockquote><p><strong>纯静态遍历</strong></p><blockquote><p><strong>方案</strong>:</p><blockquote><ul><li>基于纯静态prefab搜索</li><li>基于纯excel/dtxml配置表的key value漏译判断</li></ul></blockquote><p><strong>问题</strong></p><blockquote><ul><li>Text控件动态加载</li><li>Text上可能没有预先挂载localization组件</li><li>翻译表查出的非漏译冗余内容较多</li><li>因为动态控件导致的较难静态检查超框</li></ul></blockquote></blockquote><p><strong>运行时抓取和还原</strong></p><blockquote><p><strong>方案</strong>:</p><blockquote><ul><li>通过运行时对于text组件的get、set函数的改造，抓取每个text组件的key、value值</li><li>通过控件之间的屏幕坐标碰撞计算得到结果</li></ul></blockquote><p><strong>问题</strong></p><blockquote><ul><li>仅通过碰撞计算，冗余量很高，精细度不足</li><li>无法做更多的错误类型识别扩展</li></ul></blockquote></blockquote><p><strong>结合图像算法的运行时LQA方案 <psw>(AOV落地使用)</psw></strong></p><blockquote><p><strong>方案</strong></p><blockquote><ul><li>保持运行时抓取还原方案的优势</li><li><psw>结合效能组图像服务</psw>，做了多达6种错误类型的识别</li></ul></blockquote></blockquote></blockquote><h3 id="游戏引擎运行时的LQA自动化方案"><a href="#游戏引擎运行时的LQA自动化方案" class="headerlink" title="游戏引擎运行时的LQA自动化方案"></a>游戏引擎运行时的LQA自动化方案</h3><ul><li>运行时截取 + 还原 : Dump控件树 =&gt; 重建 =&gt; 多语言还原 =&gt; 图像检测</li></ul><p><img src="游戏引擎运行时的LQA自动化方案.png" alt="游戏引擎运行时的LQA自动化方案" style="zoom:50%;"></p><h3 id="游戏控件提取"><a href="#游戏控件提取" class="headerlink" title="游戏控件提取"></a>游戏控件提取</h3><ul><li><strong>方法</strong>: 拿到游戏当前Hierachy中的所有Canvas，以它们的始点，往上到下进行递归遍历，将特定控件的数据保存为Json字符串</li></ul><h3 id="文本控件处理"><a href="#文本控件处理" class="headerlink" title="文本控件处理"></a>文本控件处理</h3><ul><li><strong>改造目的</strong>: 为了运行时可以动态获取最真实的key值，需要在GetText和SetText加入测试代码，通过游戏代码运行时，追加必要信息到component，便于获取</li><li>Gettext(key) =&gt; Language map读翻译 =&gt; Keyvalue 拼接返回 =&gt; settext =&gt; Keyvalue追加到component =&gt; 被串改的文本还原</li></ul><h3 id="图像控件处理"><a href="#图像控件处理" class="headerlink" title="图像控件处理"></a>图像控件处理</h3><p><img src="图像控件处理.png" alt="图像控件处理" style="zoom:50%;"></p><h3 id="还原实现"><a href="#还原实现" class="headerlink" title="还原实现"></a>还原实现</h3><p><img src="还原实现.png" alt="还原实现" style="zoom:50%;"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - LQA </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> LQA </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>将纹理批量转换成Json文件</title>
       <link href="/2024/07/29/Unity/Utils/Texture_To_Json/TextureToJson/"/>
       <url>/2024/07/29/Unity/Utils/Texture_To_Json/TextureToJson/</url>
@@ -31,11 +81,11 @@
     
     
     <entry>
-      <title>UGUI的DrawCall优化方案</title>
-      <link href="/2024/07/24/Unity/Performance%20Optimization/Optimize_DrawCall/DrawCall/"/>
-      <url>/2024/07/24/Unity/Performance%20Optimization/Optimize_DrawCall/DrawCall/</url>
+      <title>UGUI的优化方案</title>
+      <link href="/2024/07/24/Unity/Performance%20Optimization/Optimize_UI/OptimizeUI/"/>
+      <url>/2024/07/24/Unity/Performance%20Optimization/Optimize_UI/OptimizeUI/</url>
       
-        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><ol><li><strong>合并UI元素</strong>：将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素。</li><li><strong>使用合批技术</strong>：将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</li><li><strong>使用Atlas</strong>：将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li><li><strong>使用UI Canvas</strong>：将UI元素放在同一个Canvas下，这样可以减少DrawCall的数量。可以使用Unity的UI Canvas组件来实现。</li></ol>]]></content>
+        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><ol><li><strong>合并UI元素</strong>：将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素。</li><li><strong>使用合批技术</strong>：将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</li><li><strong>使用Atlas</strong>：将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li><li><strong>使用UI Canvas</strong>：将UI元素放在同一个Canvas下，这样可以减少DrawCall的数量。可以使用Unity的UI Canvas组件来实现。</li></ol><h2 id="大量同屏玩家头顶UI的优化案例"><a href="#大量同屏玩家头顶UI的优化案例" class="headerlink" title="大量同屏玩家头顶UI的优化案例: "></a>大量同屏玩家头顶UI的优化案例: <psw>《华夏》手游 头顶UI性能优化</psw></h2><p><img src="bf947f9535b549c6a54357977b2137e4.png" alt="优化案例" style="zoom:50%;"></p>]]></content>
       
       
       <categories>
@@ -50,8 +100,6 @@
             <tag> 性能优化 </tag>
             
             <tag> UGUI </tag>
-            
-            <tag> DrawCall </tag>
             
         </tags>
       
@@ -219,9 +267,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -230,9 +278,20 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
+      
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -252,11 +311,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
       
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
@@ -264,10 +323,10 @@
     
     <entry>
       <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
@@ -285,11 +344,11 @@
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
@@ -312,17 +371,6 @@
       <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
