@@ -4,6 +4,60 @@
   
     
     <entry>
+      <title>渲染管线</title>
+      <link href="/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/"/>
+      <url>/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/</url>
+      
+        <content type="html"><![CDATA[<h2 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h2><p><img src="渲染管线.png" alt="渲染管线" style="zoom:50%;"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 渲染管线 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>UGUI的优化方案(2)</title>
+      <link href="/2024/08/05/Unity/Performance%20Optimization/Optimize_UI_Two/OptimizeUI_Two/"/>
+      <url>/2024/08/05/Unity/Performance%20Optimization/Optimize_UI_Two/OptimizeUI_Two/</url>
+      
+        <content type="html"><![CDATA[<h2 id="DrawCall"><a href="#DrawCall" class="headerlink" title="DrawCall"></a>DrawCall</h2><ul><li>CPU每次调用图像编程接口 glDrawElements（OpenGl中的图元渲染函数）或者 DrawIndexedPrimitive（DirectX中的顶点绘制方法）命令GPU渲染的操作称为一次Draw Call。</li><li>Draw Call就是一次渲染命令的调用，它指向一个需要被渲染的图元（primitive）列表，不包含任何材质信息，glDrawElements 或者 DrawIndexedPrimitive 函数的作用是将CPU准备好的顶点数据渲染出来。</li></ul><h2 id="Batch"><a href="#Batch" class="headerlink" title="Batch"></a>Batch</h2><ul><li>把数据加载到显存，设置渲染状态，CPU调用GPU渲染的过程称之为一个Batch。这其实就是渲染流程的运用阶段，最终输出一个渲染图元（点、线、面等），再传递给GPU进行几何阶段和光栅化阶段的渲染显示。一个Batch必然会触发一次或多次DrawCall，且包含了该对象的所有的网格和顶点数据以及材质信息。把数据加载到显存是指把渲染所需的数据从硬盘加载到内存（RAM），再将网格和纹理等加载到显卡（VRAM），这一步比较耗时。设置渲染状态就是设置场景中的网格的顶点（Vertex）/片元（Fragment）着色器，光源属性，材质等。Unity提供的动态合批（Dynamic Batching ）合并的就是这一过程，将渲染状态相同的对象合并成一个Batch，减少DrawCall。</li></ul><h2 id="SetPassCall"><a href="#SetPassCall" class="headerlink" title="SetPassCall"></a>SetPassCall</h2><ul><li>Shader脚本中一个Pass语义块就是一个完整的渲染流程，一个着色器可以包含多个Pass语义块，每当GPU运行一个Pass之前，就会产生一个SetPassCall，所以可以理解为一次完整的渲染流程次数。</li></ul><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>一个Batch包含一个或多个DrawCall，都是产生是在CPU阶段，而目前普遍渲染的瓶颈恰恰就是CPU，GPU的处理速度比CPU快多了，Draw Call太高，CPU会把大量时间花费在处理Draw Call调用上。如果Batch太大，CPU需要频繁的从硬盘加载数据，切换渲染状态，这个消耗要比DrawCall大，所以后面Unity才逐渐弱化了DrawCall的显示</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 性能优化 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> UGUI </tag>
+            
+            <tag> 性能优化 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>AssetBundle内存、资源管理机制</title>
       <link href="/2024/08/01/Unity/Utils/Asset_Bundle/AssetBundle/"/>
       <url>/2024/08/01/Unity/Utils/Asset_Bundle/AssetBundle/</url>
@@ -81,11 +135,11 @@
     
     
     <entry>
-      <title>UGUI的优化方案</title>
-      <link href="/2024/07/24/Unity/Performance%20Optimization/Optimize_UI/OptimizeUI/"/>
-      <url>/2024/07/24/Unity/Performance%20Optimization/Optimize_UI/OptimizeUI/</url>
+      <title>UGUI的优化方案(1)</title>
+      <link href="/2024/07/24/Unity/Performance%20Optimization/Optimize_UI_One/OptimizeUI_One/"/>
+      <url>/2024/07/24/Unity/Performance%20Optimization/Optimize_UI_One/OptimizeUI_One/</url>
       
-        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><ol><li><strong>合并UI元素</strong>：将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素。</li><li><strong>使用合批技术</strong>：将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</li><li><strong>使用Atlas</strong>：将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li><li><strong>使用UI Canvas</strong>：将UI元素放在同一个Canvas下，这样可以减少DrawCall的数量。可以使用Unity的UI Canvas组件来实现。</li></ol><h2 id="大量同屏玩家头顶UI的优化案例"><a href="#大量同屏玩家头顶UI的优化案例" class="headerlink" title="大量同屏玩家头顶UI的优化案例: "></a>大量同屏玩家头顶UI的优化案例: <psw>《华夏》手游 头顶UI性能优化</psw></h2><p><img src="bf947f9535b549c6a54357977b2137e4.png" alt="优化案例" style="zoom:50%;"></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><h3 id="合并UI元素"><a href="#合并UI元素" class="headerlink" title="合并UI元素"></a>合并UI元素</h3><ul><li>将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素</li><li>将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li></ul><h3 id="使用合批技术"><a href="#使用合批技术" class="headerlink" title="使用合批技术"></a>使用合批技术</h3><blockquote><p>将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</p></blockquote><p><strong>静态合批:</strong></p><ul><li>静态合批是将静态（不移动）GameObjects组合成大网格，然后进行绘制。</li><li>静态合批使用比较简单，PlayerSettings中开启static batching，然后对需要静态合批物体的Static打钩即可，unity会自动合并被标记为static的对象，前提它们共享相同的材质，并且不移动，被标记为static的物体不能在游戏中移动，旋转或缩放。</li><li>静态批处理需要额外的内存来存储合并的几何体。</li><li>注意如果多个GameObject在静态批处理之前共享相同的几何体，则会在编辑器或运行时为每个GameObject创建几何体的副本，这会增大内存的开销。例如，在密集的森林级别将树标记为静态可能会产生严重的内存影响。此时就必须去权衡利弊，为了更少的内存占用，可能需要避免某些GameObjects的静态批处理，尽管这必须要牺牲一定的渲染性能。</li></ul><p><strong>动态合批:</strong></p><blockquote><p>动态合批是将一些足够小的网格，在CPU上转换它们的顶点，将许多相似的顶点组合在一起，并一次性绘制它们。<br>无论静态还是动态合批都要求使用相同的材质，动态合批有以下限制：</p></blockquote><ul><li>动态合批处理动态的GameObjects的每个顶点都有一定的开销，因此动态合批处理仅应用于包含不超过900个顶点属性和不超过300个顶点的网格。(<code>如果shader中使用Vertex Position, Normal和single UV，可以批量处理最多300个顶点，而如果shader中使用Vertex Position, Normal, UV0, UV1和Tangent，则只能使用180个顶点。</code>注意：将来可能会更改属性计数限制。)</li><li>如果GameObjects在Transform上包含镜像，则不会对其进行动态合批处理（例如，scale 为1的GameObject A和scale为-1的GameObject B无法一起动态合批处理）</li><li>使用不同的Material实例会导致GameObjects不能一起批处理，即使它们基本相同。阴影渲染(shadow caster)是一个例外，下文会解释为什么</li><li>带有光照贴图的GameObjects有额外的渲染器参数：保存光照贴图的索引和偏移/缩放。一般来说，动态光照贴图的GameObjects应指向完全相同的光照贴图位置才能被动态合批处理</li><li>使用多个pass的shader不会被动态合批处理。</li></ul><p><strong>Github 上Unity官方总结了25种不能被合批处理的情况 :</strong> <a href="https://github.com/Unity-Technologies/BatchBreakingCause">https://github.com/Unity-Technologies/BatchBreakingCause</a></p><h3 id="使用UI-Canvas"><a href="#使用UI-Canvas" class="headerlink" title="使用UI Canvas"></a>使用UI Canvas</h3><ul><li>添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall。</li></ul><h2 id="大量同屏玩家头顶UI的优化案例"><a href="#大量同屏玩家头顶UI的优化案例" class="headerlink" title="大量同屏玩家头顶UI的优化案例: "></a>大量同屏玩家头顶UI的优化案例: <psw>《华夏》手游 头顶UI性能优化</psw></h2><p><img src="bf947f9535b549c6a54357977b2137e4.png" alt="优化案例" style="zoom:50%;"></p><h3 id="图文混排"><a href="#图文混排" class="headerlink" title="图文混排"></a>图文混排</h3>]]></content>
       
       
       <categories>
@@ -97,9 +151,9 @@
       
         <tags>
             
-            <tag> 性能优化 </tag>
-            
             <tag> UGUI </tag>
+            
+            <tag> 性能优化 </tag>
             
         </tags>
       
@@ -211,8 +265,8 @@
     
     <entry>
       <title>Unity Shader</title>
-      <link href="/2024/07/12/Unity/Graphics/Shader_Fundamentals/Render_Pipeline/"/>
-      <url>/2024/07/12/Unity/Graphics/Shader_Fundamentals/Render_Pipeline/</url>
+      <link href="/2024/07/12/Unity/Graphics/Shader_Fundamentals/Shader/"/>
+      <url>/2024/07/12/Unity/Graphics/Shader_Fundamentals/Shader/</url>
       
         <content type="html"><![CDATA[<h2 id="Unity-Shader-基础"><a href="#Unity-Shader-基础" class="headerlink" title="Unity Shader 基础"></a>Unity Shader 基础</h2><h3 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h3><p>在 Unity 中，可以选择不同的渲染管线。渲染管线执行一系列操作来获取场景的内容，并将这些内容显示在屏幕上。概括来说，这些操作如下：</p><ul><li><strong>剔除</strong></li><li><strong>渲染</strong></li><li><strong>后期处理</strong></li></ul><p>不同的渲染管线具有不同的功能和性能特征，并且适用于不同的游戏、应用程序和平台。<br>将项目从一个渲染管线切换到另一个渲染管线可能很困难，因为<code>不同的渲染管线使用不同的着色器输出</code>，并且可能没有相同的特性。因此，必须要了解 Unity 提供的不同渲染管线，以便可以在开发早期为项目做出正确决定。</p><h3 id="选择要使用的渲染管线"><a href="#选择要使用的渲染管线" class="headerlink" title="选择要使用的渲染管线"></a>选择要使用的渲染管线</h3><p>Unity 提供以下渲染管线：</p><ul><li><strong>内置渲染管线</strong>是 Unity 的默认渲染管线。这是通用的渲染管线，其自定义选项有限。</li><li><strong>通用渲染管线</strong> (URP) 是一种可快速轻松自定义的可编程渲染管线，允许您在<code>各种平台</code>上创建优化的图形。</li><li><strong>高清渲染管线</strong> (HDRP) 是一种可编程渲染管线，可让您在<code>高端平台</code>上创建出色的高保真图形。</li><li>可以使用 Unity 的<strong>可编程渲染管线</strong> API 来创建自定义的可编程渲染管线 (SRP)。这个过程可以从头开始，也可以修改 URP 或 HDRP 来适应具体需求。</li></ul><hr><h3 id="Shader"><a href="#Shader" class="headerlink" title="Shader"></a>Shader</h3><p>在Unity Shader的帮助下，开发者只需要使用ShaderLab来编写Unity Shader文件就可以完成所有工作<br><span class='p blue'>以下是StandardSurfaceShader的标准结构</span></p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Shader &quot;Custom/NewSurfaceShader&quot;</span><br><span class="line">&#123;</span><br><span class="line">    Properties</span><br><span class="line">    &#123;</span><br><span class="line">        // 属性</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SubShader</span><br><span class="line">    &#123;</span><br><span class="line">        // 显卡A使用的子着色器</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SubShader</span><br><span class="line">    &#123;</span><br><span class="line">        // 显卡B使用的子着色器</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    FallBack &quot;Diffuse&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p><table><tr><td bgcolor=silver>第一行Shader后面的 "Custom/..."是材质选择Shader时的路径（自定义Shader的名称）</td></tr></table><br><img src="CustomNewSurfaceShader.png" alt="其中Shader后面的 'Custom/....'是材质选择Shader时的路径" style="zoom:50%;"></p><h4 id="Properties"><a href="#Properties" class="headerlink" title="Properties"></a>Properties</h4><p><table><tr><td bgcolor=silver>Properties中的属性可以看作Unity-C#中公开的全局变量（public int num......）, 可以在Inspector窗口改动相对应的属性值，从而达到运行时调试Shader效果的作用</td></tr></table><br><img src="Properties.png" alt="Properties中的属性可以看作Unity-C#中公开的全局变量（public int num......）, 可以在Inspector窗口改动相对应的属性值，从而达到运行时调试Shader效果的作用" style="zoom:50%;"><br><img src="Properties_Variable.png" alt="Properties中的属性可以看作Unity-C#中公开的全局变量（public int num......）, 可以在Inspector窗口改动相对应的属性值，从而达到运行时调试Shader效果的作用" style="zoom:50%;"></p><h4 id="SubShader"><a href="#SubShader" class="headerlink" title="SubShader"></a>SubShader</h4><p>当Unity需要加载这个Unity Shader时，Unity会扫描所有的SubShader语义块，然后选择第一个能够在目标平台上运行的SubShader，如果都不支持的话，Unity就会使用Fallback语义指定的Unity Shader<br><img src="SubShader.png" alt="当Unity需要加载这个Unity Shader时，Unity会扫描所有的SubShader语义块，然后选择第一个能够在目标平台上运行的SubShader，如果都不支持的话，Unity就会使用Fallback语义指定的Unity Shader" style="zoom:50%;"></p><h5 id="Pass以及可选状态和标签"><a href="#Pass以及可选状态和标签" class="headerlink" title="Pass以及可选状态和标签"></a>Pass以及可选状态和标签</h5><p>SubShader中定义了一系列pass以及可选的状态（[RenderSetUp]）和标签（[Tags]）设置，每个pass定义了一次完整的渲染流程，但如果pass的数目过多，往往会造成渲染性能的下降。<br><img src="Tags_Pass_RenderSetUp.png" alt="SubShader中定义了一系列pass以及可选的状态（[RenderSetUp]）和标签（[Tags]）设置，每个pass定义了一次完整的渲染流程，但如果pass的数目过多，往往会造成渲染性能的下降。" style="zoom:50%;"></p><h5 id="Tags"><a href="#Tags" class="headerlink" title="Tags"></a>Tags</h5><p>SubShader的标签(Tags)是一个键值对，它的键和值都是字符串类型</p>]]></content>
       
@@ -235,57 +289,8 @@
     </entry>
     
     
-    
-    <entry>
-      <title>通过纹理提取图片的优化方案(图片提取工具的性能优化)</title>
-      <link href="/2024/07/11/Unity/Performance%20Optimization/Efficient_Access_To_Texture_Data/Efficient_Access_To_Texture/"/>
-      <url>/2024/07/11/Unity/Performance%20Optimization/Efficient_Access_To_Texture_Data/Efficient_Access_To_Texture/</url>
-      
-        <content type="html"><![CDATA[<h2 id="通过纹理提取图片的优化方案-图片提取工具的性能优化"><a href="#通过纹理提取图片的优化方案-图片提取工具的性能优化" class="headerlink" title="通过纹理提取图片的优化方案(图片提取工具的性能优化)"></a>通过纹理提取图片的优化方案(图片提取工具的性能优化)</h2>]]></content>
-      
-      
-      <categories>
-          
-          <category> Unity - 性能优化 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 纹理 </tag>
-            
-            <tag> 性能优化 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
   
   
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
-      
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
-      
-    </entry>
-    
     
     
     <entry>
@@ -301,10 +306,10 @@
     
     <entry>
       <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
       
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
       
     </entry>
     
@@ -344,22 +349,11 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
       
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
       
     </entry>
     
@@ -380,6 +374,39 @@
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
