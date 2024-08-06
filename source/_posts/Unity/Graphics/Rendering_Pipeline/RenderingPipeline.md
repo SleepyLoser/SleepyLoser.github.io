@@ -1,6 +1,6 @@
 ---
 title: 渲染管线
-top_img: '116478177_p0.png'
+top_img: '118645167_p0.png'
 cover: '116535516_p0.png'
 categories: 
     - Unity
