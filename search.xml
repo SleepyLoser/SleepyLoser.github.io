@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>UGUI运作原理(1)</title>
+      <link href="/2024/08/06/Unity/Graphics/UGUI_Fundamentals/UGUI_One/"/>
+      <url>/2024/08/06/Unity/Graphics/UGUI_Fundamentals/UGUI_One/</url>
+      
+        <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><ul><li>UGUI的图像显示核心是Graphic类，而Graphic又由Canvas相关类进行管理。在UGUI系统中Canvas管理UI元素的生命周期与样式变化，CanvasRenderer负责UI的显示，包括网格、材质以及Rect裁剪等。由于Canvas与CanvasRenderer真正核心代码未开源，所以只能从Graphic类一探究竟。</li></ul><h2 id="UGUI运作原理"><a href="#UGUI运作原理" class="headerlink" title="UGUI运作原理"></a>UGUI运作原理</h2><ul><li>UGUI系统的运作核心是CanvasUpdateRegistry类，它通过Canvas的willRenderCanvases回调入手，即每帧在Canvas进行渲染前更新各个Graphic的位置以及渲染信息（mesh、material等），然后根据渲染信息进行渲染，整个运作图如下所示，包括mask在内：</li></ul><p><img src="UGUI运作原理图.png" alt="UGUI运作原理图" style="zoom:50%;"></p><h3 id="CanvasUpdateRegistry"><a href="#CanvasUpdateRegistry" class="headerlink" title="CanvasUpdateRegistry"></a>CanvasUpdateRegistry</h3><ul><li>此类维护了两个队列，即Layout重构队列和Graphic重构队列。这两个队列分别存储了Layout的重构信息（位置、大小）和图像更改信息（mesh、材质等）。在Canvas渲染前通过PerformUpdate进行更新，更新流程如下所示：</li></ul><ol><li>移除队列中的非法元素，比如null或者destroyed</li><li>进行Layout更新，会调用<code>m_LayoutRebuildQueue</code>里元素的Rebuild(继承自ICanvasElement)进行重构</li><li>剔除（或者说遮罩），此部分是进行RectMask2D的作用，调用ClipperRegister中的Cull方法进行</li><li>进行Graphic<code>(m_GraphicRebuildQueue)</code>的更新，因为Graphic的mesh等信息跟UI的Rect位置有关系，所以最后进行Graphic重建</li></ol><ul><li>附<a href="CanvasUpdateRegistry.cs">CanvasUpdateRegistry源码</a></li></ul><h3 id="WillRenderCanvases"><a href="#WillRenderCanvases" class="headerlink" title="WillRenderCanvases"></a>WillRenderCanvases</h3><ul><li>添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall。如下代码所示，当Canvas需要重绘的时候会调用SendWillRenderCanvases()方法。</li></ul><p><img src="Canvas强制更新.png" alt="IWillRenderCanvases" style="zoom:50%;"></p><ul><li>在CanvasUpdateRegistry的构建函数中可以看到Canvas.willRenderCanvases事件添加到this.PerformUpdate()方法中，UI发生变化一般分两种情况，一种是修改了宽高这样会影响到顶点位置需要重建Mesh，还有一种仅仅只修改了显示元素，这样并不会影响顶点位置，此时unity会在代码中区别对待。</li></ul><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CanvasUpdateRegistry</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//...略</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">CanvasUpdateRegistry</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//构造函数处委托函数到PerformUpdate()方法中</span></span><br><span class="line">        <span class="comment">//每次Canvas.willRenderCanvases就会执行PerformUpdate()方法</span></span><br><span class="line">        Canvas.willRenderCanvases += PerformUpdate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">PerformUpdate</span>()</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//开始BeginSample()</span></span><br><span class="line">        <span class="comment">//在Profiler中看到的标志性函数Canvas.willRenderCanvases耗时就在这里了</span></span><br><span class="line">        <span class="comment">//EndSample()</span></span><br><span class="line">        UISystemProfilerApi.BeginSample(UISystemProfilerApi.SampleType.Layout);</span><br><span class="line">        CleanInvalidItems();</span><br><span class="line"></span><br><span class="line">        m_PerformingLayoutUpdate = <span class="literal">true</span>;</span><br><span class="line">        <span class="comment">//需要重建的布局元素(RectTransform发生变化)，首先需要根据子对象的数量对它进行排序。</span></span><br><span class="line">        m_LayoutRebuildQueue.Sort(s_SortLayoutFunction);</span><br><span class="line">        <span class="comment">//遍历待重建布局元素队列，开始重建</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt;= (<span class="built_in">int</span>)CanvasUpdate.PostLayout; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="built_in">int</span> j = <span class="number">0</span>; j &lt; m_LayoutRebuildQueue.Count; j++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">var</span> rebuild = instance.m_LayoutRebuildQueue[j];</span><br><span class="line">                <span class="keyword">try</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (ObjectValidForUpdate(rebuild))</span><br><span class="line">                        rebuild.Rebuild((CanvasUpdate)i);<span class="comment">//重建布局元素</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">catch</span> (Exception e)</span><br><span class="line">                &#123;</span><br><span class="line">                    Debug.LogException(e, rebuild.transform);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; m_LayoutRebuildQueue.Count; ++i)</span><br><span class="line">            m_LayoutRebuildQueue[i].LayoutComplete();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//布局构建完成后清空队列</span></span><br><span class="line">        instance.m_LayoutRebuildQueue.Clear();</span><br><span class="line">        m_PerformingLayoutUpdate = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 布局构建结束，开始进行Mask2D裁切（详细内容下面会介绍）</span></span><br><span class="line">        ClipperRegistry.instance.Cull();</span><br><span class="line"></span><br><span class="line">        m_PerformingGraphicUpdate = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//需要重建的Graphics元素(Image Text RawImage 发生变化)</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = (<span class="built_in">int</span>)CanvasUpdate.PreRender; i &lt; (<span class="built_in">int</span>)CanvasUpdate.MaxUpdateValue; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> k = <span class="number">0</span>; k &lt; instance.m_GraphicRebuildQueue.Count; k++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">try</span></span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">var</span> element = instance.m_GraphicRebuildQueue[k];</span><br><span class="line">                    <span class="keyword">if</span> (ObjectValidForUpdate(element))</span><br><span class="line">                        element.Rebuild((CanvasUpdate)i);<span class="comment">//重建UI元素</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">catch</span> (Exception e)</span><br><span class="line">                &#123;</span><br><span class="line">                    Debug.LogException(e, instance.m_GraphicRebuildQueue[k].transform);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 这里需要思考的是，有可能一个Image对象，RectTransform和Graphics同时发生了修改，它们的更新含义不同需要区分对待</span></span><br><span class="line">        <span class="comment">// 1. 修改了Image的宽高，这样Mesh的顶点会发生变化，此时该对象会加入m_LayoutRebuildQueue队列</span></span><br><span class="line">        <span class="comment">// 2. 修改了Image的Sprite，它并不会影响顶点位置信息，此时该对象会加入m_GraphicRebuildQueue队列</span></span><br><span class="line">        <span class="comment">// 所以上面代码在遍历的时候会分层</span></span><br><span class="line">        <span class="comment">// for (int i = 0; i &lt;= (int)CanvasUpdate.PostLayout; i++)</span></span><br><span class="line">        <span class="comment">// 与</span></span><br><span class="line">        <span class="comment">// for (var i = (int)CanvasUpdate.PreRender; i &lt; (int)CanvasUpdate.MaxUpdateValue; i++)</span></span><br><span class="line">        <span class="comment">// Rebuild的时候会把层传进去，保证Image知道现在是要更新布局，还是只更新渲染。</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; m_GraphicRebuildQueue.Count; ++i)</span><br><span class="line">            m_GraphicRebuildQueue[i].GraphicUpdateComplete();</span><br><span class="line"></span><br><span class="line">        instance.m_GraphicRebuildQueue.Clear();</span><br><span class="line">        m_PerformingGraphicUpdate = <span class="literal">false</span>;</span><br><span class="line">        UISystemProfilerApi.EndSample(UISystemProfilerApi.SampleType.Layout);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>附<a href="Canvas.cs">Canvas源码</a></li></ul><h3 id="Graphic-MaskableGraphic"><a href="#Graphic-MaskableGraphic" class="headerlink" title="Graphic/MaskableGraphic"></a>Graphic/MaskableGraphic</h3>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - UI </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> UGUI </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>渲染管线</title>
       <link href="/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/"/>
       <url>/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/</url>
@@ -306,21 +331,10 @@
     
     <entry>
       <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
       
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
-      
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
       
     </entry>
     
@@ -338,6 +352,39 @@
     
     
     <entry>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
+      
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>友情链接</title>
       <link href="/link/index.html"/>
       <url>/link/index.html</url>
@@ -349,11 +396,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -363,28 +410,6 @@
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -404,9 +429,9 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
