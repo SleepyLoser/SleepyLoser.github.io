@@ -12,8 +12,8 @@ tags:
 
 ## DrawCall
 
-* CPU每次调用图像编程接口 glDrawElements（OpenGl中的图元渲染函数）或者 DrawIndexedPrimitive（DirectX中的顶点绘制方法）命令GPU渲染的操作称为一次Draw Call。
-* Draw Call就是一次渲染命令的调用，它指向一个需要被渲染的图元（primitive）列表，不包含任何材质信息，glDrawElements 或者 DrawIndexedPrimitive 函数的作用是将CPU准备好的顶点数据渲染出来。
+* CPU每次调用图像编程接口 glDrawElements（OpenGl中的图元渲染函数）或者 DrawIndexedPrimitive（DirectX中的顶点绘制方法）命令GPU渲染的操作称为一次DrawCall。
+* DrawCall就是一次渲染命令的调用，它指向一个需要被渲染的图元（primitive）列表，不包含任何材质信息，glDrawElements 或者 DrawIndexedPrimitive 函数的作用是将CPU准备好的顶点数据渲染出来。
 
 ## Batch
 

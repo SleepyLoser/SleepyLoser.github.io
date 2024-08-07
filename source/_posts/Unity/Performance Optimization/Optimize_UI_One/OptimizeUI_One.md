@@ -33,19 +33,19 @@ tags:
 **动态合批:**
 
 > 动态合批是将一些足够小的网格，在CPU上转换它们的顶点，将许多相似的顶点组合在一起，并一次性绘制它们。
-> 无论静态还是动态合批都要求使用相同的材质，动态合批有以下限制：
+> **无论静态还是动态合批都要求使用相同的材质**，动态合批有以下限制：
 
 * 动态合批处理动态的GameObjects的每个顶点都有一定的开销，因此动态合批处理仅应用于包含不超过900个顶点属性和不超过300个顶点的网格。(`如果shader中使用Vertex Position, Normal和single UV，可以批量处理最多300个顶点，而如果shader中使用Vertex Position, Normal, UV0, UV1和Tangent，则只能使用180个顶点。`注意：将来可能会更改属性计数限制。)
 * 如果GameObjects在Transform上包含镜像，则不会对其进行动态合批处理（例如，scale 为1的GameObject A和scale为-1的GameObject B无法一起动态合批处理）
-* 使用不同的Material实例会导致GameObjects不能一起批处理，即使它们基本相同。阴影渲染(shadow caster)是一个例外，下文会解释为什么
+* 使用不同的Material实例会导致GameObjects不能一起批处理，即使它们基本相同。阴影渲染(shadow caster)是一个例外
 * 带有光照贴图的GameObjects有额外的渲染器参数：保存光照贴图的索引和偏移/缩放。一般来说，动态光照贴图的GameObjects应指向完全相同的光照贴图位置才能被动态合批处理
 * 使用多个pass的shader不会被动态合批处理。
 
-**Github 上Unity官方总结了25种不能被合批处理的情况 :** <https://github.com/Unity-Technologies/BatchBreakingCause>
+**Github上Unity官方总结了25种不能被合批处理的情况 :** <https://github.com/Unity-Technologies/BatchBreakingCause>
 
 ### 使用UI Canvas
 
-* 添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall。
+* 添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall(动静分离)。
 
 ## 大量同屏玩家头顶UI的优化案例: {% psw 《华夏》手游 头顶UI性能优化 %}
 
