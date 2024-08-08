@@ -58,7 +58,7 @@
       <link href="/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/"/>
       <url>/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/</url>
       
-        <content type="html"><![CDATA[<h2 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h2><p><img src="渲染管线.png" alt="渲染管线" style="zoom:50%;"></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h2><ul><li>渲染的三个阶段一般分为：<code>应用阶段</code>、<code>几何阶段</code>和<code>光栅化阶段</code>, 如下图</li></ul><p><img src="渲染管线.png" alt="渲染管线" style="zoom:50%;"></p><ul><li>三个阶段的操作对象的流程图可参考下图</li></ul><p><img src="渲染管线流程图.png" alt="渲染管线流程图" style="zoom:50%;"></p><h3 id="1、应用阶段"><a href="#1、应用阶段" class="headerlink" title="1、应用阶段"></a>1、应用阶段</h3><ul><li>这一阶段由CPU处理，主要任务是为接下来GPU的渲染操作<strong>提供所需要的几何信息</strong>，即输出<code>渲染图元（rending primitives）</code>以供后续阶段的使用。渲染图元就是由若干个顶点构成的几何形状，点，线，三角形，多边形面都可以是一个图元</li></ul><h4 id="1、数据的准备"><a href="#1、数据的准备" class="headerlink" title="1、数据的准备"></a>1、数据的准备</h4><ul><li><strong>第一步</strong>应先将不需要的数据剔除出去，如以包围盒为单位的视锥体（粗粒度）剔除，遮挡剔除，层级剔除等等</li><li><strong>第二步</strong>根据UI对象在Herachy面板深度值的顺序（DFS深度优先搜索）设置渲染的顺序，其余物体大体可以按照离摄像机先近后远的规则为后续循环绘制所有对象制定排队顺序</li><li><strong>第三步</strong>先将所有需要的渲染数据从硬盘读取到主存中，再把GPU渲染需要用到的数据打包发给显存（GPU一般没有对主存的访问权限，且与显存进行交换速度较快）</li><li>打包的数据详情见下图</li></ul><p><img src="打包数据.png" alt="打包数据" style="zoom:50%;"></p><h4 id="2、设置渲染状态"><a href="#2、设置渲染状态" class="headerlink" title="2、设置渲染状态"></a>2、设置渲染状态</h4><ul><li>渲染状态包括着色器（Shader），纹理，材质，灯光等等。</li><li>设置渲染状态实质上就是，告诉GPU该使用哪个Shader，纹理，材质等去渲染模型网格体，这个过程也就是SetPassCall。当使用不同的材质或者相同材质下不同的Pass时就需要设置切换多个渲染状态，就会增加SetPassCall 所以SetPassCall的次数也能反映性能的优劣。</li></ul><h4 id="3、发送DrawCall"><a href="#3、发送DrawCall" class="headerlink" title="3、发送DrawCall"></a>3、发送DrawCall</h4><ul><li>当收到一个DrawCall时，GPU会按照命令，根据<strong>渲染状态</strong>和输入的顶点信息对<strong>指定</strong>的模（网格）进行计算渲染。</li><li>CPU通过调用图形API接口（ glDrawElements (OpenGl中的图元渲染函数) 或者 DrawIndexedPrimitive (DirectX中的顶点绘制方法) ）命令GPU对指定物体进行一次渲染的操作即为DrawCall。此过程实质上就是在告诉GPU该使用哪个模型的数据（图形API函数的功能就是将CPU计算出的顶点数据渲染出来）。</li></ul><blockquote><p>在应用阶段有三个衡量性能指标非常重要的名词</p><blockquote><p>DrawCall</p><blockquote><p>CPU每次调用图形API接口命令GPU进行渲染的操作称为一次DrawCall</p></blockquote><p>SetPassCall</p><blockquote><p>设置/切换一次渲染状态</p></blockquote><p>Batch</p><blockquote><p>把数据加载到显存，设置渲染状态，CPU调用GPU渲染的过程称之为一个Batch</p></blockquote></blockquote><p><strong>注意：一个Batch包含至少一个DrawCall</strong><br><strong>详情见 <a href="https://sleepyloser.github.io/2024/08/05/Unity/Performance%20Optimization/Optimize_UI_Two/OptimizeUI_Two/">UGUI的优化方案(2)</a></strong></p></blockquote><h3 id="几何阶段"><a href="#几何阶段" class="headerlink" title="几何阶段"></a>几何阶段</h3>]]></content>
       
       
       <categories>
@@ -70,9 +70,9 @@
       
         <tags>
             
-            <tag> 渲染管线 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 渲染管线 </tag>
             
         </tags>
       
@@ -174,9 +174,9 @@
       
         <tags>
             
-            <tag> 纹理 </tag>
-            
             <tag> 实用工具 </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -344,6 +344,17 @@
     
     
     <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/css/custom.css"/>
       <url>/css/custom.css</url>
@@ -355,9 +366,20 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -388,39 +410,6 @@
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
-      
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/js/cursor.js"/>
       <url>/js/cursor.js</url>
@@ -432,9 +421,20 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -454,11 +454,11 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
