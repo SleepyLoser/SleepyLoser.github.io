@@ -1,7 +1,7 @@
 ---
 title: 将纹理批量转换成Json文件
-top_img: 'https://source.fomal.cc/img/dm1.webp'
-cover: 'https://source.fomal.cc/img/dm1.webp'
+top_img: '120498462_p0.jpg'
+cover: '109951168016315868.jpg'
 categories: 
     - Unity
       - 工具类

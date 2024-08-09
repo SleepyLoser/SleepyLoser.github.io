@@ -1,7 +1,7 @@
 ---
 title: Unity Texture
-top_img: 'https://source.fomal.cc/img/dm1.webp'
-cover: 'https://source.fomal.cc/img/dm1.webp'
+top_img: '114291391_p0.png'
+cover: '109115574_p0.png'
 categories: 
     - Unity
       - Texture

@@ -1,7 +1,7 @@
 ---
 title: 自动捕获UI变化
-top_img: 'https://source.fomal.cc/img/dm1.webp'
-cover: 'https://source.fomal.cc/img/dm1.webp'
+top_img: '121074821_p0.jpg'
+cover: '120811718_p0.jpg'
 categories: 
     - Unity
       - 工具类

@@ -1,7 +1,7 @@
 ---
 title: 进程、线程、协程之间的区别
-top_img: 'https://source.fomal.cc/img/dm1.webp'
-cover: 'https://source.fomal.cc/img/dm1.webp'
+top_img: '121247338_p0.jpg'
+cover: '100363262_p0.png'
 categories: 
     - 八股文
       - 计算机操作系统
