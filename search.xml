@@ -4,11 +4,36 @@
   
     
     <entry>
+      <title>左值、右值、纯右值、将亡值</title>
+      <link href="/2024/08/12/Eight-Part_Essay/C++/Left_Right_Value/LeftRightValue/"/>
+      <url>/2024/08/12/Eight-Part_Essay/C++/Left_Right_Value/LeftRightValue/</url>
+      
+        <content type="html"><![CDATA[<h2 id="左值、右值、纯右值、将亡值"><a href="#左值、右值、纯右值、将亡值" class="headerlink" title="左值、右值、纯右值、将亡值"></a>左值、右值、纯右值、将亡值</h2><ul><li>C++11使用下面两种独立的性质来区别类别：<ol><li><strong>拥有身份</strong>：指代某个非临时对象。</li><li><strong>可被移动</strong>：可被右值引用类型匹配。</li></ol></li><li>每个C++表达式只属于三种基本值类别中的一种：<code>左值 (lvalue)</code>、<code>纯右值 (prvalue)</code>、<code>将亡值 (xvalue)</code><ol><li>拥有身份且不可被移动的表达式被称作 <code>左值 (lvalue)</code> 表达式，指持久存在的对象或类型为左值引用类型的返还值。</li><li>拥有身份且可被移动的表达式被称作 <code>将亡值 (xvalue)</code> 表达式，一般是指类型为右值引用类型的返还值。</li><li>不拥有身份且可被移动的表达式被称作 <code>纯右值 (prvalue)</code> 表达式，也就是指纯粹的临时值（即使指代的对象是持久存在的）。</li><li>不拥有身份且不可被移动的表达式无法使用。</li></ol></li><li>如此分类是因为移动语义的出现，需要对类别重新规范说明。例如不能简单定义说右值就是临时值（因为也可能是std::move过的对象，该代指对象并不一定是临时值）。</li><li><strong>左值 :</strong></li></ul><ol><li>左值是一个数据的表达式（如变量名或引用的指针），我们<strong>可以获取到它的地址</strong>，正常情况下是可以能够对它赋值</li><li><strong>定义const修饰后的左值，不能给它赋值</strong>，但是可以取出它的地址</li><li>左值可以出现在赋值符号（ “ = “ ）的左边，也可以出现在赋值符号(“ = “ )的右边</li><li>左值具有持久的状态</li></ol><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> lValue = <span class="number">5</span>;</span><br><span class="line"><span class="type">int</span>* lValueP = <span class="keyword">new</span> <span class="built_in">int</span>();</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> lValueC = <span class="number">10</span>;</span><br></pre></td></tr></table></figure><ul><li><strong>左值引用 :</strong></li></ul><ol><li>左值引用是对左值的一种引用，相当于给左值取别名</li><li>普通的左值引用不能引用右值，<strong>但是const的左值引用可以引用右值</strong></li><li>引用方法: 类型+&amp;，例如： int&amp; lvalueReferenceP = lValueP; 引用变量</li></ol><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>&amp; lValueReference = lValue;</span><br><span class="line"><span class="type">int</span>*&amp; lValueReferenceP = lValueP;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span>&amp; lValueReferenceC_1 = <span class="number">10</span>; <span class="comment">// const的左值引用，引用右值</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span>&amp; lValueReferenceC_2 = <span class="number">10</span> + <span class="number">20</span>; <span class="comment">// const的左值引用，引用右值</span></span><br></pre></td></tr></table></figure><ul><li><strong>右值</strong></li></ul><ol><li>右值也是一个数据表达式，右值是<strong>字面常量</strong>或者是求值过程中创建的<strong>临时对象</strong></li><li>右值的生命周期是短暂的，如：<code>字面常量</code>，<code>表达式返回值</code>，<code>函数返回值</code>（不是左值引用的返回值），<code>临时变量</code>，<code>匿名对象</code>等等</li><li>右值不能出现在赋值符号的左边，右值也<strong>不能取出地址</strong>，更<strong>不能对它赋值</strong></li></ol><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 以下是常见的右值</span></span><br><span class="line">x + y; <span class="comment">// 表达式返回值</span></span><br><span class="line"><span class="built_in">function</span>(x, y); <span class="comment">// 函数返回值</span></span><br><span class="line"><span class="number">10</span>; <span class="comment">// 常量</span></span><br></pre></td></tr></table></figure><ul><li><strong>右值引用</strong></li></ul><ol><li>右值引用是给右值取别名，<strong>所有的右值引用是不能引用左值</strong></li><li><strong>右值是不能取出地址的</strong>，但是当右值<strong>取别名后，这个右值会被存到特定的位置，且可以取到该值的地址</strong>，也就是说右值引用值是一个左值</li><li>右值引用会开辟一块空间去存右值，其中普通的右值引用是可以被修改这块空间的，const的右值引用时不可以被修改的</li></ol><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>&amp;&amp; rValueReference = x + y; <span class="comment">// 正确</span></span><br><span class="line">rValueReference = <span class="number">20</span>; <span class="comment">// 正确，普通的右值引用可以被修改</span></span><br><span class="line"><span class="type">int</span>&amp;&amp; rValueReference = x; <span class="comment">// 错误，右值引用不能引用左值</span></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> rValueReferenceC = <span class="number">10</span>;</span><br><span class="line">rValueReferenceC = <span class="number">30</span>; <span class="comment">// 错误，rValueReferenceC是const右值引用，不能被修改</span></span><br><span class="line"><span class="comment">// 标准库中的move函数可以将一个左值强制转换为右值</span></span><br><span class="line"><span class="type">int</span>&amp;&amp; rValueReference = <span class="built_in">move</span>(x); <span class="comment">// 正确，move将x转化为左值</span></span><br></pre></td></tr></table></figure><h3 id="右值引用和移动拷贝构造函数"><a href="#右值引用和移动拷贝构造函数" class="headerlink" title="右值引用和移动拷贝构造函数"></a>右值引用和移动拷贝构造函数</h3><ul><li><p>为了解决<strong>深拷贝</strong>的问题，我们可以使用<strong>移动构造函数</strong>，移动构造函数本质是将参数右值中的资源给窃取过来，占为己有，这样就不用做深拷贝。本质上是窃取别人的资源来构造自己，然后作为右值直接释放掉。这样就不会去在堆区上拷贝构造新的资源。</p></li><li><p>使用移动拷贝构造函数后，源对象指向资源就被交换出去，<strong>这些资源的所有权都归属到了新对象</strong>，因此，如果<strong>源对象是一个长期存在的对象的时候</strong>，需要<strong>谨慎使用移动拷贝构造函数</strong>。调用移动拷贝构造函数创建出s2，s1的资源被转移到了s2，s1中没有指向任何资源，所以就<strong>不能通过s1去寻找之前的资源</strong>。</p></li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">string <span class="title">s1</span><span class="params">(<span class="string">&quot;123456&quot;</span>)</span></span>;</span><br><span class="line"><span class="function">string <span class="title">s2</span><span class="params">(move(s1))</span></span>; <span class="comment">// s1此时为NULL</span></span><br></pre></td></tr></table></figure><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li><strong>左值（lvalue）</strong> 指持久存在（有变量名）的对象或返还值类型为左值引用的返还值，是不可移动的。</li><li><strong>右值（rvalue）</strong> 包含了 <code>将亡值</code>、<code>纯右值</code>，是可移动（可被右值引用类型匹配）的值。</li><li>实际上C++ std::move函数的实现原理就是的强转成右值引用类型并返还之，因此该返还值会被判断为将亡值，更宽泛的说是被判定为右值。</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vector&amp; <span class="title">func1</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function">Vector&amp;&amp; <span class="title">func2</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function">Vector <span class="title">func3</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Vector v;</span><br><span class="line"></span><br><span class="line">    v;              <span class="comment">//左值表达式</span></span><br><span class="line">    <span class="built_in">func1</span>();        <span class="comment">//左值表达式，返还值是临时的，返还类型是左值引用，因此被认为不可移动。</span></span><br><span class="line">    <span class="built_in">func2</span>();        <span class="comment">//将亡值表达式，返还值是临时的，返还类型是右值引用，因此指代的对象即使非临时也会被认为可移动。</span></span><br><span class="line">    <span class="built_in">func3</span>();        <span class="comment">//纯右值表达式，返还值为临时值。</span></span><br><span class="line">    std::<span class="built_in">move</span>(v)；  <span class="comment">//将亡值表达式，std::move本质也是个函数，同上。</span></span><br><span class="line">    <span class="built_in">Vector</span>();       <span class="comment">//纯右值表达式</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C++ </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>一种UGUI的Outline描边优化方案</title>
       <link href="/2024/08/09/Unity/Performance_Optimization/Outline_Stroke_Optimization/OutlineStrokeOptimization/"/>
       <url>/2024/08/09/Unity/Performance_Optimization/Outline_Stroke_Optimization/OutlineStrokeOptimization/</url>
       
-        <content type="html"><![CDATA[<h2 id="性能消耗原因-例如顶点数量的大幅增加-分析"><a href="#性能消耗原因-例如顶点数量的大幅增加-分析" class="headerlink" title="性能消耗原因(例如顶点数量的大幅增加)分析"></a>性能消耗原因(例如顶点数量的大幅增加)分析</h2>]]></content>
+        <content type="html"><![CDATA[<h2 id="性能消耗原因-例如顶点数量的大幅增加-分析"><a href="#性能消耗原因-例如顶点数量的大幅增加-分析" class="headerlink" title="性能消耗原因(例如顶点数量的大幅增加)分析"></a>性能消耗原因(例如顶点数量的大幅增加)分析</h2><ul><li>描边的文字与美术同学出的效果图有不小的差异。效果图的描边效果连贯而且均匀，而UGUI的Outline组件的效果仅仅只是解决了“温饱问题”，Better Than Not而已，并且这种实现方式带来了其他问题，比如顶点数量的大幅增加。</li></ul><p><img src="效果图差异.png" alt="美术同学的效果图与实际实现的对比（放大至300%）" style="zoom:50%;"></p><h2 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h2><ul><li>通过研究Outline的源码可以看到，Outline组件的原理是在原顶点的基础上，在effectDistance.(x,y), (x, -y), (-x,y), (-x,-y)这4个偏移上ApplyShadowZeroAlloc实现的。亦即Outline组件是在Shadow的基础上实现的，Outline相当于4个不同偏移方向上的Shadow。</li></ul><p><img src="Outline组件核心源码.png" alt="UGUI Outline组件的核心源码" style="zoom:50%;"></p><ul><li>进一步查看Shadow的源码，发现Shadow的原理实际上是将原始的顶点数据复制一份, 根据设置的偏移量计算复制后的新顶点的位置，并为新的顶点颜色赋值为设置的颜色值。</li></ul><p><img src="Shadow组件核心源码.png" alt="Shadow组件的核心源码" style="zoom:50%;"></p><ul><li>我们可以简单地将Outline的参数EffectDistance调整到一个较大的值即可观察到4次复制。实际上Outline在处理1像素以上的描边时就会出现较大瑕疵，超过1.5像素就已经不可用了。</li></ul><h2 id="业界的一般做法"><a href="#业界的一般做法" class="headerlink" title="业界的一般做法"></a>业界的一般做法</h2><h3 id="基于Shadow"><a href="#基于Shadow" class="headerlink" title="基于Shadow"></a>基于Shadow</h3><ul><li>Outline的实现是在原始顶点的4个方向ApplyShadow，为了描边效果更好，可以在8个方向甚至16个方向ApplyShadow来实现饱满的描边效果。实现原理与Outline类似。</li></ul><h3 id="TextMeshPro"><a href="#TextMeshPro" class="headerlink" title="TextMeshPro"></a>TextMeshPro</h3><ul><li>注意TextMeshPro使用时需要制作字体文件，即FontAsset。对于英文及数字来说，只需要针对ASCII字符集制作FontAsset即可，但对于中文需要动态生成的文字来说，需要生成的字体文件相对较大，对于手游项目来说，对包量及内存的影响在目前来看都是不能接受的。</li><li>但TextMeshPro用在可确定的中文字符及ASCII字符上的效果还是不错的，比如用在登录、主界面这类文字不需要动态生成的界面上。</li></ul><h3 id="基于Mesh"><a href="#基于Mesh" class="headerlink" title="基于Mesh"></a>基于Mesh</h3><ul><li>实现思路如下：<ol><li>提取文字原始UV区域，扩大文字绘图区域</li><li>对文字纹理的每个像素点周围多次采样，应用描边RGBA作为新的点的颜色</li><li>将原始纹理及采样后的点进行融合</li></ol></li></ul><h2 id="第一次优化"><a href="#第一次优化" class="headerlink" title="第一次优化"></a>第一次优化</h2><ul><li>采用基于Shadow的实现方式，多次ApplyShadow以使描边效果饱和。</li><li>Outline的实现方式是在(x,-y),(x,y),(-x,y),(-x,-y)4个方向ApplyShadow。模仿Outline的实现有了新的BoldOutline，在原有的4个方向之外增加(x,0),(-x,0),(0,y),(0,-y)4个方向共计8个方向的描边。描边效果较Outline有了一定提升。</li></ul><p><img src="Outline和BoldOutline效果对比.png" alt="Outline和BoldOutline效果对比" style="zoom:50%;"></p><ul><li>但，顶点总数爆炸了</li></ul><p><img src="理论计算.png" alt="理论计算的各效果数值表" style="zoom:50%;"></p><ul><li>从理论上计算，Outline对于1个字符是绘制了5次，BoldOutline是绘制了9次，顶点总数及三角形总数相对于无效果的字符分别应该是5倍和9倍的关系。</li></ul><p><img src="实际运行.png" alt="实际运行时的各效果数值表" style="zoom:50%;"></p><ul><li>原因分析：<ol><li>在UGUI中Text是由TextGenerator产生顶点数据，通过顶点数据与字体贴图渲染到屏幕上的。</li><li>Text组件继承自MaskableGraphic，MaskableGraphic又继承自Graphic，Text组件实现了protected virtual void OnPopulateMesh(VertexHelper vh)方法为所需的数据赋值。</li><li>实现这些文字效果的基础是Unity为外部提供的接口IMeshModifier，如果Text组件所在的GameObject中存在实现了IMeshModifier接口的组件，就会调用对应组件的ModifyMesh方法。这样就可以在外部修改Text的顶点数据了。</li></ol></li></ul><p><img src="ModifyMesh.png" alt="典型的顶点修改组件结构" style="zoom:100%;"></p><ul><li>了解了各种文字效果实现的原理，继续来看关键函数ModifyMesh(VertexHelper vh)的具体实现。Text组件生成的顶点数据通过参数类型VertexHelper传入后，需要通过<code>public void GetUIVertexStream(List&lt;UIVertex&gt; stream)</code>这个方法获取具体数据。Verts/Tris比值的变化就发生在这个帮助函数中。这个函数将原本共享的三角形顶点做了拆分，按照1个三角形对应3个顶点的数据输出了。</li><li>引用一位国外Unity开发者的话讲：<code>GetUIVertexStream takes a nice optimized mesh with shared verts and completely ruins it. Dont call it. Ever.</code></li></ul><h2 id="第二次优化"><a href="#第二次优化" class="headerlink" title="第二次优化"></a>第二次优化</h2><blockquote><p>简单的基于Shadow的实现方式会引起顶点数量的暴涨，第二次优化将方向调整为了<strong>基于Mesh</strong>。实现思路如下：</p></blockquote><p><strong>在字符原UV边界uvOrigin的基础上，通过描边大小fSize计算描边后的UV边界uvAdd。</strong></p><p><strong>将原UV边界uvOrigin,扩展后的UV边界uvAdd,描边大小fSize以及描边颜色color传入Shader。将顶点信息传入Shader时需要注意，UIVertex结构体的成员如下：</strong></p><p><img src="UIVertex.png" alt="UIVertex结构体" style="zoom:100%;"></p><ul><li>没有被默认Shader使用的参数是uv1,normal及tangent。这些需要传给Shader的值就塞进这些参数里就可以了，在Shader中只要逆向解出一一对应即可。</li></ul><p><strong>对字符贴图像素处理时，从当前像素向四周做8次采样以确定当前像素点的值。采样时需要判断当前点是否是在uvOrigin的范围内，否则的话可能会出现采样到隔壁字符的情况。</strong></p><ul><li>判断当前点是否在uvOrigin的方法如下：在范围内返回1，不在范围内返回0</li></ul><p><img src="判断方法.png" alt="使用Step方法判断范围" style="zoom:100%;"></p><ul><li>沿当前像素采样的8个方向偏移，数组已经被解开，避免需要在Shader中用循环来实现。</li></ul><p><img src="采样偏移矩阵.png" alt="采样偏移矩阵" style="zoom:100%;"></p><ul><li>将所有采样点采样的像素值求和，然后除以采样的数量。</li></ul><p><img src="偏移采样.png" alt="对（-1，-1）偏移采样" style="zoom:100%;"></p><p><strong>在接下来的pass中将字符的原始贴图信息与刚刚计算得到的数据进行融合。</strong></p><ul><li>需要注意的是，不在uvOrigin中的像素点的color值直接置0.避免uvOrigin之外，uvAdd之内的脏点混进来。</li><li>于是我们就得到了这样的结果：</li></ul><p><img src="效果图.png" alt="描边2像素、15像素效果及对应数据" style="zoom:100%;"><br><img src="MeshOutline.png" alt="MeshOutline与其他效果对比数据" style="zoom:50%;"></p><p><strong>使用MeshOutline后Batches数量为2，而Outline因为是复制的原顶点信息，所以无论复制多少份Batches数量都为1（如果不理解的话可参考<a href="https://sleepyloser.github.io/2024/07/24/Unity/Performance_Optimization/Optimize_UI_One/OptimizeUI_One/">UGUI的优化方案(1)</a>和<a href="https://sleepyloser.github.io/2024/08/05/Unity/Performance_Optimization/Optimize_UI_Two/OptimizeUI_Two/">UGUI的优化方案(2)</a>）.总的来说，这种优化方式带来的是采样次数的增加及顶点数量的相对减少。</strong></p>]]></content>
       
       
       <categories>
@@ -371,22 +396,11 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
@@ -404,6 +418,17 @@
     
     
     <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/js/cursor.js"/>
       <url>/js/cursor.js</url>
@@ -415,42 +440,9 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
-      
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -470,9 +462,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -486,6 +478,39 @@
       <url>/subinterface/index.html</url>
       
         <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
