@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>A* 算法基础</title>
+      <link href="/2024/08/13/Unity/Utils/A_Star/AStar/"/>
+      <url>/2024/08/13/Unity/Utils/A_Star/AStar/</url>
+      
+        <content type="html"><![CDATA[<h2 id="A-算法基础"><a href="#A-算法基础" class="headerlink" title="A* 算法基础"></a>A* 算法基础</h2><h3 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h3><ul><li>Dijkstra算法用来寻找图形中节点之间的最短路径。</li><li>在Dijkstra算法中，需要计算<strong>每一个节点距离起点的总移动代价</strong>。同时，还需要一个<strong>优先队列结构</strong>。对于所有待遍历的节点，放入优先队列中会按照代价进行排序。</li><li>在算法运行的过程中，每次都从优先队列中选出代价最小的作为下一个遍历的节点。直到到达终点为止。</li><li>下面对比了不考虑节点移动代价差异的广度优先搜索与考虑移动代价的Dijkstra算法的运算结果：</li></ul><p><img src="Dijkstra.webp" alt="当图形为网格图，并且每个节点之间的移动代价是相等的，那么Dijkstra算法将和广度优先算法变得一样。" style="zoom:100%;"></p><h3 id="最佳优先搜索"><a href="#最佳优先搜索" class="headerlink" title="最佳优先搜索"></a>最佳优先搜索</h3><ul><li>在一些情况下，如果我们可以预先计算出每个节点到终点的距离，则我们可以利用这个信息更快的到达终点。</li><li>其原理也很简单。与Dijkstra算法类似，我们也使用一个优先队列，但此时以每个节点到达终点的距离作为优先级，每次始终选取到终点移动代价最小（离终点最近）的节点作为下一个遍历的节点。这种算法称之为最佳优先（Best First）算法。</li><li>这样做可以大大加快路径的搜索速度，如下图所示：</li></ul><p><img src="BestFirst.webp" alt="最佳优先算法" style="zoom:100%;"></p><ul><li>但这种算法会不会有什么缺点呢？答案是肯定的。</li><li>因为，如果起点和终点之间存在障碍物，则最佳优先算法找到的很可能不是最短路径，下图描述了这种情况。</li></ul><p><img src="BF.webp" alt="最佳优先算法的缺点" style="zoom:100%;"></p><h3 id="A-算法"><a href="#A-算法" class="headerlink" title="A* 算法"></a>A* 算法</h3><ul><li>A* 算法实际上是综合上面这些算法的特点于一身的。</li><li>A* 算法通过下面这个函数来计算每个节点的优先级。</li></ul><script type="math/tex; mode=display">f(n) = g(n) + h(n)</script><ul><li><p>其中：</p><ul><li>f(n)是节点n的综合优先级。当我们选择下一个要遍历的节点时，我们总会选取综合优先级最高（值最小）的节点。</li><li>g(n) 是节点n距离起点的代价。</li><li>h(n)是节点n距离终点的预计代价，这也就是A*算法的启发函数。关于启发函数我们在下面详细讲解。</li></ul></li><li><p>A*算法在运算过程中，每次从优先队列中选取f(n)值最小（优先级最高）的节点作为下一个待遍历的节点。</p></li><li>另外，A*算法使用两个集合来表示待遍历的节点，与已经遍历过的节点，我称之为<code>Open_List</code>和<code>Close_List</code>。</li><li>完整的A*算法描述如下：</li></ul><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">* 初始化open_set和close_set；</span><br><span class="line">* 将起点加入open_set中，并设置优先级为<span class="number">0</span>（优先级最高）；</span><br><span class="line">* 如果open_set不为空，则从open_set中选取优先级最高的节点n：</span><br><span class="line">    * 如果节点n为终点，则：</span><br><span class="line">        * 从终点开始逐步追踪parent节点，一直达到起点；</span><br><span class="line">        * 返回找到的结果路径，算法结束；</span><br><span class="line">    * 如果节点n不是终点，则：</span><br><span class="line">        * 将节点n从open_set中删除，并加入close_set中；</span><br><span class="line">        * 遍历节点n所有的邻近节点：</span><br><span class="line">            * 如果邻近节点m在close_set中，则：</span><br><span class="line">                * 跳过，选取下一个邻近节点</span><br><span class="line">            * 如果邻近节点m也不在open_set中，则：</span><br><span class="line">                * 设置节点m的parent为节点n</span><br><span class="line">                * 计算节点m的优先级</span><br><span class="line">                * 将节点m加入open_set中</span><br></pre></td></tr></table></figure><h4 id="启发函数"><a href="#启发函数" class="headerlink" title="启发函数"></a>启发函数</h4><ul><li><p>上面已经提到，启发函数会影响A*算法的行为。</p><ul><li>在极端情况下，当启发函数h(n)始终为0，则将由g(n)决定节点的优先级，此时算法就退化成了Dijkstra算法。</li><li>如果h(n)始终小于等于节点n到终点的代价，则A*算法保证一定能够找到最短路径。但是当h(n)的值越小，算法将遍历越多的节点，也就导致算法越慢。</li><li>如果h(n)完全等于节点n到终点的代价，则A*算法将找到最佳路径，并且速度很快。可惜的是，并非所有场景下都能做到这一点。因为在没有达到终点之前，我们很难确切算出距离终点还有多远。</li><li>如果h(n)的值比节点n到终点的代价要大，则A*算法不能保证找到最短路径，不过此时会很快。</li><li>在另外一个极端情况下，如果h(n)相较于g(n)大很多，则此时只有h(n)产生效果，这也就变成了最佳优先搜索。</li></ul></li><li><p>由上面这些信息我们可以知道，通过调节启发函数我们可以控制算法的速度和精确度。因为在一些情况，我们可能未必需要最短路径，而是希望能够尽快找到一个路径即可。这也是A*算法比较灵活的地方。</p></li><li><p>对于网格形式的图，有以下这些启发函数可以使用：</p><ul><li>如果图形中只允许朝上下左右四个方向移动，则可以使用曼哈顿距离（Manhattan distance）。</li><li>如果图形中允许朝八个方向移动，则可以使用对角距离。</li><li>如果图形中允许朝任何方向移动，则可以使用欧几里得距离（Euclidean distance）。</li></ul></li></ul><h4 id="关于距离"><a href="#关于距离" class="headerlink" title="关于距离"></a>关于距离</h4><h5 id="曼哈顿距离"><a href="#曼哈顿距离" class="headerlink" title="曼哈顿距离"></a>曼哈顿距离</h5><ul><li>如果图形中只允许朝上下左右四个方向移动，则启发函数可以使用曼哈顿距离，它的计算方法如下图所示:</li></ul><p><img src="MHD.webp" alt="曼哈顿距离" style="zoom:100%;"></p><ul><li>计算曼哈顿距离的函数如下。</li></ul><script type="math/tex; mode=display">|x1 - x2| + |y1 + y2|</script><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 曼哈顿距离</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name=&quot;v1&quot;&gt;</span>坐标1<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name=&quot;v2&quot;&gt;</span>坐标2<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span>两个坐标之间的曼哈顿距离<span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">ManhattanDistance</span>(<span class="params">Vector2 v1, Vector2 v2</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> Mathf.Abs(v1.x - v2.x) + Mathf.Abs(v1.y - v2.y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h5 id="对角距离-与-欧拉距离"><a href="#对角距离-与-欧拉距离" class="headerlink" title="对角距离 与 欧拉距离"></a>对角距离 与 欧拉距离</h5><ul><li>如果图形中允许<strong>斜着朝邻近的节点</strong> 或 <strong>任意方向</strong> 移动，则启发函数可以使用欧拉距离。</li><li>其函数表示如下（实际使用时通常不开根号，可以提高精度）：</li></ul><script type="math/tex; mode=display">\sqrt{ (x1 - x2) ^ 2 + (y1 - y2) ^ 2 }</script><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 欧拉距离的平方</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name=&quot;v1&quot;&gt;</span>坐标1<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name=&quot;v2&quot;&gt;</span>坐标2<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span>两个坐标之间的欧拉距离的平方<span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">EulerDistance</span>(<span class="params">Vector2 v1, Vector2 v2</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 统一不开根号，这样可以提高精度</span></span><br><span class="line">    <span class="keyword">return</span> Mathf.Pow(v1.x - v2.x, <span class="number">2</span>) + Mathf.Pow(v1.y - v2.y, <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><ul><li>调用A<em> 算法时需要自行根据项目需要调节启发函数（即下方代码中的<strong>CalculateH</strong>函数）和判断邻近节点合法性函数（即下方代码中的<em>*FindAdjacentNodesAndAddThemToTheOpenList</em></em>函数）</li><li>附 <a href="AStar.cs">A* 参考代码</a></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 算法 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> A* </tag>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Unity 批处理Component缺失 工具方案</title>
       <link href="/2024/08/12/Unity/Utils/Batch_Processing_Component_Missing/BatchProcessingComponentMissing/"/>
       <url>/2024/08/12/Unity/Utils/Batch_Processing_Component_Missing/BatchProcessingComponentMissing/</url>
@@ -147,9 +174,9 @@
       
         <tags>
             
-            <tag> 渲染管线 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 渲染管线 </tag>
             
         </tags>
       
@@ -421,6 +448,39 @@
     
     
     <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>文章分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -432,9 +492,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -465,17 +525,6 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
@@ -487,9 +536,9 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -514,28 +563,6 @@
       <url>/subinterface/index.html</url>
       
         <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
