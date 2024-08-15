@@ -104,12 +104,12 @@ public Texture2D DeCompress(Texture2D source)
     Graphics.Blit(source, renderTex);
     RenderTexture previous = RenderTexture.active;
     RenderTexture.active = renderTex;
-    Texture2D readableText = new Texture2D(source.width, source.height);
-    readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
-    readableText.Apply();
+    Texture2D readableTexture = new Texture2D(source.width, source.height);
+    readableTexture.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+    readableTexture.Apply();
     RenderTexture.active = previous;
     RenderTexture.ReleaseTemporary(renderTex);
-    return readableText;
+    return readableTexture;
 }
 ```
 
@@ -237,12 +237,12 @@ namespace HaruoYaguchi.Editor
             Graphics.Blit(source, renderTex);
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = renderTex;
-            Texture2D readableText = new Texture2D(source.width, source.height);
-            readableText.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
-            readableText.Apply();
+            Texture2D readableTexture = new Texture2D(source.width, source.height);
+            readableTexture.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+            readableTexture.Apply();
             RenderTexture.active = previous;
             RenderTexture.ReleaseTemporary(renderTex);
-            return readableText;
+            return readableTexture;
         }
 
     }    

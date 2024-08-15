@@ -138,5 +138,5 @@ float EulerDistance(Vector2 v1, Vector2 v2)
 
 #### 小结
 
-* 调用A* 算法时需要自行根据项目需要调节启发函数（即下方代码中的**CalculateH**函数）和判断邻近节点合法性函数（即下方代码中的**FindAdjacentNodesAndAddThemToTheOpenList**函数）
+* 调用AStar算法时需要自行根据项目需要调节启发函数（即下方代码中的**CalculateH**函数）和判断邻近节点合法性函数（即下方代码中的**FindAdjacentNodesAndAddThemToTheOpenList**函数）
 * 附 [A* 参考代码](AStar.cs)
