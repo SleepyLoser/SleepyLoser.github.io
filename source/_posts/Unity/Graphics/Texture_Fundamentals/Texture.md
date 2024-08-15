@@ -1,7 +1,7 @@
 ---
 title: Unity Texture
 top_img: '114291391_p0.png'
-cover: '74451735_p0.png'
+cover: '109115574_p0.png'
 categories: 
     - Unity
       - Texture
