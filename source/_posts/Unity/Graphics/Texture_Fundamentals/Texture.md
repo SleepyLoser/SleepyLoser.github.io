@@ -80,8 +80,8 @@ tags:
 * FrameBuffer就是GPU里渲染结果的目的地，我们绘制的**所有结果**（包括color depth stencil等）都最终存在这个这里，有一个默认的FBO它直接连着我们的显示器窗口区域，就是把我们的绘制物体绘制到显示器的窗口区域。但是**现代GPU通常可以创建很多其他的FBO**，这些FBO不连接窗口区域，这种我们创建的FBO的存在目的就是**允许我们将渲染结果保存在GPU的一块存储区域**，待之后使用。
 * 当渲染的结果被渲染到一个FBO上后，就有很多种方法得到这些结果，我们能想想的使用方式就是把这个结果作为一个Texture的形式得到，通常有这样几种方式得到这个贴图：
   * 将这个FBO上的结果传回CPU这边的贴图，在GLES中的实现一般是ReadPixels（）这样的函数，这个函数是将当前设为可读的FBO拷贝到CPU这边的一个存储Buffer，没错如果当前设为可读的FBO是那个默认FBO，那这个函数就是在截屏，如果是你自己创建的FBO，那就把刚刚绘制到上面的结果从GPU存储拿回内存。
-  * 将这个FBO上的结果拷贝到一个gpu上的texture，在GLES中的实现一般是CopyTexImage2D（），它一般是将可读的FBO的一部分拷贝到存在于gpu上的一个texture对象中，直接考到server-sider就意味着可以马上被gpu渲染使用
-  * 将这个FBO直接关联一个gpu上的texture对象，这样就等于在绘制时就直接绘制到这个texure上，这样也省去了拷贝时间，GLES中一般是使用FramebufferTexture2D（）这样的接口
+  * 将这个FBO上的结果拷贝到一个GPU上的Texture，在GLES中的实现一般是CopyTexImage2D（），它一般是将可读的FBO的一部分拷贝到存在于GPU上的一个Texture对象中，直接考到server-sider就意味着可以马上被GPU渲染使用
+  * 将这个FBO直接关联一个GPU上的Texture对象，这样就等于在绘制时就直接绘制到这个Texure上，这样也省去了拷贝时间，GLES中一般是使用FramebufferTexture2D（）这样的接口
 
 ### 渲染到RenderTexture的几种方式
 
@@ -114,7 +114,7 @@ RenderTexture.active = currentActiveRT;
 * **RenderTexture的分配和销毁**：如果你频繁的要new一个RenderTexture出来，那么不要直接new，而是使用RenderTexture提供的**GetTemporary**和**ReleaseTemporary**，它将在内部维护一个池，反复重用一些**大小格式一样**的RenderTexture资源，因为让GPU为你分配一个新的Texture其实是要耗时间的。更重要的这里还会调用DiscardContents
 * **DiscardContents**：这个RenderTexture的接口非常重要，好的习惯是你应该尽量在每次往一个已经有内容的RenderTexture上绘制之前总是调用它的这个DiscardContents函数，大致得到的优化是，在一些基于Tile的GPU上，RenderTexture和一些Tile的内存之间要存在着各种同步， 如果你准备往一个已经有内容的RenderTexture上绘制，将触发到这种同步，而这个函数告诉GPU这块RenderTexture的内容不用管他了，我反正是要重新绘制，这样就避免了这个同步而产生的巨大开销。总之还是尽量用**GetTemporary**这个接口吧，它会自动为你处理这个事情
 
-## 纹理采样
+## UI纹理采样
 
 * 在着色器里**采集纹理样本**是最常见的 **GPU 像素数据处理操作**。要想**修改**这段数据，可以**复制修改后的纹理**，或用**着色器**把修改渲染到一张纹理上。
 * 附 [Unity 渲染管线](https://sleepyloser.github.io/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/) 和 [纹理采样代码示例](https://sleepyloser.github.io/2024/08/15/Unity/Utils/TextureUtils/TextureUtil/) 供理解参考

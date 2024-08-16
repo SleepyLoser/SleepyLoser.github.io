@@ -39,7 +39,7 @@ tags:
 2. 如果这个UI元件频繁的出现，那么最好使用UISprite，因为这样它就可以和图集一起被载入内存，并不用新增一个DrawCall去渲染它。
 3. 对于一些展示型的图片，不会变化，只是起一个展示的作用，例如弹框上的花纹装饰，顶部的花圈, 一般都以Sprite的方式来制作和展示。
 
-### 存储纹理的数据结构
+### 存储纹理的结构体
 
 ``` C#
 [Serializable]
@@ -96,5 +96,140 @@ public struct TextureData
 ### 从Image组件中获取纹理数据
 
 ``` C#
+/// <summary>
+/// 从Image组件中获取纹理数据
+/// </summary>
+/// <param name="image">想要提取纹理数据的Image组件</param>
+/// <param name="atlasTexture">Image组件中精灵图的纹理</param>
+/// <returns>Image组件中的纹理数据</returns>
+public static TextureData GetTexture2DFromImage (Image image, Texture2D atlasTexture)
+{
+    float textureWidth;
+    float textureHeight;
+    float textureX = 0;
+    float textureY = 0;
+    // 如果Image的SourceImage使用的是原图
+    if (image.mainTexture == null || (image.sprite.rect.width == atlasTexture.width &&
+        image.sprite.rect.height == atlasTexture.height))
+    {
+        textureWidth = image.sprite.texture.width;
+        textureHeight = image.sprite.texture.height;
+    }
+    // 如果Image的SourceImage使用的是图集
+    else
+    {
+        textureWidth = image.sprite.textureRect.width;
+        textureHeight = image.sprite.textureRect.height;
+        textureY = image.sprite.textureRect.y;
+        textureX = image.sprite.textureRect.x;
+    }
 
+    TextureData textureData = new TextureData()
+    {
+        rectX = textureX.Equals(0) ? 0 : textureX / propertyScaleImage,
+        rectY = textureY.Equals(0) ? 0 : textureY / propertyScaleImage,
+        rectWidth = textureWidth.Equals(0) ? 0 : textureWidth / propertyScaleImage,
+        rectHeight = textureHeight.Equals(0) ? 0 : textureHeight / propertyScaleImage,
+        rectOffsetX = image.sprite.textureRectOffset.x.Equals(0) ? 0 : image.sprite.textureRectOffset.x / propertyScaleImage,
+        rectOffsetY = image.sprite.textureRectOffset.y.Equals(0) ? 0 : image.sprite.textureRectOffset.y / propertyScaleImage,
+        width = image.sprite.rect.width.Equals(0) ? 0 : (int)image.sprite.rect.width / propertyScaleImage,
+        height = image.sprite.rect.height.Equals(0) ? 0 : (int)image.sprite.rect.height / propertyScaleImage,
+        name = image.sprite.name.Equals("") ? image.GetHashCode().ToString() : image.sprite.name,
+    };
+
+    if (atlasTexture.name.Equals(""))
+    {
+        textureData.atlasName = image.name + "_" + atlasTexture.GetHashCode();
+    }
+    else
+    {
+        textureData.atlasName = atlasTexture.name;
+    }
+    // textureData.atlasPath = ;
+    textureData.creationDate = DateTimeOffset.Now.ToUnixTimeSeconds() + textureData.atlasName;
+
+    return textureData;
+}
+```
+
+### 从RawImage组件中获取纹理数据
+
+``` C#
+
+```
+
+### 获取Texture2D的渲染数据
+
+``` C#
+// 精灵图缩放比例
+public static int propertyScaleImage = 1;
+
+/// <summary>
+/// 获取Texture2D的渲染数据
+/// </summary>
+/// <param name="source">源纹理</param>
+/// <param name="renderTex">指定的渲染纹理</param>
+/// <param name="sourceMaterial">要使用的材质。如果您不提供材质，将使用默认材质。</param>
+/// <returns>Texture2D的渲染数据</returns>
+public static Texture2D CopyTextureByBlit(Texture2D source, RenderTexture renderTex = null, Material sourceMaterial = null)
+{
+
+    Material material = new Material(sourceMaterial);
+    material.SetVector("_ClipRect", new Vector4(0, 0, 0, 1));
+
+    // 如果使用的是内置渲染管线，则当 dest 为 null 时，Unity 将屏幕后备缓冲区用作 blit 目标。
+    // 但是，如果将主摄像机设置为渲染到 RenderTexture（即 Camera.main 具有非 null 的 targetTexture 属性）则 blit 使用主摄像机的渲染目标作为目标。
+    // 为确保 blit 确实写入到屏幕后备缓冲区，在调用 Blit 前请务必将 Camera.main.targetTexture 设置为 null。
+
+    RenderTexture currentCameraRenderTexture = null;
+    if (renderTex == null)
+    {
+        
+        if (Camera.main != null)
+        {
+            currentCameraRenderTexture = Camera.main.targetTexture;
+        }
+        if (currentCameraRenderTexture != null)
+        {
+            Camera.main.targetTexture = null;
+        }
+    }
+
+    Graphics.Blit(source, renderTex, material);
+
+    RenderTexture previous = RenderTexture.active;
+    RenderTexture.active = renderTex;
+
+    Texture2D readableTexture = new Texture2D(source.width, source.height);
+    readableTexture.ReadPixels(new Rect(0, 0, renderTex.width, renderTex.height), 0, 0);
+
+    RenderTexture.active = previous;
+    if (Camera.main != null && currentCameraRenderTexture != null)
+    {
+        Camera.main.targetTexture = currentCameraRenderTexture;
+    }
+
+    return readableTexture;
+}
+```
+
+### 获取Texture的渲染数据
+
+``` C#
+/// <summary>
+/// 获取Texture的渲染数据（复制纹理最快的方法，但，只能复制纹理，无法复制材质信息，源纹理要可读且无法复制压缩纹理）
+/// </summary>
+/// <param name="sourceTexture">源纹理</param>
+/// <returns>Texture的渲染数据</returns>
+public static Texture2D CopyTextureByCT(Texture sourceTexture)
+{
+    if (!sourceTexture.isReadable || sourceTexture == null)
+    {
+        return null;
+    }
+    Texture2D myTexture2D = new Texture2D(sourceTexture.width, sourceTexture.height, TextureFormat.ARGB32, false);
+    Graphics.CopyTexture(sourceTexture, myTexture2D);
+    myTexture2D.Apply();
+    return myTexture2D;
+}
 ```
