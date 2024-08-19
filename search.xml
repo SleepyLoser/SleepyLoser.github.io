@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>手撕队列（queue）</title>
+      <link href="/2024/08/19/Eight-Part_Essay/C++/Custom_Queue/CustomQueue/"/>
+      <url>/2024/08/19/Eight-Part_Essay/C++/Custom_Queue/CustomQueue/</url>
+      
+        <content type="html"><![CDATA[<h2 id="手撕队列（基于数组）"><a href="#手撕队列（基于数组）" class="headerlink" title="手撕队列（基于数组）"></a>手撕队列（基于数组）</h2><ul><li>关键点在于头指针和尾指针在队列清空时的调整（MyQueue::pop()），不当的操作可能导致清空后的空间无法重复使用，不断扩容。</li><li>可对扩容操作（MyQueue::push()）做进一步优化（数据前移）。</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyQueue</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    T* _data;</span><br><span class="line">    <span class="type">int</span> _front;</span><br><span class="line">    <span class="type">int</span> _rear;</span><br><span class="line">    <span class="type">int</span> _size;</span><br><span class="line">    <span class="type">int</span> _capacity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">MyQueue</span>();</span><br><span class="line">    <span class="built_in">MyQueue</span>(<span class="type">int</span> capacity);</span><br><span class="line">    ~<span class="built_in">MyQueue</span>();</span><br><span class="line">    <span class="function">T <span class="title">front</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">T <span class="title">back</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">T <span class="title">size</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">T <span class="title">pop</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">bool</span> <span class="title">empty</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">push</span><span class="params">(T num)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">MyQueue&lt;T&gt;::<span class="built_in">MyQueue</span>() : _front(<span class="number">0</span>), _rear(<span class="number">-1</span>), _size(<span class="number">0</span>), _capacity(<span class="number">4</span>)</span><br><span class="line">&#123;</span><br><span class="line">    _data = <span class="keyword">new</span> T[<span class="number">4</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">MyQueue&lt;T&gt;::<span class="built_in">MyQueue</span>(<span class="type">int</span> capacity) : _front(<span class="number">0</span>), _rear(<span class="number">-1</span>), _size(<span class="number">0</span>), _capacity(capacity)</span><br><span class="line">&#123;</span><br><span class="line">    _data = <span class="keyword">new</span> T[capacity];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">MyQueue&lt;T&gt;::~<span class="built_in">MyQueue</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">delete</span>[] _data;</span><br><span class="line">    _data = <span class="literal">nullptr</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">T MyQueue&lt;T&gt;::<span class="built_in">front</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_size == <span class="number">0</span>) <span class="keyword">throw</span> <span class="string">&quot;队列为空&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> _data[_front];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">T MyQueue&lt;T&gt;::<span class="built_in">back</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_size == <span class="number">0</span>) <span class="keyword">throw</span> <span class="string">&quot;队列为空&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> _data[_rear];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">T MyQueue&lt;T&gt;::<span class="built_in">size</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> _size;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line">T MyQueue&lt;T&gt;::<span class="built_in">pop</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_size == <span class="number">0</span>) <span class="keyword">throw</span> <span class="string">&quot;队列为空&quot;</span>;</span><br><span class="line">    T value = _data[_front];</span><br><span class="line">    _front = (_front + <span class="number">1</span>) % _capacity;</span><br><span class="line">    <span class="keyword">if</span> (_front == <span class="number">0</span>) _rear = <span class="number">0</span>;</span><br><span class="line">    --_size;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="type">bool</span> MyQueue&lt;T&gt;::<span class="built_in">empty</span>()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> _size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="type">void</span> MyQueue&lt;T&gt;::<span class="built_in">push</span>(T element)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (_size == _capacity)</span><br><span class="line">    &#123;</span><br><span class="line">        _capacity *= <span class="number">2</span>;</span><br><span class="line">        T* newData = <span class="keyword">new</span> T[_capacity];</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; _size; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            newData[i] = _data[i];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">delete</span>[] _data;</span><br><span class="line">        _data = newData;</span><br><span class="line">        newData = <span class="literal">nullptr</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ++_rear;</span><br><span class="line">    _data[_rear] = element;</span><br><span class="line">    ++_size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="手撕队列（基于链表）"><a href="#手撕队列（基于链表）" class="headerlink" title="手撕队列（基于链表）"></a>手撕队列（基于链表）</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">待更新</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 数据结构 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>纹理工具</title>
       <link href="/2024/08/15/Unity/Utils/TextureUtils/TextureUtil/"/>
       <url>/2024/08/15/Unity/Utils/TextureUtils/TextureUtil/</url>
@@ -20,9 +47,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -201,9 +228,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -305,9 +332,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -475,9 +502,20 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -497,11 +535,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -519,22 +557,22 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -552,11 +590,11 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -574,22 +612,11 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
