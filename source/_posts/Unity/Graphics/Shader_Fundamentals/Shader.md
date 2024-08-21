@@ -452,7 +452,7 @@ Shader "Custom/TestShader"
                 float4 vertex : POSITION;       // 顶点坐标
                 float3 normal : NORMAL;         // 法线
                 float4 texcoord : TEXCOORD0;    // 第一纹理坐标
-                UNITY_VERTEX_INPUT_INSTANCE_ID  // ID信息
+                // UNITY_VERTEX_INPUT_INSTANCE_ID  // ID信息
             }; // 记得打分号
 
             // 顶点着色器
