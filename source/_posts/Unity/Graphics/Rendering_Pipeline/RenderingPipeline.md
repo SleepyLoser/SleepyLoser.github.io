@@ -73,6 +73,7 @@ tags:
 * **一句话简单说，确定形状的点**
 
 <img src="顶点着色器.png" alt="坐标转换" style="zoom:50%;">
+<img src="几何阶段着色器.png" alt="几何阶段着色器" style="zoom:50%;">
 
 #### 裁剪
 
