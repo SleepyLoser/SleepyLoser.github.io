@@ -4,6 +4,133 @@
   
     
     <entry>
+      <title>碎玉零珠————计算机网络</title>
+      <link href="/2024/08/22/Eight-Part_Essay/Computer_Network/Broken_Jade_Beads/BrokenJadeBeads/"/>
+      <url>/2024/08/22/Eight-Part_Essay/Computer_Network/Broken_Jade_Beads/BrokenJadeBeads/</url>
+      
+        <content type="html"><![CDATA[<h2 id="OSI-七层模型"><a href="#OSI-七层模型" class="headerlink" title="OSI 七层模型"></a>OSI 七层模型</h2><h2 id="TCP-IP-四层模型"><a href="#TCP-IP-四层模型" class="headerlink" title="TCP / IP 四层模型"></a>TCP / IP 四层模型</h2><h2 id="TCP-IP-五层体系结构"><a href="#TCP-IP-五层体系结构" class="headerlink" title="TCP / IP 五层体系结构"></a>TCP / IP 五层体系结构</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网路 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>页面置换算法</title>
+      <link href="/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Page_Replacement/PageReplacement/"/>
+      <url>/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Page_Replacement/PageReplacement/</url>
+      
+        <content type="html"><![CDATA[<h2 id="页面置换算法简介"><a href="#页面置换算法简介" class="headerlink" title="页面置换算法简介"></a>页面置换算法简介</h2><ul><li>进程运行时，若其访问的页面不在内存而需将其调入（<strong>缺页异常</strong>），但内存已无空闲空间时，就需要从内存中调出一页程序或数据，送入磁盘的对换区，其中选择调出页面的算法就称为页面置换算法。</li><li>好的页面置换算法应有<strong>较低的页面更换频率</strong>，也就是说，应将以后不会再访问或者以后较长时间内不会再访问的页面先调出。</li><li>页面置换算法的目标是<strong>最小化缺页中断的次数</strong>，常见的页面置换算法有<code>最佳⻚⾯置换算法（OPT）</code>、<code>先进先出置换算法（FIFO）</code>、<code>最近最久未使⽤的置换算法（LRU）</code>、<code>时钟页面置换算法</code>和<code>最不常⽤置换算法</code>等。</li></ul><h2 id="最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）"><a href="#最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）" class="headerlink" title="最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）"></a>最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）</h2><ul><li>理论上的最佳算法，因为它可以保证最低的缺页率。但在实际应用中，由于无法预知未来的访问模式，OPT 通常无法实现。</li></ul><p><img src="最佳页面置换.png" alt="最佳页面置换" style="zoom:100%;"></p><h2 id="先进先出置换算法（优先淘汰最早进入内存的页面）"><a href="#先进先出置换算法（优先淘汰最早进入内存的页面）" class="headerlink" title="先进先出置换算法（优先淘汰最早进入内存的页面）"></a>先进先出置换算法（优先淘汰最早进入内存的页面）</h2><ul><li>FIFO 算法维护一个队列，新来的页面加入队尾，当发生页面置换时，队头的页面（即最早进入内存的页面）被移出。</li></ul><p><img src="先进先出置换.png" alt="先进先出置换" style="zoom:100%;"></p><ul><li><strong>FIFO 和 OPT 算法的区别在于：除了在时间上向后或向前看之外，FIFO 算法使用的是页面调入内存的时间，OPT 算法使用的是页面将来使用的时间</strong></li></ul><h2 id="最近最久未使用的置换算法（淘汰最近没有使用的页面）"><a href="#最近最久未使用的置换算法（淘汰最近没有使用的页面）" class="headerlink" title="最近最久未使用的置换算法（淘汰最近没有使用的页面）"></a>最近最久未使用的置换算法（淘汰最近没有使用的页面）</h2><ul><li>LRU 算法根据页面的访问历史（维护一个链表）来进行置换，<strong>最长时间未被访问的页面</strong>将被置换出去。</li><li>相对更接近最优算法的效果，因为最近未使用的页面可能在将来也不会被使用。但 LRU 算法的实现需要跟踪页面的访问历史，可能会增加系统的开销。</li></ul><p><img src="最近最久未使用.png" alt="最近最久未使用" style="zoom:100%;"></p><h2 id="时钟页面置换算法"><a href="#时钟页面置换算法" class="headerlink" title="时钟页面置换算法"></a>时钟页面置换算法</h2><ul><li>通过一个类似钟⾯的（环形链表）遍历页面，每个页面有一个使用位，当页面被访问时，使用位设置为 1。</li><li>当需要页面置换时，时钟指针会顺时针移动，直到找到使用位为 0 的页面进行置换。这个过程类似于给每个页面一个二次机会。算法执行时，会先将使用位从 1 清零，如果该页面再次被访问，它的使用位再次被设置为 1。</li></ul><p><img src="时钟页面置换.png" alt="时钟页面置换" style="zoom:100%;"></p><h2 id="最不常用置换算法"><a href="#最不常用置换算法" class="headerlink" title="最不常用置换算法"></a>最不常用置换算法</h2><ul><li>根据页面被访问的频率进行置换，<strong>访问次数最少的页面最先被置换</strong>。实现较为复杂，需要记录每个页面的访问频率。</li><li>它的实现方式是，对每个页面设置⼀个<strong>访问计数器</strong>，每当⼀个页面被访问时，该页面的访问计数器就累加 1。在发生缺页中断时，淘汰计数器值最小的那个页面。</li><li>看起来很简单，每个页面加⼀个计数器就可以实现了，但是在操作系统中实现的时候，我们需要考虑效率和硬件成本的。<ol><li>要增加⼀个计数器来实现，这个硬件成本是比较高的，另外如果要对这个计数器查找哪个页面访问次数最小，查找链表本身，如果链表很长，是非常耗时的，效率不高。</li><li>还有个问题，LFU 算法只考虑了频率问题，没考虑时间的问题，比如有些页面在过去时间里访问的频率很高，但是现在已经没有访问了，而当前频繁访问的页面由于没有这些页面访问的次数高，在发生缺页中断时，就会可能会误伤当前刚开始频繁访问，但访问次数还不高的页面。</li></ol></li><li>这个问题的解决的办法还是有的，可以定期减少访问的次数，比如当发生时间中断时，把过去时间访问的页面的访问次数除以 2，也就说，随着时间的流失，以前的高访问次数的页面会慢慢减少，相当于加大了被置换的概率。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机操作系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>碎玉零珠————计算机操作系统</title>
+      <link href="/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Broken_Jade_Beads/BrokenJadeBeads/"/>
+      <url>/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Broken_Jade_Beads/BrokenJadeBeads/</url>
+      
+        <content type="html"><![CDATA[<h2 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h2><ul><li><strong>并发</strong>：<strong>在一段时间内</strong>，多个任务都会被处理。<strong>但在某一时刻，只有一个任务在执行</strong>。单核处理器做到的并发，其实是利用时间片的轮转，例如有两个进程 A 和 B，A 运行一个时间片之后，切换到 B，B 运行一个时间片之后又切换到 A。因为切换速度足够快，所以宏观上表现为在一段时间内能同时运行多个程序。</li><li><strong>并行</strong>：<strong>在同一时刻</strong>，有多个任务在执行。这个<strong>需要多核处理器才能完成</strong>，在微观上就能同时执行多条指令，不同的程序被放到不同的处理器上运行，这个是物理上的多个进程同时进行。</li></ul><p><img src="并发与并行.png" alt="并发与并行" style="zoom:100%;"></p><h2 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h2><ul><li><strong>运⾏状态（Runing）</strong>：该时刻进程占⽤ CPU；</li><li><strong>就绪状态（Ready）</strong>：可运⾏，由于其他进程处于运⾏状态⽽暂时停⽌运⾏；</li><li><strong>阻塞状态（Blocked）</strong>：该进程正在等待某⼀事件发⽣（如等待输⼊/输出操作的完成）⽽暂时停⽌运⾏，这时，即使给它 CPU 控制权，它也⽆法运⾏；</li><li><strong>创建状态（new）</strong>：进程正在被创建时的状态；</li><li><strong>结束状态（Exit）</strong>：进程正在从系统中消失时的状态；</li></ul><p><img src="进程的状态.png" alt="进程的状态" style="zoom:100%;"></p><h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><ul><li>进程是一个正在执行的程序的实例。<strong>每个进程有自己独立的地址空间、全局变量、堆栈、和文件描述符等资源</strong>。</li><li>线程是进程中的一个执行单元。一个进程可以包含多个线程，<strong>它们共享进程的地址空间和资源</strong>。</li><li>每个进程在独立的地址空间中运行，<strong>不会</strong>直接影响其他进程。线程共享<strong>同一个进程</strong>的内存空间、全局变量和文件描述符。</li><li>进程切换需要保存和恢复大量的上下文信息，代价较高。线程切换相对较轻量，因为线程共享进程的地址空间，只需要保存和恢复线程私有的数据。</li><li>线程的生命周期由进程控制，进程终止时，其所有线程也会终止。</li></ul><div class="table-container"><table><thead><tr><th>特性</th><th>进程</th><th>线程</th></tr></thead><tbody><tr><td>地址空间</td><td>独立</td><td>共享</td></tr><tr><td>内存开销</td><td>高</td><td>低</td></tr><tr><td>上下文切换</td><td>慢，开销大</td><td>快，开销小</td></tr><tr><td>通信</td><td>需要IPC机制，开销较大</td><td>共享内存，直接通信</td></tr><tr><td>创建销毁</td><td>开销大，较慢</td><td>开销小，较快</td></tr><tr><td>并发性</td><td>低</td><td>高</td></tr><tr><td>崩溃影响</td><td>一个进程崩溃不会影响其他进程</td><td>一个线程崩溃可能导致整个进程崩溃</td></tr></tbody></table></div><h2 id="线程上下文切换"><a href="#线程上下文切换" class="headerlink" title="线程上下文切换"></a>线程上下文切换</h2><ul><li>这还得看线程是不是属于同⼀个进程：<ol><li>当两个线程<strong>不属于</strong>同⼀个进程，则切换的过程就跟进程上下⽂切换⼀样；</li><li>当两个线程<strong>属于</strong>同⼀个进程，因为<strong>虚拟内存是共享的</strong>，所以在切换时，虚拟内存这些资源就保持不动，<strong>只需要切换线程的私有数据、寄存器等不共享的数据</strong>；</li></ol></li><li>所以，线程的上下⽂切换相⽐进程，开销要⼩很多。</li></ul><h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><ul><li>允许两个或多个进程共享一个给定的内存区，一个进程写⼊的东西，其他进程⻢上就能看到。</li><li>共享内存是最快的进程间通信方式，它是针对其他进程间通信方式运行效率低而专门设计的。</li><li><strong>缺点</strong>：当多进程竞争同一个共享资源时，会造成数据错乱的问题。</li></ul><p><img src="共享内存.png" alt="共享内存" style="zoom:50%;"></p><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><ul><li>我们实际的物理内存主要是主存，但是物理主存空间有限，所以一般现代操作系统都会想办法把一部分内存块放到磁盘中，用到的时候再装入主存，但是对用户程序而言，是不需要注意实际的物理内存的，为什么呢？因为有<code>虚拟内存</code>的机制。</li><li>简单说，<strong>虚拟内存是操作系统提供的⼀种机制，将不同进程的虚拟地址和不同内存的物理地址映射起来</strong>。</li><li>每个进程都有自己独立的地址空间，再由操作系统映射到到实际的物理内存。</li><li>于是，这⾥就引出了两种地址的概念：<ol><li>程序所使⽤的内存地址叫做虚拟内存地址（Virtual Memory Address）。</li><li>实际存在硬件⾥⾯的空间地址叫物理内存地址（Physical Memory Address）。<br><img src="虚拟内存.png" alt="虚拟内存" style="zoom:50%;"></li></ol></li></ul><h3 id="为什么要使用虚拟内存？"><a href="#为什么要使用虚拟内存？" class="headerlink" title="为什么要使用虚拟内存？"></a>为什么要使用虚拟内存？</h3><ul><li>程序是运行在内存中的，程序运行时会将保存在硬盘上的程复制到RAM内存（载入内存），然后CPU执行内存中的程序代码。</li><li>如果执行的程序占用内存很大或很多，或同时执行多个程序，就会导致内存消耗殆尽。从而导致程序执行异常或崩溃。</li></ul><h3 id="虚拟内存工作原理"><a href="#虚拟内存工作原理" class="headerlink" title="虚拟内存工作原理"></a>虚拟内存工作原理</h3><ul><li>当进程开始运行时，先将一部分程序装入内存，另一部分暂时留在外存；当要执行的指令不在内存时，由系统自动完成将它们调入内存的工作；当没有足够的内存时，系统自动选择部分内存（暂不执行的程序）空间，将其中原有的内容交换到磁盘上，并释放这些内存空间供其他进程使用。</li><li>这样做的结果使程序的运行丝毫不受影响，使程序在运行中感觉到拥有一个不受内存容量约束的、虚拟的、能够满足自己需求的存储器。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机操作系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>进程调度算法</title>
+      <link href="/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Process_Scheduling/ProcessScheduling/"/>
+      <url>/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Process_Scheduling/ProcessScheduling/</url>
+      
+        <content type="html"><![CDATA[<h2 id="进程的调度方式"><a href="#进程的调度方式" class="headerlink" title="进程的调度方式"></a>进程的调度方式</h2><ul><li><p>通常有以下两种进程调度方式：</p><ol><li><strong>非剥夺（非抢占）调度方式</strong>：当一个进程正在处理机上执行时，即使有某个更为重要或者紧迫的进程进入就绪队列，仍然让正在执行的进程继续执行，直到该进程完成或发生某种事件而进入阻塞态时，才把处理机分配给更为重要或紧迫（优先级更高）的进程。其优点是实现简单，系统开销小，适用于大多数批处理系统，但它不能用于分时系统和大多数实时系统。</li><li><strong>剥夺（抢占）调度方式</strong>：当一个进程正在处理机上执行时，若有某个更为重要或紧迫的进程（优先级更高）的进程需要使用处理机，则立即暂停正在执行的进程，将处理机分配给这个更重要的进程。这种方式对提高系统吞吐率和响应效率都有明显的好处。但抢占也要遵循一定原则。</li></ol></li></ul><h2 id="调度的基本准则"><a href="#调度的基本准则" class="headerlink" title="调度的基本准则"></a>调度的基本准则</h2><ul><li>主要有以下几种：<ol><li><strong>CPU利用率</strong>：CPU是计算机系统中最重要和最昂贵的资源之一，所以应该尽可能使得CPU保持忙的状态，资源利用率尽可能高。</li><li><strong>系统吞吐量</strong>：单位时间内CPU完成的作业数量。长作业需要消耗较长的处理机时间，会降低系统的吞吐量。对于短作业，他们所需消耗的处理机时间较短，因此能提高系统吞吐量。调度算法和方式不同，也会对系统的吞吐量产生较大影响。</li><li><strong>周转时间</strong>：周转时间是指<strong>从作业提交到作业完成所经历的时间</strong>，是作业等待、在就绪队列中排队，在处理机上运行及输入输出操作所花费的时间的总和。</li><li><strong>等待时间</strong>：进程处于等处理机状态的时间之和。等待时间越长，用户满意度越低。实际上，处理机调度算法实际上并不影响作业执行或输入输出操作的时间，只影响作业在就绪队列中等待所花的时间。因此，<strong>衡量一个调度算法的优劣，常常只需简单地考察等待时间</strong>。</li><li><strong>响应时间</strong>：用户提交请求到系统首次产生响应所用的时间。在交互式系统中，周转时间不可能是最好的评价准则，一般采用响应时间作业衡量调度算法的重要准则之一。从用户角度来看，调度策略应该尽量降低响应时间，使得响应时间处在用户能接受的范围之内。</li></ol></li><li>总之，想得到一个满足所有用户和系统要求的算法几乎是不可能的。设计调度程序，一方面要满足特定系统用户的要求（比如，实时和交互进程的快速响应要求），另一方面要考虑系统整体的效率（比如，减少整个系统的进程平均周转时间），同时还要考虑调度算法的开销等。</li></ul><h2 id="几种典型的调度算法"><a href="#几种典型的调度算法" class="headerlink" title="几种典型的调度算法"></a>几种典型的调度算法</h2><ul><li><strong>先来先服务（FCFS）调度算法</strong></li><li><strong>短作业优先（SJF）调度算法</strong></li><li><strong>优先级调度算法</strong></li><li><strong>高响应比优先调度算法</strong><ul><li>在每次进行作业调度时，先计算后备队列中每个作业的响应比，从中选出响应比最高的作业投入运行。</li><li>响应比 = (等待时间+要求服务时间) / 要求服务时间</li><li>根据公式可知：<ol><li>作业的等待时间相同时，要求服务时间约旦，响应比越高，有利于短作业。</li><li>要求服务时间相同时，作业的响应比由其等待时间决定，等待时间越长，其响应比越高，因而它实现的是先来先服务。</li><li>对于长作业，作业的响应比可以随等待时间的增加而提高，等待时间足够长时，其响应比便可升到很高，从而可以获得处理机，不会饿死。</li></ol></li></ul></li><li><strong>时间片轮转调度算法</strong><ol><li>时间片轮转调度算法主要适用于分时系统。在这种算法中，系统将所有就绪进程按到达时间的先后次序排成一个队列，进程调度程序<strong>总是选择就绪队列中的第一个进程执行，即先来先服务的原则，但是仅能运行一个时间片</strong>。在使用完一个时间片后，即使进程并未完成其运行，它也必须释放出（被抢占）处理机给下一个就绪的进程，而被抢占的进程返回到就绪队列的末尾重新排队，等候再次运行。</li><li>在时间片轮转的调度算法中，时间片的大小对系统性能有很大影响。如果<strong>时间片足够大</strong>，以至于所以进程都能在一个事件内执行完毕，则时间片轮转调度算法就<strong>退化成FCFS算法</strong>。如果<strong>时间片很小</strong>，则处理机将在进程间过于频繁地切换，使得<strong>处理机开销增大</strong>，而真正用于运行用户进程的时间将减少。因此，时间片的选择要适当，可以根据系统响应时间、就绪队列中的进程数目和系统的处理能力等决定。</li></ol></li><li><strong>多级反馈队列调度算法</strong><ol><li>设置多个就绪队列，并为各个队列赋予不同的优先级，第一级队列的优先级最高，第二级队列次之，其余队列的优先级逐次降低。</li><li>赋予各个队列中进程执行时间片的大小各不相同。在优先级越高的队列中，每个进程的运行时间片越小。例如，第二级队列的时间片要比第一级队列的时间片长一倍…第i+1级队列的时间片要比第i级队列的时间片长一倍。</li><li>当一个新的进程进入内存后，首先将它放入第一级队列的末尾，按FCFS原则排队等待调度。当轮到该进程执行时候，如果它能在时间片内完成，便可准备撤离系统；若它在一个时间片结束时尚未完成，调度程序便将该进程转入第二级末尾，再同样按FCFS原则等待调度执行；若它在第二级队列中运行一个时间片后仍未完成，再以同样的方法进入第三级队列…如此下去，当一个长进程从第一级队列一次降到第n级队列后，在第n级队列中便采用时间片轮转方式进行。</li><li>仅当第一级队列为空时，调度程序才调度第二级队列中的进程进行；仅当第1到（i-1）级队列均为空，才会调度第i级队列中的进程运行。若处理机正在执行第i级队列中的某个进程，此时又有新的进程进入优先级较高的队列（第1到（i-1）级的任意一级），则此时行进程将抢占正在运行的处理机，即由调度程序把正在运行的进程放回第i级队列末尾，把处理机分配给新到的更高优先级进程。</li></ol><ul><li>这种调度方法优势如下：<ol><li>终端型作业用户：短作业优先。</li><li>短批处理作业用户：周转时间较短。</li><li>长批处理作业用户：经过前面几个队列得到部分执行，不会饿死。<br><img src="多级反馈队列.png" alt="多级反馈队列算法" style="zoom:100%;"></li></ol></li></ul></li></ul><h3 id="例题"><a href="#例题" class="headerlink" title="例题"></a>例题</h3><ul><li>根据下表给出的进程调度信息，描述分别采用FCFS、非抢占式SJF、抢占式SJF调度算法、非抢占式优先权、抢占式优先权及时间片轮转（时间片为1）算法的执行次序，并计算平均周转时间和平均等待时间。（注：优先数越大，优先级越小）</li></ul><div class="table-container"><table><thead><tr><th>进程</th><th>到达时刻（秒）</th><th>执行时间（秒）</th><th>优先级</th></tr></thead><tbody><tr><td>P1</td><td>0</td><td>10</td><td>3</td></tr><tr><td>P2</td><td>2</td><td>1</td><td>1</td></tr><tr><td>P3</td><td>4</td><td>2</td><td>3</td></tr><tr><td>P4</td><td>5</td><td>1</td><td>4</td></tr><tr><td>P5</td><td>6</td><td>5</td><td>2</td></tr></tbody></table></div><ul><li>解答：</li></ul><p><img src="进程调度.png" alt="进程调度题解" style="zoom:100%;"></p><ul><li>平均周转时间和平均等待时间的求解:</li></ul><div class="table-container"><table><thead><tr><th>进程</th><th>FCFS周期时间</th><th>抢占式SJF周转时间</th><th>非抢占式SJF周转时间</th><th>非抢占式优先级周转时间</th><th>抢占式优先级周转时间</th><th>时间片轮转周转时间</th></tr></thead><tbody><tr><td>P1</td><td>10s</td><td>19s</td><td>10s</td><td>10s</td><td>16s</td><td>19s</td></tr><tr><td>P2</td><td>9s</td><td>1s</td><td>9s</td><td>9s</td><td>1s</td><td>1s</td></tr><tr><td>P3</td><td>9s</td><td>3s</td><td>10s</td><td>14s</td><td>14s</td><td>4s</td></tr><tr><td>P4</td><td>9s</td><td>1s</td><td>7s</td><td>14s</td><td>14s</td><td>2s</td></tr><tr><td>P5</td><td>13s</td><td>6s</td><td>13s</td><td>10s</td><td>5s</td><td>11s</td></tr><tr><td>平均周转时间</td><td>8s</td><td>6s</td><td>9.8s</td><td>11.4s</td><td>10s</td><td>7.4s</td></tr></tbody></table></div><ul><li>提示：用进程到达（提交）的时间减去最终进程完成的时间即可。</li></ul><div class="table-container"><table><thead><tr><th>进程</th><th>FCFS周期时间</th><th>抢占式SJF周转时间</th><th>非抢占式SJF周转时间</th><th>非抢占式优先级周转时间</th><th>抢占式优先级周转时间</th><th>时间片轮转周转时间</th></tr></thead><tbody><tr><td>P1</td><td>10s</td><td>19s</td><td>10s</td><td>10s</td><td>16s</td><td>19s</td></tr><tr><td>P2</td><td>9s</td><td>1s</td><td>9s</td><td>9s</td><td>1s</td><td>1s</td></tr><tr><td>P3</td><td>9s</td><td>3s</td><td>10s</td><td>14s</td><td>14s</td><td>4s</td></tr><tr><td>P4</td><td>9s</td><td>1s</td><td>7s</td><td>14s</td><td>14s</td><td>2s</td></tr><tr><td>P5</td><td>13s</td><td>6s</td><td>13s</td><td>10s</td><td>5s</td><td>11s</td></tr><tr><td>平均周转时间</td><td>8s</td><td>6s</td><td>9.8s</td><td>11.4s</td><td>10s</td><td>7.4s</td></tr></tbody></table></div><ul><li>提示：进程到达（提交）后，只要没有执行完并且没有分配处理机，就是在等待状态。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机操作系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>继 Unity Shader</title>
+      <link href="/2024/08/21/Unity/Graphics/Shader_Fundamentals/Shader_Two/"/>
+      <url>/2024/08/21/Unity/Graphics/Shader_Fundamentals/Shader_Two/</url>
+      
+        <content type="html"><![CDATA[<h2 id="继-Unity-Shader"><a href="#继-Unity-Shader" class="headerlink" title="继 Unity Shader"></a>继 Unity Shader</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - Shader </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+            <tag> Shader </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>手撕队列（queue）</title>
       <link href="/2024/08/19/Eight-Part_Essay/C++/Custom_Queue/CustomQueue/"/>
       <url>/2024/08/19/Eight-Part_Essay/C++/Custom_Queue/CustomQueue/</url>
@@ -502,17 +629,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>文章分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -524,11 +640,33 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
+      
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
       
     </entry>
     
@@ -540,17 +678,6 @@
       <url>/css/custom.css</url>
       
         <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -569,21 +696,10 @@
     
     <entry>
       <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
       
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
       
     </entry>
     
@@ -593,6 +709,17 @@
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
