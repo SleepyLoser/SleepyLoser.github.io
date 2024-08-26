@@ -8,7 +8,7 @@
       <link href="/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/"/>
       <url>/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/</url>
       
-        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2>]]></content>
+        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2><h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><ul><li>const修饰符用来定义常量，具有不可变性。在类中，被const修饰的成员函数，不能修改类中的数据成员；</li><li><strong>指针常量</strong>指的是该指针本身是一个常量，不能被修改，但是指针指向的对象可以被修改；</li><li><strong>常量指针</strong>指的是这个指针指向的对象是一个常量，不能被修改，但是指针本身可以被修改。</li></ul><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><h2 id="malloc-与-new"><a href="#malloc-与-new" class="headerlink" title="malloc 与 new"></a>malloc 与 new</h2><ul><li>C使用malloc / free, C++使用new / delete, 前者是C语言中的库函数，后者是C++语言的运算符</li><li>对于自定义对象，malloc/free只进行分配内存和释放内存，无法调用其构造函数和析构函数</li><li>只有new/delete能做到，完成对象的空间分配和初始化，以及对象的销毁和释放空间</li><li>所有二者<strong>不可混用</strong></li><li>具体区别如下：<ol><li>new分配内存空间无需指定分配内存大小，malloc需要；</li><li>new返回类型指针，类型安全，malloc返回void*，再强制转换成所需要的类型；</li><li>new是从自由存储区获得内存，malloc从堆中获取内存；</li><li>对于类对象，new会调用构造函数和析构函数，malloc不会（核心）。</li></ol></li></ul>]]></content>
       
       
       <categories>
@@ -679,53 +679,9 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -745,11 +701,11 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
@@ -767,9 +723,9 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -789,9 +745,53 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
