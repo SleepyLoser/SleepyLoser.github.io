@@ -4,11 +4,115 @@
   
     
     <entry>
+      <title>碎玉零珠————计算机组成原理</title>
+      <link href="/2024/08/27/Eight-Part_Essay/Computer_Organization/Broken_Jade_Beads/BrokenJadeBeads/"/>
+      <url>/2024/08/27/Eight-Part_Essay/Computer_Organization/Broken_Jade_Beads/BrokenJadeBeads/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机组成原理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机组成原理 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Cache对代码的影响</title>
+      <link href="/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Impact_Of_Cache_On_Code/TheImpactOfCacheOnCode/"/>
+      <url>/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Impact_Of_Cache_On_Code/TheImpactOfCacheOnCode/</url>
+      
+        <content type="html"><![CDATA[<h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><ul><li>代码片段一</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> array[<span class="number">10</span>][<span class="number">128</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">128</span>; j++)</span><br><span class="line">        array[i][j] = <span class="number">1</span>;</span><br></pre></td></tr></table></figure><ul><li>代码片段二</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> array[<span class="number">10</span>][<span class="number">128</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">128</span>; i++)</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">10</span>; j++)</span><br><span class="line">        array[j][i] = <span class="number">1</span>;</span><br></pre></td></tr></table></figure><ul><li>我们假设使用的L1 Cache Line大小是64字节，采用写分配及写回策略。继续假设数组 array 内存首地址是64字节对齐。</li></ul><h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><ul><li>在有了以上背景假设后，我们先分析下<code>片段1</code>导致的Cache Miss / Hit情况。</li><li>当执行 <code>array[0][0]</code> = 1 时，Cache 控制器发现 <code>array[0][0]</code> 的值不在Cache中，此时发生一次 Cache Miss。然后从主存中读取 <code>array[0][0]</code> 到 <code>array[0][15]</code> 的内存值到 Cache 中。</li><li>当执行访问 <code>array[0][1]</code> = 1 时会发生一次 Cache Hit。此时内存访问速度极快。接着继续往下执行，会一直 Cache Hit。</li><li>直到执行 <code>array[0][16]</code> = 1，此时会 Cache Miss。总结来说就是访问内存每发生一次 Cache Miss。接下来会发生15次 Cache Hit。</li><li>因此这种初始化方法<strong>Cache命中率很高</strong>。</li></ul><hr><ul><li>我们再来分析下<code>片段2</code>。</li><li>当执行 <code>array[0][0]</code> = 1 时，Cache 控制器发现 <code>array[0][0]</code> 的值不在 Cache 中，此时发生一次 Cache Miss。然后从主存中读取 <code>array[0][0]</code> 到 <code>array[0][15]</code> 的内存值到 Cache 中。</li><li>当执行访问 <code>array[1][0]</code> = 1 时依然发生一次 Cache Miss。一直执行到 <code>array[9][0]</code> = 1 依然是一次Cache Miss。</li><li>现在思考下，访问 <code>array[0][1]</code> 会是怎么情况呢？此时就需要考虑 Cache 的大小了。如果<strong>Cache大小大于数组 array 大小</strong>，Cache 此时相当于缓存了整个 array 数组的内容。那么后续访问其他元素，确实是 Cache Hit。似乎和片段1代码分析结果差不多。</li><li>但是如果 Cache 的大小很小，例如只有数组一半大小，那么 Cache 命中率就很明显会降低。同样的 Cache 大小，<code>片段1</code> 的代码依然会获得很高的cache命中率。</li></ul><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>在大多数情况下，<code>片段1</code> 代码的性能比 <code>片段2</code> 好。因此我们倾向 <code>片段1</code> 代码的写法。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机组成原理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Cache的基本原理</title>
+      <link href="/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/"/>
+      <url>/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/</url>
+      
+        <content type="html"><![CDATA[<h2 id="为什么需要Cache"><a href="#为什么需要Cache" class="headerlink" title="为什么需要Cache"></a>为什么需要Cache</h2><h3 id="程序是如何运行起来的"><a href="#程序是如何运行起来的" class="headerlink" title="程序是如何运行起来的"></a>程序是如何运行起来的</h3><ul><li>程序是运行在 RAM（随机存储器） 之中，我们称之为 main memory（主存）。当我们需要运行一个进程的时候，首先会从磁盘设备（例如，eMMC、UFS、SSD等）中将可执行程序load到主存中，然后开始执行。</li><li>在CPU内部存在一堆的通用寄存器（register）。如果 CPU 需要将一个变量（假设地址是A）加1，一般分为以下3个步骤：<ol><li>CPU 从主存中读取地址 A 的数据到内部通用寄存器 x0（ARM64架构的通用寄存器之一）。</li><li>通用寄存器 x0 加1。</li><li>CPU 将通用寄存器 x0 的值写入主存。</li></ol></li></ul><p><img src="变量加一过程.png" alt="变量加一过程" style="zoom:100%;"></p><ul><li>其实现实中，CPU通用寄存器的速度（&lt; 1ns）和主存（~ 65ns）之间存在着太大的差异。</li><li>因此，上面举例的3个步骤中，步骤1和步骤3实际上速度很慢。当CPU试图从主存中 Load / Store 操作时，由于主存的速度限制，CPU不得不等待这漫长的65ns时间。</li><li>如果我们采用更快材料制作更快速度的主存，并且拥有几乎差不多的容量, 其成本将会大幅度上升。我们试图提升主存的速度和容量，又期望其成本很低，这就有点难为人了。</li><li>因此，我们有一种折中的方法，那就是制作一块速度极快但是容量极小的存储设备。那么其成本也不会太高。这块存储设备我们称之为<strong>Cache Memory</strong>。</li><li>在硬件上，我们将Cache放置在CPU和主存之间，作为主存数据的缓存。</li><li>当CPU试图从主存中 Load / Store数据的时候，CPU会首先从 Cache 中查找对应地址的数据是否缓存在 Cache 中。如果其数据缓存在 Cache 中，直接从 Cache 中拿到数据并返回给CPU。</li></ul><p><img src="变量加一过程(2).png" alt="变量加一过程(2)" style="zoom:100%;"></p><ul><li>CPU和主存之间直接数据传输的方式转变成 CPU 和 Cache 之间直接数据传输。Cache 负责和主存之间数据传输。</li></ul><h2 id="多级Cache存储结构"><a href="#多级Cache存储结构" class="headerlink" title="多级Cache存储结构"></a>多级Cache存储结构</h2>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机组成原理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>矩阵快速幂</title>
+      <link href="/2024/08/26/Unity/Utils/Matrix_Fast_Power/MatrixFastPower/"/>
+      <url>/2024/08/26/Unity/Utils/Matrix_Fast_Power/MatrixFastPower/</url>
+      
+        <content type="html"><![CDATA[<h2 id="快速幂"><a href="#快速幂" class="headerlink" title="快速幂"></a>快速幂</h2><ul><li>快速幂是一种高效的指数运算方法，通过指数折半或二进制位运算减少计算次数。</li><li>如下：快速计算base的power次方</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// base：底数，power：指数</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">FastPower</span><span class="params">(<span class="type">int</span> base, <span class="type">int</span> power)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> result = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (power)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 表示按位与操作，相当于power % 2</span></span><br><span class="line">        <span class="keyword">if</span> (power &amp; <span class="number">1</span>) result *= base;</span><br><span class="line">        <span class="comment">// 右移运算符，相当于 power /= 2</span></span><br><span class="line">        power &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        base *= base;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 快速幂取模运算</span></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="type">long</span> <span class="title">FastPower</span><span class="params">(<span class="type">int</span> base, <span class="type">int</span> power, <span class="type">int</span> model)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> result = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (power)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (power &amp; <span class="number">1</span>) result = (result * base) % model;</span><br><span class="line">        power &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        base = (base * base) % model;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="矩阵快速幂"><a href="#矩阵快速幂" class="headerlink" title="矩阵快速幂"></a>矩阵快速幂</h2><ul><li>例：降低斐波那契（Fibonacci）数列的时间、空间复杂度</li></ul><p><img src="juzhen.png" alt="推导过程" style="zoom:50%;"></p><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 矩阵相乘运算</span></span><br><span class="line"><span class="comment">// x，y：需要计算的两个矩阵</span></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">MatrixMul</span>(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; x, vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; y)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> sizeARow = x.<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> sizeAColumn = x[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> sizeBColumn = y[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">result</span>(sizeARow, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(sizeBColumn, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; sizeARow; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; sizeBColumn; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; sizeAColumn; ++k)</span><br><span class="line">            &#123;</span><br><span class="line">                result[i][j] += x[i][k] * y[k][j];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 矩阵相乘取模运算</span></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">MatrixMul</span>(vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; x, vector&lt;vector&lt;<span class="type">int</span>&gt;&gt;&amp; y, <span class="type">int</span> model)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> sizeARow = x.<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> sizeAColumn = x[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">    <span class="type">int</span> sizeBColumn = y[<span class="number">0</span>].<span class="built_in">size</span>();</span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">result</span>(sizeARow, <span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(sizeBColumn, <span class="number">0</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; sizeARow; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; sizeBColumn; ++j)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; sizeAColumn; ++k)</span><br><span class="line">            &#123;</span><br><span class="line">                result[i][j] = (result[i][j] + (x[i][k] % model) * (y[k][j] % model)) % model;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算一个2 * 2矩阵的n次方</span></span><br><span class="line">vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; <span class="built_in">MatrixFastPower</span>(<span class="type">int</span> n)</span><br><span class="line">&#123;</span><br><span class="line">    --n;</span><br><span class="line">    <span class="comment">// 初始矩阵</span></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; matrix = &#123;&#123;<span class="number">1</span>, <span class="number">1</span>&#125;, &#123;<span class="number">1</span>, <span class="number">0</span>&#125;&#125;;</span><br><span class="line">    <span class="comment">// 初始矩阵的n - 1次方</span></span><br><span class="line">    vector&lt;vector&lt;<span class="type">int</span>&gt;&gt; result = &#123;&#123;<span class="number">1</span>, <span class="number">0</span>&#125;, &#123;<span class="number">0</span>, <span class="number">1</span>&#125;&#125;;</span><br><span class="line">    <span class="keyword">while</span> (n)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (n &amp; <span class="number">1</span>) result = <span class="built_in">MatrixMul</span>(result, matrix);</span><br><span class="line">        n &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">        matrix = <span class="built_in">MatrixMul</span>(matrix, matrix);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 算法 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 算法 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>碎玉零珠———— C++</title>
       <link href="/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/"/>
       <url>/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/</url>
       
-        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2><h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><ul><li>const修饰符用来定义常量，具有不可变性。在类中，被const修饰的成员函数，不能修改类中的数据成员；</li><li><strong>指针常量</strong>指的是该指针本身是一个常量，不能被修改，但是指针指向的对象可以被修改；</li><li><strong>常量指针</strong>指的是这个指针指向的对象是一个常量，不能被修改，但是指针本身可以被修改。</li></ul><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><h2 id="malloc-与-new"><a href="#malloc-与-new" class="headerlink" title="malloc 与 new"></a>malloc 与 new</h2><ul><li>C使用malloc / free, C++使用new / delete, 前者是C语言中的库函数，后者是C++语言的运算符</li><li>对于自定义对象，malloc/free只进行分配内存和释放内存，无法调用其构造函数和析构函数</li><li>只有new/delete能做到，完成对象的空间分配和初始化，以及对象的销毁和释放空间</li><li>所有二者<strong>不可混用</strong></li><li>具体区别如下：<ol><li>new分配内存空间无需指定分配内存大小，malloc需要；</li><li>new返回类型指针，类型安全，malloc返回void*，再强制转换成所需要的类型；</li><li>new是从自由存储区获得内存，malloc从堆中获取内存；</li><li>对于类对象，new会调用构造函数和析构函数，malloc不会（核心）。</li></ol></li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2><h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><ul><li>const修饰符用来定义常量，具有不可变性。在类中，被const修饰的成员函数，不能修改类中的数据成员；</li><li><strong>指针常量</strong>指的是该指针本身是一个常量，不能被修改，但是指针指向的对象可以被修改；</li><li><strong>常量指针</strong>指的是这个指针指向的对象是一个常量，不能被修改，但是指针本身可以被修改。</li></ul><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><ul><li>static 变量在类的声明中不占用内存（未赋值），因此必须在.cpp文件中定义类静态变量以分配内存；</li><li>文件域的静态变量和类的静态成员变量<strong>在main执行之前的静态初始化过程中分配内存并初始化</strong>（已赋值）；</li><li>局部静态变量在<strong>第一次使用时分配内存并初始化</strong>；</li><li>赋予字面值时会在<strong>编译阶段</strong>就被初始化, 加载时将其映射到内存空间。</li></ul><h4 id="静态数据的存储"><a href="#静态数据的存储" class="headerlink" title="静态数据的存储"></a>静态数据的存储</h4><ul><li><strong>全局（静态）存储区</strong>：分为 DATA 段和 BSS 段。DATA 段（全局初始化区）存放初始化的全局变量和静态变量；BSS 段（全局未初始化区）存放未初始化的全局变量和静态变量。程序运行结束时自动释放。</li><li>其中BBS段在程序执行之前会被系统自动清0，所以未初始化的全局变量和静态变量<strong>在程序执行之前</strong>已经为0。</li><li>存储在静态数据区的变量会<strong>在程序刚开始运行时</strong>就完成初始化，也是<strong>唯一</strong>的一次初始化。</li><li>在 C++ 中 static 的内部实现机制：静态数据成员要在程序一开始运行时就必须存在。因为函数在程序运行中被调用，所以静态数据成员不能在任何函数内分配空间和初始化。</li></ul><h2 id="malloc-与-new"><a href="#malloc-与-new" class="headerlink" title="malloc 与 new"></a>malloc 与 new</h2><ul><li>C使用malloc / free, C++使用new / delete, 前者是C语言中的库函数，后者是C++语言的运算符</li><li>对于自定义对象，malloc/free只进行分配内存和释放内存，无法调用其构造函数和析构函数</li><li>只有new/delete能做到，完成对象的空间分配和初始化，以及对象的销毁和释放空间</li><li>所有二者<strong>不可混用</strong></li><li>具体区别如下：<ol><li>new分配内存空间无需指定分配内存大小，malloc需要；</li><li>new返回类型指针，类型安全，malloc返回void*，再强制转换成所需要的类型；</li><li>new是从自由存储区获得内存，malloc从堆中获取内存；</li><li>对于类对象，new会调用构造函数和析构函数，malloc不会（核心）。</li></ol></li></ul><h2 id="inline-与-define"><a href="#inline-与-define" class="headerlink" title="inline 与 define"></a>inline 与 define</h2><h3 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h3><ul><li>使编译器在函数调用点上展开函数，可以避免函数调用的栈开销；</li><li>内联函数的<strong>缺点</strong>是可能造成代码膨胀，尤其是递归的函数，会造成大量内存开销，exe太大，占用CPU资源。此外，内联函数不方便调试，每次修改会重新编译头文件，增加编译时间。</li></ul><h3 id="二者区别"><a href="#二者区别" class="headerlink" title="二者区别"></a>二者区别</h3><ul><li>define宏命令是在预处理阶段对命令进行替换，inline是在编译阶段在函数调用点处直接展开函数，节省了函数调用的栈开销；</li><li>define<strong>不会</strong>对参数的类型进行检查的，因此会出现类型安全的问题。比如定义一个max命令，但是传递的时候可能会传递一个整数和一个字符串，就会出错；</li><li>内联函数在编译阶段会进行类型检查；</li><li>使用宏的时候可能要添加很多括号，比较容易出错。</li></ul><h2 id="各种排序算法的原理和时间复杂度"><a href="#各种排序算法的原理和时间复杂度" class="headerlink" title="各种排序算法的原理和时间复杂度"></a>各种排序算法的原理和时间复杂度</h2><ol><li><strong>快速排序</strong>：一轮划分，选择一个基准值，小于该基准值的元素放到左边，大于的放在右边，此时该基准值在整个序列中的位置就确定了，接着递归地对左边子序列和右边子序列进行划分。时间复杂度O(nlogn)，最坏的时间复杂度是O(n^2)。<strong>需要排序的对象越有序，快速排序的退化程度越高，即时间复杂度越趋向于O(n ^ 2)</strong>；</li><li><strong>堆排序</strong>：利用完全二叉树性质构造的一个一维数组，用数组下标代表结点，则一个结点的左孩子下标为2i+1,右孩子为2i+2，一个结点的父节点为(i-1)/2。堆排序的思想就是，构造一个最大堆或者最小堆，以最大堆为例，那么最大的值就是根节点，把这个最大值和最后一个结点交换，然后在从前n-1个结点中构造一个最大堆，再重复上述的操作，即每次将现有序列的最大值放在现有数组的最后一位，最后就会形成一个有序数组；求升序用最大堆，降序用最小堆。时间复杂度O(nlogn)；</li><li><strong>冒泡排序</strong>：从前往后两两比较，逆序则交换，不断重复直到有序；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>插入排序</strong>：类似打牌，从第二个元素开始，把每个元素插入前面有序的序列中；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>选择排序</strong>：每次选择待排序列中的最小值和未排序列中的首元素交换；时间复杂度O(n^2);</li><li><strong>归并排序</strong>：将整个序列划分成最小的&gt;=2的等长序列，排序后再合并，再排序再合并，最后合成一个完整序列。时间复杂度O(nlogn)。</li><li><strong>希尔排序</strong>：是插入排序的改进版，取一个步长划分为多个子序列进行排序，再合并（如135一个序列，246一个序列），时间复杂度O(n1.3)，最好O(n)，最坏O(n^2)；</li><li><strong>桶排序</strong>：将数组分到有限数量的桶里。每个桶再个别排序，最后依次把各个桶中的记录列出来记得到有序序列。桶排序的平均时间复杂度为线性的O(N+C)，其中C = N * (logN - logM)，M为桶的数量。最好的情况下为O(N)。</li></ol>]]></content>
       
       
       <categories>
@@ -224,9 +328,9 @@
       
         <tags>
             
-            <tag> 纹理 </tag>
-            
             <tag> 实用工具 </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -405,9 +509,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -509,9 +613,9 @@
       
         <tags>
             
-            <tag> 纹理 </tag>
-            
             <tag> 实用工具 </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -613,9 +717,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -679,33 +783,11 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
-      
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
@@ -723,9 +805,42 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -756,17 +871,6 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/css/font_bilibili.css"/>
       <url>/css/font_bilibili.css</url>
@@ -778,9 +882,9 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -789,11 +893,11 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
