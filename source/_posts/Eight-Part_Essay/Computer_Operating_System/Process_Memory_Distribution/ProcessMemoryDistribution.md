@@ -1,7 +1,7 @@
 ---
 title: 进程内存分布
-top_img: '119683453_p2.jpg'
-cover: '101091270_p0.png'
+top_img: '100700212_p0.jpg'
+cover: '92607177_p0.png'
 categories: 
     - 八股文
       - 计算机操作系统
