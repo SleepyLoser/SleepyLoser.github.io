@@ -30,3 +30,7 @@ tags:
 * 如果调用 AssetBundle.LoadAsset() 重新加载M，Unity不会将已有的M副本作为AB中的数据的实例，因此，Unity会加载一个新的M的副本，这样，Scene中就会有两个不同的M的副本。
 
 <img src="646eeff5fc5d3d30c01cf6f13de9475e.jpg" alt="AB包内存管理" style="zoom:50%;">
+
+* 附AB包流程
+
+<img src="AB包流程.png" alt="AB包流程" style="zoom:50%;">
