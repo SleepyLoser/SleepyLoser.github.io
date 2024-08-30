@@ -4,11 +4,65 @@
   
     
     <entry>
+      <title>继 渲染管线</title>
+      <link href="/2024/08/30/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/"/>
+      <url>/2024/08/30/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/</url>
+      
+        <content type="html"><![CDATA[<h2 id="渲染管线中各个阶段的可控性"><a href="#渲染管线中各个阶段的可控性" class="headerlink" title="渲染管线中各个阶段的可控性"></a>渲染管线中各个阶段的可控性</h2><div class="table-container"><table><thead><tr><th>阶段名</th><th>具体步骤</th><th>可控程度</th><th>由谁控制</th></tr></thead><tbody><tr><td>应用阶段</td><td></td><td>完全可控</td><td>应用程序编程</td></tr><tr><td>几何阶段</td><td>顶点着色</td><td>完全可控</td><td>Vertex Shader</td></tr><tr><td></td><td>几何着色</td><td>完全可控</td><td>Geometry Shader</td></tr><tr><td></td><td>投影</td><td>完全可控</td><td>Vertex Shader 中编程</td></tr><tr><td></td><td>视锥体裁剪</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>屏幕映射</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>背面剔除</td><td>可配置</td><td>Shader 中的选项，cull back</td></tr><tr><td>光栅化</td><td>三角形设置</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>三角形遍历</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td>逐像素阶段</td><td>顶点属性插值</td><td>不可控</td><td>硬件中的 Attribute Setup 组件负责</td></tr><tr><td></td><td>Early Z-Test（深度测试）</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>片元着色</td><td>完全可控</td><td>Fragment Shader</td></tr><tr><td></td><td>混合</td><td>可配置</td><td>Shader中的选项，blend命令等</td></tr></tbody></table></div>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 渲染管线 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Cache的组织方式</title>
+      <link href="/2024/08/30/Eight-Part_Essay/Computer_Organization/Cache_Organization_Method/CacheOrganizationMethod/"/>
+      <url>/2024/08/30/Eight-Part_Essay/Computer_Organization/Cache_Organization_Method/CacheOrganizationMethod/</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机组成原理 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Cache </tag>
+            
+            <tag> 计算机组成原理 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>进程内存分布</title>
       <link href="/2024/08/28/Eight-Part_Essay/Computer_Operating_System/Process_Memory_Distribution/ProcessMemoryDistribution/"/>
       <url>/2024/08/28/Eight-Part_Essay/Computer_Operating_System/Process_Memory_Distribution/ProcessMemoryDistribution/</url>
       
-        <content type="html"><![CDATA[<h2 id="内存分布"><a href="#内存分布" class="headerlink" title="内存分布"></a>内存分布</h2><ul><li><p>以32位系统为例，共有4G的寻址能力，进程在内存中的分布如下图所示。Linux默认将高地址的1G空间分配给内核，称为内核空间，剩下的3G空间分配给进程使用，称为用户空间。</p><p>  | 操作系统内核区 | 用户不可见 |<br>  | —-           | —-       |<br>  | 用户栈        | 栈指针，向下扩展 |<br>  | 动态堆        | 向上扩展 |<br>  | 全局区（静态区）| .data初始化 .bss未初始化 |<br>  | 文字常量区（只读数据）| 常量字符串 |<br>  | 程序代码区 | 栈指针，向下扩展 |</p></li></ul><p><img src="进程内存分布.png" alt="进程内存分布" style="zoom:100%;"></p><h3 id="栈区"><a href="#栈区" class="headerlink" title="栈区"></a>栈区</h3><ul><li>由编译器自动分配释放，速度较快</li><li>用来存储函数调用时的临时信息的结构，存放为运行时函数分配的<strong>局部变量</strong>、<strong>函数参数</strong>、<strong>返回数据</strong>、<strong>返回地址</strong>等。这些局部变量等空间都会被释放</li><li>程序运行过程中函数调用时参数的传递也在栈上进行，如递归调用栈</li><li>当栈过多的时候，就是导致栈溢出（比如大量的递归调用或者大量的内存分配）</li><li>栈是向低地址扩展的数据结构，是一块连续的内存的区域，空间有限</li></ul><h3 id="堆区"><a href="#堆区" class="headerlink" title="堆区"></a>堆区</h3><ul><li>由程序员分配 (new,malloc) 释放 (delete,free) ，并指明大小，速度较慢</li><li>若程序员不释放，导致内存泄漏，new 完没有 delete</li><li>不过在整个程序结束时由操作系统回收,但是这样无疑增加了操作系统的负担</li><li>高地址扩展的数据结构，是不连续的内存区域，空间很大，比较灵活</li><li>频繁地分配和释放不同大小的堆空间容易产生内存碎片</li></ul><p><strong>注：当 堆区 数据地址 和 栈区 数据地址相同时（碰面了）就代表，数据已用完。</strong></p><h3 id="全局区（静态区static）"><a href="#全局区（静态区static）" class="headerlink" title="全局区（静态区static）"></a>全局区（静态区static）</h3><ul><li>全局变量和静态变量是放在一起的</li><li>初始化的全局变量和静态变量（static修饰的）放在一块区域.data节</li><li>未初始化的全局变量和未初始化的静态变量在相邻的另一块区域.bss（不占磁盘空间，不做具体解释）</li><li>程序结束后由系统释放</li></ul><h3 id="文字常量区"><a href="#文字常量区" class="headerlink" title="文字常量区"></a>文字常量区</h3><ul><li>常量字符串就是放在这里，程序结束后由系统释放</li></ul><h3 id="程序代码区"><a href="#程序代码区" class="headerlink" title="程序代码区"></a>程序代码区</h3><ul><li>存放函数体的二进制代码</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="内存分布"><a href="#内存分布" class="headerlink" title="内存分布"></a>内存分布</h2><ul><li>以32位系统为例，共有4G的寻址能力，进程在内存中的分布如下图所示。Linux默认将高地址的1G空间分配给内核，称为内核空间，剩下的3G空间分配给进程使用，称为用户空间。</li></ul><div class="table-container"><table><thead><tr><th>操作系统内核区</th><th>用户不可见</th></tr></thead><tbody><tr><td>用户栈</td><td>栈指针，向下扩展</td></tr><tr><td>动态堆</td><td>向上扩展</td></tr><tr><td>全局区（静态区）</td><td>.data初始化 .bss未初始化</td></tr><tr><td>文字常量区（只读数据）</td><td>常量字符串</td></tr><tr><td>程序代码区</td><td>栈指针，向下扩展</td></tr></tbody></table></div><p><img src="进程内存分布.png" alt="进程内存分布" style="zoom:100%;"></p><h3 id="栈区"><a href="#栈区" class="headerlink" title="栈区"></a>栈区</h3><ul><li>由编译器自动分配释放，速度较快</li><li>用来存储函数调用时的临时信息的结构，存放为运行时函数分配的<strong>局部变量</strong>、<strong>函数参数</strong>、<strong>返回数据</strong>、<strong>返回地址</strong>等。这些局部变量等空间都会被释放</li><li>程序运行过程中函数调用时参数的传递也在栈上进行，如递归调用栈</li><li>当栈过多的时候，就是导致栈溢出（比如大量的递归调用或者大量的内存分配）</li><li>栈是向低地址扩展的数据结构，是一块连续的内存的区域，空间有限</li></ul><h3 id="堆区"><a href="#堆区" class="headerlink" title="堆区"></a>堆区</h3><ul><li>由程序员分配 (new,malloc) 释放 (delete,free) ，并指明大小，速度较慢</li><li>若程序员不释放，导致内存泄漏，new 完没有 delete</li><li>不过在整个程序结束时由操作系统回收,但是这样无疑增加了操作系统的负担</li><li>高地址扩展的数据结构，是不连续的内存区域，空间很大，比较灵活</li><li>频繁地分配和释放不同大小的堆空间容易产生内存碎片</li></ul><p><strong>注：当 堆区 数据地址 和 栈区 数据地址相同时（碰面了）就代表，数据已用完。</strong></p><h3 id="全局区（静态区static）"><a href="#全局区（静态区static）" class="headerlink" title="全局区（静态区static）"></a>全局区（静态区static）</h3><ul><li>全局变量和静态变量是放在一起的</li><li>初始化的全局变量和静态变量（static修饰的）放在一块区域.data节</li><li>未初始化的全局变量和未初始化的静态变量在相邻的另一块区域.bss（不占磁盘空间，不做具体解释）</li><li>程序结束后由系统释放</li></ul><h3 id="文字常量区"><a href="#文字常量区" class="headerlink" title="文字常量区"></a>文字常量区</h3><ul><li>常量字符串就是放在这里，程序结束后由系统释放</li></ul><h3 id="程序代码区"><a href="#程序代码区" class="headerlink" title="程序代码区"></a>程序代码区</h3><ul><li>存放函数体的二进制代码</li></ul>]]></content>
       
       
       <categories>
@@ -33,7 +87,7 @@
       <link href="/2024/08/27/Eight-Part_Essay/Computer_Organization/Broken_Jade_Beads/BrokenJadeBeads/"/>
       <url>/2024/08/27/Eight-Part_Essay/Computer_Organization/Broken_Jade_Beads/BrokenJadeBeads/</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="什么是缓存-Cache-？为什么需要缓存？如何提高缓存的命中率？缓存是不是最快的？"><a href="#什么是缓存-Cache-？为什么需要缓存？如何提高缓存的命中率？缓存是不是最快的？" class="headerlink" title="什么是缓存(Cache)？为什么需要缓存？如何提高缓存的命中率？缓存是不是最快的？"></a>什么是缓存(Cache)？为什么需要缓存？如何提高缓存的命中率？缓存是不是最快的？</h2><ul><li>Cache即CPU的高速缓冲存储器，是一种是用于减少处理器访问内存所需平均时间的部件；</li><li>由于CPU的计算速度远远大于从CPU向内存取数据的速度，如果每次都让CPU去内存取数据，会导致CPU计算能力的浪费，所以人们设计了缓存，CPU通过读写缓存来获取操作数，结果也通过缓存写入内存；</li><li>注意程序的<strong>局部性原理</strong>，在遍历数组时按照内存顺序访问；充分利用<strong>CPU分支预测功能</strong>，将预测的指令放到缓存中执行；此外缓存的容量和块长是影响缓存效率的重要因素。</li><li>缓存不是最快的，寄存器更快。</li><li>附 <a href="https://sleepyloser.github.io/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/">Cache 的基本原理</a></li></ul>]]></content>
       
       
       <categories>
@@ -85,7 +139,7 @@
       <link href="/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/"/>
       <url>/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/</url>
       
-        <content type="html"><![CDATA[<h2 id="为什么需要Cache"><a href="#为什么需要Cache" class="headerlink" title="为什么需要Cache"></a>为什么需要Cache</h2><h3 id="程序是如何运行起来的"><a href="#程序是如何运行起来的" class="headerlink" title="程序是如何运行起来的"></a>程序是如何运行起来的</h3><ul><li>程序是运行在 RAM（随机存储器） 之中，我们称之为 main memory（主存）。当我们需要运行一个进程的时候，首先会从磁盘设备（例如，eMMC、UFS、SSD等）中将可执行程序load到主存中，然后开始执行。</li><li>在CPU内部存在一堆的通用寄存器（register）。如果 CPU 需要将一个变量（假设地址是A）加1，一般分为以下3个步骤：<ol><li>CPU 从主存中读取地址 A 的数据到内部通用寄存器 x0（ARM64架构的通用寄存器之一）。</li><li>通用寄存器 x0 加1。</li><li>CPU 将通用寄存器 x0 的值写入主存。</li></ol></li></ul><p><img src="变量加一过程.png" alt="变量加一过程" style="zoom:100%;"></p><ul><li>其实现实中，CPU通用寄存器的速度（&lt; 1ns）和主存（~ 65ns）之间存在着太大的差异。</li><li>因此，上面举例的3个步骤中，步骤1和步骤3实际上速度很慢。当CPU试图从主存中 Load / Store 操作时，由于主存的速度限制，CPU不得不等待这漫长的65ns时间。</li><li>如果我们采用更快材料制作更快速度的主存，并且拥有几乎差不多的容量, 其成本将会大幅度上升。我们试图提升主存的速度和容量，又期望其成本很低，这就有点难为人了。</li><li>因此，我们有一种折中的方法，那就是制作一块速度极快但是容量极小的存储设备。那么其成本也不会太高。这块存储设备我们称之为<strong>Cache Memory</strong>。</li><li>在硬件上，我们将Cache放置在CPU和主存之间，作为主存数据的缓存。</li><li>当CPU试图从主存中 Load / Store数据的时候，CPU会首先从 Cache 中查找对应地址的数据是否缓存在 Cache 中。如果其数据缓存在 Cache 中，直接从 Cache 中拿到数据并返回给CPU。</li></ul><p><img src="变量加一过程(2).png" alt="变量加一过程(2)" style="zoom:100%;"></p><ul><li>CPU和主存之间直接数据传输的方式转变成 CPU 和 Cache 之间直接数据传输。Cache 负责和主存之间数据传输。</li></ul><h2 id="多级Cache存储结构"><a href="#多级Cache存储结构" class="headerlink" title="多级Cache存储结构"></a>多级Cache存储结构</h2><ul><li>当cache中没有缓存我们想要的数据的时候，依然需要漫长的等待从主存中load数据。为了进一步提升性能，引入多级cache。</li><li>前面提到的cache，称之为L1 cache（第一级cache）。我们在L1 cache 后面连接L2 cache，在L2 cache 和主存之间连接L3 cache。等级越高，速度越慢，容量越大。但是速度相比较主存而言，依然很快。</li><li>不同等级cache速度之间关系如下：</li></ul><p><img src="不同等级cache速度.png" alt="不同等级cache速度" style="zoom:100%;"></p><ul><li>经过3级cache的缓冲，各级cache和主存之间的速度差也逐级减小。</li></ul><h2 id="多级cache之间的配合工作"><a href="#多级cache之间的配合工作" class="headerlink" title="多级cache之间的配合工作"></a>多级cache之间的配合工作</h2><ul><li>首先引入两个名词概念，<code>命中</code>和<code>缺失</code>。CPU要访问的数据在cache中有缓存，称为<strong>命中</strong> (hit)，反之则称为<strong>缺失</strong> (miss)。</li><li>多级cache之间是如何配合工作的呢？我们假设现在考虑的系统只有两级cache。<ol><li>当CPU试图从某地址load数据时，首先从L1 cache中查询是否命中，如果命中则把数据返回给CPU。如果L1 cache缺失，则继续从L2 cache中查找。</li><li>当L2 cache命中时，数据会返回给L1 cache以及CPU。如果L2 cache也缺失，很不幸，我们需要从主存中load数据，将数据返回给L2 cache、L1 cache及CPU。</li></ol></li></ul><p><img src="多级Cache.jpg" alt="多级Cache" style="zoom:100%;"></p><ul><li>这种多级cache的工作方式称之为inclusive cache（包容性缓存），某一地址的数据可能存在多级缓存中。</li><li>与inclusive cache对应的是exclusive cache（独占缓存），这种cache保证某一地址的数据缓存只会存在于多级cache其中一级。也就是说，任意地址的数据不可能同时在 L1 和 L2 cache 中缓存。</li></ul><h2 id="直接映射缓存-Direct-mapped-cache"><a href="#直接映射缓存-Direct-mapped-cache" class="headerlink" title="直接映射缓存(Direct mapped cache)"></a>直接映射缓存(Direct mapped cache)</h2><ul><li>cache的大小称之为 <code>cache size</code>，代表cache可以缓存最大数据的大小。我们将cache平均分成相等的很多块，每一个块大小称之为 <code>cache line</code> ，其大小是 <code>cache line size</code> 。</li><li>例如一个64 Bytes大小的cache。如果我们将64 Bytes平均分成64块，那么cache line就是1字节，总共64行cache line。如果我们将64 Bytes平均分成8块，那么cache line就是8字节，总共8行cache line。</li><li>现在的硬件设计中，一般cache line的大小是4-128 Bytes。为什么没有1 byte呢？原因我们后面讨论。</li><li>注意，<strong>cache line是cache和主存之间数据传输的最小单位</strong>。什么意思呢？当CPU试图load一个字节数据的时候，如果cache缺失，那么cache控制器会从主存中<strong>一次性</strong>的load cache line大小的数据到cache中。</li><li>例如，cache line大小是8字节。CPU即使读取一个byte，在cache缺失后，cache会从主存中load 8字节填充整个cache line。又是因为什么呢？后面说完就懂了。</li><li>我们假设下面的讲解都是针对64 Bytes大小的cache，并且cache line大小是8字节。我们可以类似把这块cache想想成一个数组，数组总共8个元素，每个元素大小是8字节。就像下图这样。</li></ul><p><img src="Cache数组.jpg" alt="Cache数组" style="zoom:100%;"></p><ul><li>一个地址访问要映射到Cache中，地址被分成三个字段：tag，set index，block offset。这样，通过一个物理地址就可以获取数据或指令在缓存中的位置(set, way, byte)</li><li>现在我们考虑一个问题，CPU从0x0654地址读取一个字节，cache控制器是如何判断数据是否在cache中命中呢？我们<strong>如何根据地址在有限大小的cache中查找数据</strong>呢？现在硬件采取的做法是对地址进行<strong>散列</strong>（可以理解成地址取模操作）。</li></ul><p><img src="在Cache中寻找数据.jpg" alt="在Cache中寻找数据" style="zoom:100%;"></p><ul><li>我们一共有8行cache line，cache line大小是8 Bytes。所以我们可以利用地址低3 bits（如上图地址蓝色部分）用来寻址8 bytes中某一字节，我们称这部分bit组合为offset。</li><li>同理，8行cache line，为了覆盖所有行。我们需要3 bits（如上图地址黄色部分）查找某一行，这部分地址部分称之为index。</li><li>现在我们知道，如果两个不同的地址，其地址的bit3-bit5如果完全一样的话，那么这两个地址经过硬件散列之后都会找到同一个cache line。</li><li>所以，当我们找到cache line之后，只代表我们访问的地址对应的数据可能存在这个cache line中，但是也有可能是其他地址对应的数据。</li><li>为此，我们又引入tag array区域，tag array和data array一一对应。一个cache line都对应唯一一个tag，tag中保存的是整个地址位宽去除index和offset使用的bit剩余部分（如上图地址绿色部分）。</li><li>tag、index和offset三者组合就可以唯一确定一个地址了。因此，当我们根据地址中index位找到cache line后，取出当前cache line对应的tag，然后和地址中的tag进行比较，如果相等，这说明<strong>cache命中</strong>。如果不相等，说明当前cache line存储的是其他地址的数据，这就是<strong>cache缺失</strong>。</li><li>因此解答了我们之前的一个疑问<strong>为什么硬件cache line不做成一个字节？</strong>。这样会导致硬件成本的上升，因为原本8个字节对应一个tag，现在需要8个tag，占用了很多内存。tag也是cache的一部分，但是我们谈到cache size的时候并不考虑tag占用的内存部分。</li><li>我们可以从图中看到tag旁边还有一个<code>valid bit</code>，这个bit用来表示cache line中数据<strong>是否有效</strong>（例如：1代表有效；0代表无效）。当系统刚启动时，cache中的数据都应该是无效的，因为还没有缓存任何数据。cache控制器可以根据valid bit确认当前cache line数据是否有效。所以，上述比较tag确认cache line是否命中之前还会检查valid bit是否有效。只有在有效的情况下，比较tag才有意义。如果无效，直接判定cache缺失。</li><li>上面的例子中，cache size是64 Bytes并且cache line size是8 bytes。offset、index和tag分别使用3 bits、3 bits和42 bits（假设地址宽度是48 bits）。我们现在再看一个例子：512 Bytes cache size，64 Bytes cache line size。根据之前的地址划分方法，offset、index和tag分别使用6 bits、3 bits和39 bits。如下图所示。</li></ul><p><img src="在Cache中寻找数据(2).jpg" alt="在Cache中寻找数据(2)" style="zoom:100%;"></p><h2 id="直接映射缓存的优缺点"><a href="#直接映射缓存的优缺点" class="headerlink" title="直接映射缓存的优缺点"></a>直接映射缓存的优缺点</h2><p><img src="直接映射缓存的优缺点.png" alt="直接映射缓存" style="zoom:100%;"></p><ul><li>我们可以看到，地址0x00-0x3f地址处对应的数据可以覆盖整个cache。0x40-0x7f地址的数据也同样是覆盖整个cache。</li><li>0x00、0x40、0x80地址中index部分是一样的。因此，这3个地址对应的cache line是同一个。</li><li>所以，当我们访问0x00地址时，cache会缺失，然后数据会从主存中加载到cache中第0行cache line。</li><li>当我们访问0x40地址时，依然索引到cache中第0行cache line，由于此时cache line中存储的是地址0x00地址对应的数据，所以此时依然会cache缺失。然后从主存中加载0x40地址数据到第一行cache line中。</li><li>同理，继续访问0x80地址，依然会cache缺失。</li><li>这就相当于每次访问数据都要从主存中读取，所以cache的存在并没有对性能有什么提升。访问0x40地址时，就会把0x00地址缓存的数据替换。</li><li>这种现象叫做<strong>cache颠簸（cache thrashing）</strong>。针对这个问题，我们引入<strong>多路组相连缓存</strong>。我们首先研究下最简单的两路组相连缓存的工作原理。</li></ul><h2 id="两路组相连缓存-Two-way-set-associative-cache"><a href="#两路组相连缓存-Two-way-set-associative-cache" class="headerlink" title="两路组相连缓存(Two-way set associative cache)"></a>两路组相连缓存(Two-way set associative cache)</h2>]]></content>
+        <content type="html"><![CDATA[<h2 id="为什么需要Cache"><a href="#为什么需要Cache" class="headerlink" title="为什么需要Cache"></a>为什么需要Cache</h2><h3 id="程序是如何运行起来的"><a href="#程序是如何运行起来的" class="headerlink" title="程序是如何运行起来的"></a>程序是如何运行起来的</h3><ul><li>程序是运行在 RAM（随机存储器） 之中，我们称之为 main memory（主存）。当我们需要运行一个进程的时候，首先会从磁盘设备（例如，eMMC、UFS、SSD等）中将可执行程序load到主存中，然后开始执行。</li><li>在CPU内部存在一堆的通用寄存器（register）。如果 CPU 需要将一个变量（假设地址是A）加1，一般分为以下3个步骤：<ol><li>CPU 从主存中读取地址 A 的数据到内部通用寄存器 x0（ARM64架构的通用寄存器之一）。</li><li>通用寄存器 x0 加1。</li><li>CPU 将通用寄存器 x0 的值写入主存。</li></ol></li></ul><p><img src="变量加一过程.png" alt="变量加一过程" style="zoom:100%;"></p><ul><li>其实现实中，CPU通用寄存器的速度（&lt; 1ns）和主存（~ 65ns）之间存在着太大的差异。</li><li>因此，上面举例的3个步骤中，步骤1和步骤3实际上速度很慢。当CPU试图从主存中 Load / Store 操作时，由于主存的速度限制，CPU不得不等待这漫长的65ns时间。</li><li>如果我们采用更快材料制作更快速度的主存，并且拥有几乎差不多的容量, 其成本将会大幅度上升。我们试图提升主存的速度和容量，又期望其成本很低，这就有点难为人了。</li><li>因此，我们有一种折中的方法，那就是制作一块速度极快但是容量极小的存储设备。那么其成本也不会太高。这块存储设备我们称之为<strong>Cache Memory</strong>。</li><li>在硬件上，我们将Cache放置在CPU和主存之间，作为主存数据的缓存。</li><li>当CPU试图从主存中 Load / Store数据的时候，CPU会首先从 Cache 中查找对应地址的数据是否缓存在 Cache 中。如果其数据缓存在 Cache 中，直接从 Cache 中拿到数据并返回给CPU。</li></ul><p><img src="变量加一过程(2).png" alt="变量加一过程(2)" style="zoom:100%;"></p><ul><li>CPU和主存之间直接数据传输的方式转变成 CPU 和 Cache 之间直接数据传输。Cache 负责和主存之间数据传输。</li></ul><h2 id="多级Cache存储结构"><a href="#多级Cache存储结构" class="headerlink" title="多级Cache存储结构"></a>多级Cache存储结构</h2><ul><li>当cache中没有缓存我们想要的数据的时候，依然需要漫长的等待从主存中load数据。为了进一步提升性能，引入多级cache。</li><li>前面提到的cache，称之为L1 cache（第一级cache）。我们在L1 cache 后面连接L2 cache，在L2 cache 和主存之间连接L3 cache。等级越高，速度越慢，容量越大。但是速度相比较主存而言，依然很快。</li><li>不同等级cache速度之间关系如下：</li></ul><p><img src="不同等级cache速度.png" alt="不同等级cache速度" style="zoom:100%;"></p><ul><li>经过3级cache的缓冲，各级cache和主存之间的速度差也逐级减小。</li></ul><h2 id="多级cache之间的配合工作"><a href="#多级cache之间的配合工作" class="headerlink" title="多级cache之间的配合工作"></a>多级cache之间的配合工作</h2><ul><li>首先引入两个名词概念，<code>命中</code>和<code>缺失</code>。CPU要访问的数据在cache中有缓存，称为<strong>命中</strong> (hit)，反之则称为<strong>缺失</strong> (miss)。</li><li>多级cache之间是如何配合工作的呢？我们假设现在考虑的系统只有两级cache。<ol><li>当CPU试图从某地址load数据时，首先从L1 cache中查询是否命中，如果命中则把数据返回给CPU。如果L1 cache缺失，则继续从L2 cache中查找。</li><li>当L2 cache命中时，数据会返回给L1 cache以及CPU。如果L2 cache也缺失，很不幸，我们需要从主存中load数据，将数据返回给L2 cache、L1 cache及CPU。</li></ol></li></ul><p><img src="多级Cache.jpg" alt="多级Cache" style="zoom:100%;"></p><ul><li>这种多级cache的工作方式称之为inclusive cache（包容性缓存），某一地址的数据可能存在多级缓存中。</li><li>与inclusive cache对应的是exclusive cache（独占缓存），这种cache保证某一地址的数据缓存只会存在于多级cache其中一级。也就是说，任意地址的数据不可能同时在 L1 和 L2 cache 中缓存。</li></ul><h2 id="直接映射缓存-Direct-mapped-cache"><a href="#直接映射缓存-Direct-mapped-cache" class="headerlink" title="直接映射缓存(Direct mapped cache)"></a>直接映射缓存(Direct mapped cache)</h2><ul><li>cache的大小称之为 <code>cache size</code>，代表cache可以缓存最大数据的大小。我们将cache平均分成相等的很多块，每一个块大小称之为 <code>cache line</code> ，其大小是 <code>cache line size</code> 。</li><li>例如一个64 Bytes大小的cache。如果我们将64 Bytes平均分成64块，那么cache line就是1字节，总共64行cache line。如果我们将64 Bytes平均分成8块，那么cache line就是8字节，总共8行cache line。</li><li>现在的硬件设计中，一般cache line的大小是4-128 Bytes。为什么没有1 byte呢？原因我们后面讨论。</li><li>注意，<strong>cache line是cache和主存之间数据传输的最小单位</strong>。什么意思呢？当CPU试图load一个字节数据的时候，如果cache缺失，那么cache控制器会从主存中<strong>一次性</strong>的load cache line大小的数据到cache中。</li><li>例如，cache line大小是8字节。CPU即使读取一个byte，在cache缺失后，cache会从主存中load 8字节填充整个cache line。又是因为什么呢？后面说完就懂了。</li><li>我们假设下面的讲解都是针对64 Bytes大小的cache，并且cache line大小是8字节。我们可以类似把这块cache想想成一个数组，数组总共8个元素，每个元素大小是8字节。就像下图这样。</li></ul><p><img src="Cache数组.jpg" alt="Cache数组" style="zoom:100%;"></p><ul><li>一个地址访问要映射到Cache中，地址被分成三个字段：tag，set index，block offset。这样，通过一个物理地址就可以获取数据或指令在缓存中的位置(set, way, byte)</li><li>现在我们考虑一个问题，CPU从0x0654地址读取一个字节，cache控制器是如何判断数据是否在cache中命中呢？我们<strong>如何根据地址在有限大小的cache中查找数据</strong>呢？现在硬件采取的做法是对地址进行<strong>散列</strong>（可以理解成地址取模操作）。</li></ul><p><img src="在Cache中寻找数据.jpg" alt="在Cache中寻找数据" style="zoom:100%;"></p><ul><li>我们一共有8行cache line，cache line大小是8 Bytes。所以我们可以利用地址低3 bits（如上图地址蓝色部分）用来寻址8 bytes中某一字节，我们称这部分bit组合为offset。</li><li>同理，8行cache line，为了覆盖所有行。我们需要3 bits（如上图地址黄色部分）查找某一行，这部分地址部分称之为index。</li><li>现在我们知道，如果两个不同的地址，其地址的bit3-bit5如果完全一样的话，那么这两个地址经过硬件散列之后都会找到同一个cache line。</li><li>所以，当我们找到cache line之后，只代表我们访问的地址对应的数据可能存在这个cache line中，但是也有可能是其他地址对应的数据。</li><li>为此，我们又引入tag array区域，tag array和data array一一对应。一个cache line都对应唯一一个tag，<strong>tag中保存的是整个地址位宽去除index和offset使用的bit剩余部分</strong>（如上图地址绿色部分）。</li><li>tag、index和offset三者组合就可以唯一确定一个地址了。因此，当我们根据地址中index位找到cache line后，<strong>取出当前cache line对应的tag，然后和地址中的tag进行比较</strong>，如果相等，这说明<strong>cache命中</strong>。如果不相等，说明当前cache line存储的是其他地址的数据，这就是<strong>cache缺失</strong>。</li><li>因此解答了我们之前的一个疑问<strong>为什么硬件cache line不做成一个字节？</strong>。这样会导致硬件成本的上升，因为原本8个字节对应一个tag，现在需要8个tag，占用了很多内存。tag也是cache的一部分，但是我们谈到cache size的时候并不考虑tag占用的内存部分。</li><li>我们可以从图中看到tag旁边还有一个<code>valid bit</code>，这个bit用来表示cache line中数据<strong>是否有效</strong>（例如：1代表有效；0代表无效）。当系统刚启动时，cache中的数据都应该是无效的，因为还没有缓存任何数据。cache控制器可以根据valid bit确认当前cache line数据是否有效。所以，上述比较tag确认cache line是否命中之前还会检查valid bit是否有效。只有在有效的情况下，比较tag才有意义。如果无效，直接判定cache缺失。</li><li>上面的例子中，cache size是64 Bytes并且cache line size是8 bytes。offset、index和tag分别使用3 bits、3 bits和42 bits（假设地址宽度是48 bits）。我们现在再看一个例子：512 Bytes cache size，64 Bytes cache line size。根据之前的地址划分方法，offset、index和tag分别使用6 bits、3 bits和39 bits。如下图所示。</li></ul><p><img src="在Cache中寻找数据(2).jpg" alt="在Cache中寻找数据(2)" style="zoom:100%;"></p><h2 id="直接映射缓存的优缺点"><a href="#直接映射缓存的优缺点" class="headerlink" title="直接映射缓存的优缺点"></a>直接映射缓存的优缺点</h2><p><img src="直接映射缓存的优缺点.png" alt="直接映射缓存" style="zoom:50%;"></p><ul><li>我们可以看到，地址0x00-0x3f地址处对应的数据可以覆盖整个cache。0x40-0x7f地址的数据也同样是覆盖整个cache。</li><li>0x00、0x40、0x80地址中index部分是一样的。因此，这3个地址对应的cache line是同一个。</li><li>所以，当我们访问0x00地址时，cache会缺失，然后数据会从主存中加载到cache中第0行cache line。</li><li>当我们访问0x40地址时，依然索引到cache中第0行cache line，由于此时cache line中存储的是地址0x00地址对应的数据，所以此时依然会cache缺失。然后从主存中加载0x40地址数据到第一行cache line中。</li><li>同理，继续访问0x80地址，依然会cache缺失。</li><li>这就相当于每次访问数据都要从主存中读取，所以cache的存在并没有对性能有什么提升。访问0x40地址时，就会把0x00地址缓存的数据替换。</li><li>这种现象叫做<strong>cache颠簸（cache thrashing）</strong>。针对这个问题，我们引入<strong>多路组相连缓存</strong>。我们首先研究下最简单的两路组相连缓存的工作原理。</li></ul><h2 id="两路组相连缓存-Two-way-set-associative-cache"><a href="#两路组相连缓存-Two-way-set-associative-cache" class="headerlink" title="两路组相连缓存(Two-way set associative cache)"></a>两路组相连缓存(Two-way set associative cache)</h2><ul><li><strong>什么是路（way）</strong>：我们依然假设64 Bytes cache size，cache line size是8 Bytes。我们将cache平均分成多份，每一份就是一路。因此，两路组相连缓存就是将cache平均分成2份，每份32 Bytes。如下图所示。</li></ul><p><img src="两路组相连缓存.png" alt="两路组相连缓存" style="zoom:100%;"></p><ul><li>cache被分成2路，每路包含4行cache line。<strong>我们将所有索引一样的cache line组合在一起称之为组</strong>。例如，上图中一个组有两个cache line，总共4个组。</li><li>我们依然假设从地址0x0654地址读取一个字节数据。由于cache line size是8 Bytes，因此offset需要3 bits，这和之前直接映射缓存一样。不一样的地方是index，在两路组相连缓存中，index只需要2 bits，因为一路只有4行cache line。</li><li>上面的例子根据index找到第2行cache line（从0开始计算），第2行对应2个cache line，分别对应way 0和way 1。因此index也可以称作 <code>set index（组索引）</code> 。</li><li>先根据index找到set，然后将组内的所有cache line对应的tag取出来和地址中的tag部分对比，如果其中一个相等就意味着命中。</li><li>因此，两路组相连缓存较直接映射缓存最大的差异就是：第一个地址对应的数据可以对应2个cache line，而直接映射缓存一个地址只对应一个cache line。那么这究竟有什么好处呢？</li></ul><h2 id="两路组相连缓存优缺点"><a href="#两路组相连缓存优缺点" class="headerlink" title="两路组相连缓存优缺点"></a>两路组相连缓存优缺点</h2><ul><li><strong>两路组相连缓存的硬件成本相对于直接映射缓存更高</strong>。因为其每次比较tag的时候需要比较多个cache line对应的tag（某些硬件可能还会做并行比较，增加比较速度，这就增加了硬件设计复杂度）。</li><li>为什么我们还需要两路组相连缓存呢？<strong>因为其可以有助于降低cache颠簸可能性</strong>。那么是如何降低的呢？根据两路组相连缓存的工作方式，我们可以画出主存地址0x00-0x4f地址对应的cache分布图。</li></ul><p><img src="降低cache颠簸.png" alt="降低cache颠簸" style="zoom:100%;"></p><ul><li>我们依然考虑直接映射缓存一节的问题：如果一个程序试图依次访问地址0x00、0x40、0x80，cache中的数据会发生什么呢？。现在0x00地址的数据可以被加载到way 1，0x40可以被加载到way 0。这样是不是就在一定程度上避免了直接映射缓存的尴尬境地呢？在两路组相连缓存的情况下，0x00和0x40地址的数据都缓存在cache中。试想一下，如果我们是4路组相连缓存，后面继续访问0x80，也可能被缓存。</li><li>因此，当cache size一定的情况下，组相连缓存对性能的提升最差情况下也和直接映射缓存一样，在大部分情况下组相连缓存效果比直接映射缓存好。</li><li>同时，其降低了cache颠簸的频率。从某种程度上来说，直接映射缓存是组相连缓存的一种特殊情况，每个组只有一个cache line而已。因此，<strong>直接映射缓存也可以称作单路组相连缓存</strong>。</li></ul><h2 id="全相连缓存-Full-associative-cache"><a href="#全相连缓存-Full-associative-cache" class="headerlink" title="全相连缓存(Full associative cache)"></a>全相连缓存(Full associative cache)</h2><ul><li>既然组相连缓存那么好，如果所有的cache line都在一个组内。岂不是性能更好。是的，这种缓存就是全相连缓存。我们依然以64 Byts大小cache为例说明。</li></ul><p><img src="全相连缓存.png" alt="全相连缓存" style="zoom:100%;"></p><ul><li>由于所有的cache line都在一个组内，因此地址中不需要set index部分。因为，只有一个组让你选择，间接来说就是你没得选。</li><li>我们根据地址中的tag部分和所有的cache line对应的tag进行比较（硬件上可能并行比较也可能串行比较）。哪个tag比较相等，就意味着命中某个cache line。</li><li>因此，在全相连缓存中，任意地址的数据可以缓存在任意的cache line中。</li><li><strong>这可以最大程度的降低cache颠簸的频率。但是硬件成本上也是更高</strong>。</li></ul><h2 id="一个四路组相连缓存实例问题"><a href="#一个四路组相连缓存实例问题" class="headerlink" title="一个四路组相连缓存实例问题"></a>一个四路组相连缓存实例问题</h2><ul><li>考虑这么一个问题，32 KB大小4路组相连cache，cache line大小是32 Bytes。请思考以下2个问题：<ol><li>多少个组？</li><li>假设地址宽度是48 bits，index、offset以及tag分别占用几个bit？</li></ol></li><li>答：总共4路，因此每路大小是8 KB。cache line size是32 Bytes，因此一共有256组（8 KB / 32 Bytes）。由于cache line size是32 Bytes，所以offset需要5位。一共256组，所以index需要8位，剩下的就是tag部分，占用35位。这个cache可以绘制下图表示。</li></ul><p><img src="四路组相连缓存.png" alt="四路组相连缓存" style="zoom:100%;"></p><h2 id="Cache分配策略-Cache-allocation-policy"><a href="#Cache分配策略-Cache-allocation-policy" class="headerlink" title="Cache分配策略(Cache allocation policy)"></a>Cache分配策略(Cache allocation policy)</h2><ul><li>cache的分配策略是指<strong>我们什么情况下应该为数据分配cache line</strong>。cache分配策略分为<code>读</code>和<code>写</code>两种情况。</li></ul><h3 id="读分配-read-allocation"><a href="#读分配-read-allocation" class="headerlink" title="读分配(read allocation)"></a>读分配(read allocation)</h3><ul><li>当CPU读数据时，发生cache缺失，这种情况下都会分配一个cache line缓存从主存读取的数据。默认情况下，cache都支持读分配。</li></ul><h3 id="写分配-write-allocation"><a href="#写分配-write-allocation" class="headerlink" title="写分配(write allocation)"></a>写分配(write allocation)</h3><ul><li>当CPU写数据发生cache缺失时，才会考虑写分配策略。</li><li>当我们不支持写分配的情况下，写指令只会更新主存数据，然后就结束了。</li><li>当支持写分配的时候，我们首先从主存中加载数据到cache line中（相当于先做个读分配动作），然后会<strong>更新</strong>cache line中的数据。</li></ul><h2 id="Cache更新策略-Cache-update-policy"><a href="#Cache更新策略-Cache-update-policy" class="headerlink" title="Cache更新策略(Cache update policy)"></a>Cache更新策略(Cache update policy)</h2><ul><li>cache更新策略是指<strong>当发生cache命中时，写操作应该如何更新数据</strong>。cache更新策略分成两种：<code>写直通</code>和<code>回写</code>。</li></ul><h3 id="写直通-write-through"><a href="#写直通-write-through" class="headerlink" title="写直通(write through)"></a>写直通(write through)</h3><ul><li>当CPU执行store指令并在cache命中时，我们更新cache中的数据并且更新主存中的数据。<strong>cache和主存的数据始终保持一致</strong>。</li></ul><h3 id="写回-write-back"><a href="#写回-write-back" class="headerlink" title="写回(write back)"></a>写回(write back)</h3><ul><li>当CPU执行store指令并在cache命中时，我们只更新cache中的数据。并且每个cache line中会有一个bit位记录数据是否被修改过，称之为dirty bit（翻翻前面的图片，cache line旁边有一个D就是dirty bit）。我们会将dirty bit置位。主存中的数据只会在<strong>cache line被替换</strong>或者<strong>显式的clean操作</strong>时更新。</li><li>因此，主存中的数据可能是未修改的数据，而修改的数据躺在cache中。<strong>cache和主存的数据可能不一致</strong>。</li></ul><h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><ul><li>假设我们有一个64 Bytes大小直接映射缓存，cache line大小是8 Bytes，采用写分配和写回机制。当CPU从地址0x2a读取一个字节，cache中的数据将会如何变化呢？</li><li>假设当前cache状态如下图所示(tag旁边valid一栏的数字1代表合法。0代表非法。后面Dirty的1代表dirty，0代表没有写过数据，即非dirty)。</li></ul><p><img src="Cache读写.png" alt="Cache读写示例" style="zoom:100%;"></p><ul><li>根据index找到对应的cache line，对应的tag部分valid bit是合法的，但是tag的值不相等，因此发生缺失。</li><li>此时我们需要从地址0x28地址（请注意cache line大小对齐）加载8字节数据到该cache line中。但是，我们发现当前cache line的dirty bit置位。</li><li>因此，cache line里面的数据不能被简单的丢弃，由于采用写回机制，所以我们需要将cache中的数据0x11223344写到地址0x0128地址（这个地址根据tag中的值及所处的cache line行计算得到）。这个过程如下图所示。</li></ul><p><img src="Cache读写(2).png" alt="Cache读写示例" style="zoom:100%;"></p><ul><li>当写回操作完成，我们将主存中0x28地址开始的8个字节加载到该cache line中，并清除dirty bit。然后根据offset找到0x52返回给CPU。</li></ul><h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><ul><li>我们一直避开了一个关键问题。我们都知道cache控制器根据地址查找判断是否命中，这里的地址究竟是虚拟地址(virtual address，VA)还是物理地址(physical address，PA)？</li><li>详情参考下一篇博客 <a href="https://sleepyloser.github.io/2024/08/30/Eight-Part_Essay/Computer_Organization/Cache_Organization_Method/CacheOrganizationMethod/">Cache组织方式</a></li></ul>]]></content>
       
       
       <categories>
@@ -212,7 +266,7 @@
       <link href="/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Page_Replacement/PageReplacement/"/>
       <url>/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Page_Replacement/PageReplacement/</url>
       
-        <content type="html"><![CDATA[<h2 id="页面置换算法简介"><a href="#页面置换算法简介" class="headerlink" title="页面置换算法简介"></a>页面置换算法简介</h2><ul><li>进程运行时，若其访问的页面不在内存而需将其调入（<strong>缺页异常</strong>），但内存已无空闲空间时，就需要从内存中调出一页程序或数据，送入磁盘的对换区，其中选择调出页面的算法就称为页面置换算法。</li><li>好的页面置换算法应有<strong>较低的页面更换频率</strong>，也就是说，应将以后不会再访问或者以后较长时间内不会再访问的页面先调出。</li><li>页面置换算法的目标是<strong>最小化缺页中断的次数</strong>，常见的页面置换算法有<code>最佳⻚⾯置换算法（OPT）</code>、<code>先进先出置换算法（FIFO）</code>、<code>最近最久未使⽤的置换算法（LRU）</code>、<code>时钟页面置换算法</code>和<code>最不常⽤置换算法</code>等。</li></ul><h2 id="最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）"><a href="#最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）" class="headerlink" title="最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）"></a>最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）</h2><ul><li>理论上的最佳算法，因为它可以保证最低的缺页率。但在实际应用中，由于无法预知未来的访问模式，OPT 通常无法实现。</li></ul><p><img src="最佳页面置换.png" alt="最佳页面置换" style="zoom:100%;"></p><h2 id="先进先出置换算法（优先淘汰最早进入内存的页面）"><a href="#先进先出置换算法（优先淘汰最早进入内存的页面）" class="headerlink" title="先进先出置换算法（优先淘汰最早进入内存的页面）"></a>先进先出置换算法（优先淘汰最早进入内存的页面）</h2><ul><li>FIFO 算法维护一个队列，新来的页面加入队尾，当发生页面置换时，队头的页面（即最早进入内存的页面）被移出。</li></ul><p><img src="先进先出置换.png" alt="先进先出置换" style="zoom:100%;"></p><ul><li><strong>FIFO 和 OPT 算法的区别在于：除了在时间上向后或向前看之外，FIFO 算法使用的是页面调入内存的时间，OPT 算法使用的是页面将来使用的时间</strong></li></ul><h2 id="最近最久未使用的置换算法（淘汰最近没有使用的页面）"><a href="#最近最久未使用的置换算法（淘汰最近没有使用的页面）" class="headerlink" title="最近最久未使用的置换算法（淘汰最近没有使用的页面）"></a>最近最久未使用的置换算法（淘汰最近没有使用的页面）</h2><ul><li>LRU 算法根据页面的访问历史（维护一个链表）来进行置换，<strong>最长时间未被访问的页面</strong>将被置换出去。</li><li>相对更接近最优算法的效果，因为最近未使用的页面可能在将来也不会被使用。但 LRU 算法的实现需要跟踪页面的访问历史，可能会增加系统的开销。</li></ul><p><img src="最近最久未使用.png" alt="最近最久未使用" style="zoom:100%;"></p><h2 id="时钟页面置换算法"><a href="#时钟页面置换算法" class="headerlink" title="时钟页面置换算法"></a>时钟页面置换算法</h2><ul><li>通过一个类似钟⾯的（环形链表）遍历页面，每个页面有一个使用位，当页面被访问时，使用位设置为 1。</li><li>当需要页面置换时，时钟指针会顺时针移动，直到找到使用位为 0 的页面进行置换。这个过程类似于给每个页面一个二次机会。算法执行时，会先将使用位从 1 清零，如果该页面再次被访问，它的使用位再次被设置为 1。</li></ul><p><img src="时钟页面置换.png" alt="时钟页面置换" style="zoom:100%;"></p><h2 id="最不常用置换算法"><a href="#最不常用置换算法" class="headerlink" title="最不常用置换算法"></a>最不常用置换算法</h2><ul><li>根据页面被访问的频率进行置换，<strong>访问次数最少的页面最先被置换</strong>。实现较为复杂，需要记录每个页面的访问频率。</li><li>它的实现方式是，对每个页面设置⼀个<strong>访问计数器</strong>，每当⼀个页面被访问时，该页面的访问计数器就累加 1。在发生缺页中断时，淘汰计数器值最小的那个页面。</li><li>看起来很简单，每个页面加⼀个计数器就可以实现了，但是在操作系统中实现的时候，我们需要考虑效率和硬件成本的。<ol><li>要增加⼀个计数器来实现，这个硬件成本是比较高的，另外如果要对这个计数器查找哪个页面访问次数最小，查找链表本身，如果链表很长，是非常耗时的，效率不高。</li><li>还有个问题，LFU 算法只考虑了频率问题，没考虑时间的问题，比如有些页面在过去时间里访问的频率很高，但是现在已经没有访问了，而当前频繁访问的页面由于没有这些页面访问的次数高，在发生缺页中断时，就会可能会误伤当前刚开始频繁访问，但访问次数还不高的页面。</li></ol></li><li>这个问题的解决的办法还是有的，可以定期减少访问的次数，比如当发生时间中断时，把过去时间访问的页面的访问次数除以 2，也就说，随着时间的流失，以前的高访问次数的页面会慢慢减少，相当于加大了被置换的概率。</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="页面置换算法简介"><a href="#页面置换算法简介" class="headerlink" title="页面置换算法简介"></a>页面置换算法简介</h2><ul><li>进程运行时，若其访问的页面不在内存而需将其调入（<strong>缺页异常</strong>），但内存已无空闲空间时，就需要从内存中调出一页程序或数据，送入磁盘的对换区，其中选择调出页面的算法就称为页面置换算法。</li><li>好的页面置换算法应有<strong>较低的页面更换频率</strong>，也就是说，应将以后不会再访问或者以后较长时间内不会再访问的页面先调出。</li><li>页面置换算法的目标是<strong>最小化缺页中断的次数</strong>，常见的页面置换算法有<code>最佳⻚⾯置换算法（OPT）</code>、<code>先进先出置换算法（FIFO）</code>、<code>最近最久未使⽤的置换算法（LRU）</code>、<code>时钟页面置换算法</code>和<code>最不常⽤置换算法</code>等。</li></ul><h2 id="最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）"><a href="#最佳页面置换算法（淘汰未来不会使用-最长时间不访问的页面）" class="headerlink" title="最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）"></a>最佳页面置换算法（淘汰未来不会使用/最长时间不访问的页面）</h2><ul><li>理论上的最佳算法，因为它可以保证最低的缺页率。但在实际应用中，由于无法预知未来的访问模式，OPT 通常无法实现。</li></ul><p><img src="最佳页面置换.png" alt="最佳页面置换" style="zoom:100%;"></p><h2 id="先进先出置换算法（优先淘汰最早进入内存的页面）"><a href="#先进先出置换算法（优先淘汰最早进入内存的页面）" class="headerlink" title="先进先出置换算法（优先淘汰最早进入内存的页面）"></a>先进先出置换算法（优先淘汰最早进入内存的页面）</h2><ul><li>FIFO 算法维护一个队列，新来的页面加入队尾，当发生页面置换时，队头的页面（即最早进入内存的页面）被移出。</li></ul><p><img src="先进先出置换.png" alt="先进先出置换" style="zoom:100%;"></p><ul><li><strong>FIFO 和 OPT 算法的区别在于：除了在时间上向后或向前看之外，FIFO 算法使用的是页面调入内存的时间，OPT 算法使用的是页面将来使用的时间</strong></li></ul><h2 id="最近最久未使用的置换算法（淘汰最近没有使用的页面）"><a href="#最近最久未使用的置换算法（淘汰最近没有使用的页面）" class="headerlink" title="最近最久未使用的置换算法（淘汰最近没有使用的页面）"></a>最近最久未使用的置换算法（淘汰最近没有使用的页面）</h2><ul><li>LRU 算法根据页面的访问历史（维护一个链表）来进行置换，<strong>最长时间未被访问的页面</strong>将被置换出去。</li><li>相对更接近最优算法的效果，因为最近未使用的页面可能在将来也不会被使用。但 LRU 算法的实现需要跟踪页面的访问历史，可能会增加系统的开销。</li></ul><p><img src="最近最久未使用.png" alt="最近最久未使用" style="zoom:100%;"></p><h2 id="时钟页面置换算法"><a href="#时钟页面置换算法" class="headerlink" title="时钟页面置换算法"></a>时钟页面置换算法</h2><ul><li>通过一个类似钟面的（环形链表）遍历页面，每个页面有一个使用位，当页面被访问时，使用位设置为 1。</li><li>当需要页面置换时，时钟指针会顺时针移动，直到找到使用位为 0 的页面进行置换。这个过程类似于给每个页面一个二次机会。算法执行时，会先将使用位从 1 清零，如果该页面再次被访问，它的使用位再次被设置为 1。</li></ul><p><img src="时钟页面置换.png" alt="时钟页面置换" style="zoom:100%;"></p><h2 id="最不常用置换算法"><a href="#最不常用置换算法" class="headerlink" title="最不常用置换算法"></a>最不常用置换算法</h2><ul><li>根据页面被访问的频率进行置换，<strong>访问次数最少的页面最先被置换</strong>。实现较为复杂，需要记录每个页面的访问频率。</li><li>它的实现方式是，对每个页面设置⼀个<strong>访问计数器</strong>，每当⼀个页面被访问时，该页面的访问计数器就累加 1。在发生缺页中断时，淘汰计数器值最小的那个页面。</li><li>看起来很简单，每个页面加⼀个计数器就可以实现了，但是在操作系统中实现的时候，我们需要考虑效率和硬件成本的。<ol><li>要增加⼀个计数器来实现，这个硬件成本是比较高的，另外如果要对这个计数器查找哪个页面访问次数最小，查找链表本身，如果链表很长，是非常耗时的，效率不高。</li><li>还有个问题，LFU 算法只考虑了频率问题，没考虑时间的问题，比如有些页面在过去时间里访问的频率很高，但是现在已经没有访问了，而当前频繁访问的页面由于没有这些页面访问的次数高，在发生缺页中断时，就会可能会误伤当前刚开始频繁访问，但访问次数还不高的页面。</li></ol></li><li>这个问题的解决的办法还是有的，可以定期减少访问的次数，比如当发生时间中断时，把过去时间访问的页面的访问次数除以 2，也就说，随着时间的流失，以前的高访问次数的页面会慢慢减少，相当于加大了被置换的概率。</li></ul>]]></content>
       
       
       <categories>
@@ -237,7 +291,7 @@
       <link href="/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Broken_Jade_Beads/BrokenJadeBeads/"/>
       <url>/2024/08/22/Eight-Part_Essay/Computer_Operating_System/Broken_Jade_Beads/BrokenJadeBeads/</url>
       
-        <content type="html"><![CDATA[<h2 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h2><ul><li><strong>并发</strong>：<strong>在一段时间内</strong>，多个任务都会被处理。<strong>但在某一时刻，只有一个任务在执行</strong>。单核处理器做到的并发，其实是利用时间片的轮转，例如有两个进程 A 和 B，A 运行一个时间片之后，切换到 B，B 运行一个时间片之后又切换到 A。因为切换速度足够快，所以宏观上表现为在一段时间内能同时运行多个程序。</li><li><strong>并行</strong>：<strong>在同一时刻</strong>，有多个任务在执行。这个<strong>需要多核处理器才能完成</strong>，在微观上就能同时执行多条指令，不同的程序被放到不同的处理器上运行，这个是物理上的多个进程同时进行。</li></ul><p><img src="并发与并行.png" alt="并发与并行" style="zoom:100%;"></p><h2 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h2><ul><li><strong>运⾏状态（Runing）</strong>：该时刻进程占⽤ CPU；</li><li><strong>就绪状态（Ready）</strong>：可运⾏，由于其他进程处于运⾏状态⽽暂时停⽌运⾏；</li><li><strong>阻塞状态（Blocked）</strong>：该进程正在等待某⼀事件发⽣（如等待输⼊/输出操作的完成）⽽暂时停⽌运⾏，这时，即使给它 CPU 控制权，它也⽆法运⾏；</li><li><strong>创建状态（new）</strong>：进程正在被创建时的状态；</li><li><strong>结束状态（Exit）</strong>：进程正在从系统中消失时的状态；</li></ul><p><img src="进程的状态.png" alt="进程的状态" style="zoom:100%;"></p><h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><ul><li>进程是一个正在执行的程序的实例。<strong>每个进程有自己独立的地址空间、全局变量、堆栈、和文件描述符等资源</strong>。</li><li>线程是进程中的一个执行单元。一个进程可以包含多个线程，<strong>它们共享进程的地址空间和资源</strong>。</li><li>每个进程在独立的地址空间中运行，<strong>不会</strong>直接影响其他进程。线程共享<strong>同一个进程</strong>的内存空间、全局变量和文件描述符。</li><li>进程切换需要保存和恢复大量的上下文信息，代价较高。线程切换相对较轻量，因为线程共享进程的地址空间，只需要保存和恢复线程私有的数据。</li><li>线程的生命周期由进程控制，进程终止时，其所有线程也会终止。</li></ul><div class="table-container"><table><thead><tr><th>特性</th><th>进程</th><th>线程</th></tr></thead><tbody><tr><td>地址空间</td><td>独立</td><td>共享</td></tr><tr><td>内存开销</td><td>高</td><td>低</td></tr><tr><td>上下文切换</td><td>慢，开销大</td><td>快，开销小</td></tr><tr><td>通信</td><td>需要IPC机制，开销较大</td><td>共享内存，直接通信</td></tr><tr><td>创建销毁</td><td>开销大，较慢</td><td>开销小，较快</td></tr><tr><td>并发性</td><td>低</td><td>高</td></tr><tr><td>崩溃影响</td><td>一个进程崩溃不会影响其他进程</td><td>一个线程崩溃可能导致整个进程崩溃</td></tr></tbody></table></div><h2 id="线程上下文切换"><a href="#线程上下文切换" class="headerlink" title="线程上下文切换"></a>线程上下文切换</h2><ul><li>这还得看线程是不是属于同⼀个进程：<ol><li>当两个线程<strong>不属于</strong>同⼀个进程，则切换的过程就跟进程上下⽂切换⼀样；</li><li>当两个线程<strong>属于</strong>同⼀个进程，因为<strong>虚拟内存是共享的</strong>，所以在切换时，虚拟内存这些资源就保持不动，<strong>只需要切换线程的私有数据、寄存器等不共享的数据</strong>；</li></ol></li><li>所以，线程的上下⽂切换相⽐进程，开销要⼩很多。</li></ul><h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><ul><li>允许两个或多个进程共享一个给定的内存区，一个进程写⼊的东西，其他进程⻢上就能看到。</li><li>共享内存是最快的进程间通信方式，它是针对其他进程间通信方式运行效率低而专门设计的。</li><li><strong>缺点</strong>：当多进程竞争同一个共享资源时，会造成数据错乱的问题。</li></ul><p><img src="共享内存.png" alt="共享内存" style="zoom:50%;"></p><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><ul><li>我们实际的物理内存主要是主存，但是物理主存空间有限，所以一般现代操作系统都会想办法把一部分内存块放到磁盘中，用到的时候再装入主存，但是对用户程序而言，是不需要注意实际的物理内存的，为什么呢？因为有<code>虚拟内存</code>的机制。</li><li>简单说，<strong>虚拟内存是操作系统提供的⼀种机制，将不同进程的虚拟地址和不同内存的物理地址映射起来</strong>。</li><li>每个进程都有自己独立的地址空间，再由操作系统映射到到实际的物理内存。</li><li>于是，这⾥就引出了两种地址的概念：<ol><li>程序所使⽤的内存地址叫做虚拟内存地址（Virtual Memory Address）。</li><li>实际存在硬件⾥⾯的空间地址叫物理内存地址（Physical Memory Address）。<br><img src="虚拟内存.png" alt="虚拟内存" style="zoom:50%;"></li></ol></li></ul><h3 id="为什么要使用虚拟内存？"><a href="#为什么要使用虚拟内存？" class="headerlink" title="为什么要使用虚拟内存？"></a>为什么要使用虚拟内存？</h3><ul><li>程序是运行在内存中的，程序运行时会将保存在硬盘上的程复制到RAM内存（载入内存），然后CPU执行内存中的程序代码。</li><li>如果执行的程序占用内存很大或很多，或同时执行多个程序，就会导致内存消耗殆尽。从而导致程序执行异常或崩溃。</li></ul><h3 id="虚拟内存工作原理"><a href="#虚拟内存工作原理" class="headerlink" title="虚拟内存工作原理"></a>虚拟内存工作原理</h3><ul><li>当进程开始运行时，先将一部分程序装入内存，另一部分暂时留在外存；当要执行的指令不在内存时，由系统自动完成将它们调入内存的工作；当没有足够的内存时，系统自动选择部分内存（暂不执行的程序）空间，将其中原有的内容交换到磁盘上，并释放这些内存空间供其他进程使用。</li><li>这样做的结果使程序的运行丝毫不受影响，使程序在运行中感觉到拥有一个不受内存容量约束的、虚拟的、能够满足自己需求的存储器。</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="并发与并行"><a href="#并发与并行" class="headerlink" title="并发与并行"></a>并发与并行</h2><ul><li><strong>并发</strong>：<strong>在一段时间内</strong>，多个任务都会被处理。<strong>但在某一时刻，只有一个任务在执行</strong>。单核处理器做到的并发，其实是利用时间片的轮转，例如有两个进程 A 和 B，A 运行一个时间片之后，切换到 B，B 运行一个时间片之后又切换到 A。因为切换速度足够快，所以宏观上表现为在一段时间内能同时运行多个程序。</li><li><strong>并行</strong>：<strong>在同一时刻</strong>，有多个任务在执行。这个<strong>需要多核处理器才能完成</strong>，在微观上就能同时执行多条指令，不同的程序被放到不同的处理器上运行，这个是物理上的多个进程同时进行。</li></ul><p><img src="并发与并行.png" alt="并发与并行" style="zoom:100%;"></p><h2 id="进程的状态"><a href="#进程的状态" class="headerlink" title="进程的状态"></a>进程的状态</h2><ul><li><strong>运⾏状态（Runing）</strong>：该时刻进程占用 CPU；</li><li><strong>就绪状态（Ready）</strong>：可运行，由于其他进程处于运行状态而暂时停止运行；</li><li><strong>阻塞状态（Blocked）</strong>：该进程正在等待某⼀事件发生（如等待输⼊/输出操作的完成）而暂时停止运行，这时，即使给它 CPU 控制权，它也无法运行；</li><li><strong>创建状态（new）</strong>：进程正在被创建时的状态；</li><li><strong>结束状态（Exit）</strong>：进程正在从系统中消失时的状态；</li></ul><p><img src="进程的状态.png" alt="进程的状态" style="zoom:100%;"></p><h2 id="进程与线程"><a href="#进程与线程" class="headerlink" title="进程与线程"></a>进程与线程</h2><ul><li>进程是一个正在执行的程序的实例。<strong>每个进程有自己独立的地址空间、全局变量、堆栈、和文件描述符等资源</strong>。</li><li>线程是进程中的一个执行单元。一个进程可以包含多个线程，<strong>它们共享进程的地址空间和资源</strong>。</li><li>每个进程在独立的地址空间中运行，<strong>不会</strong>直接影响其他进程。线程共享<strong>同一个进程</strong>的内存空间、全局变量和文件描述符。</li><li>进程切换需要保存和恢复大量的上下文信息，代价较高。线程切换相对较轻量，因为线程共享进程的地址空间，只需要保存和恢复线程私有的数据。</li><li>线程的生命周期由进程控制，进程终止时，其所有线程也会终止。</li></ul><div class="table-container"><table><thead><tr><th>特性</th><th>进程</th><th>线程</th></tr></thead><tbody><tr><td>地址空间</td><td>独立</td><td>共享</td></tr><tr><td>内存开销</td><td>高</td><td>低</td></tr><tr><td>上下文切换</td><td>慢，开销大</td><td>快，开销小</td></tr><tr><td>通信</td><td>需要IPC机制，开销较大</td><td>共享内存，直接通信</td></tr><tr><td>创建销毁</td><td>开销大，较慢</td><td>开销小，较快</td></tr><tr><td>并发性</td><td>低</td><td>高</td></tr><tr><td>崩溃影响</td><td>一个进程崩溃不会影响其他进程</td><td>一个线程崩溃可能导致整个进程崩溃</td></tr></tbody></table></div><h2 id="线程上下文切换"><a href="#线程上下文切换" class="headerlink" title="线程上下文切换"></a>线程上下文切换</h2><ul><li>这还得看线程是不是属于同⼀个进程：<ol><li>当两个线程<strong>不属于</strong>同⼀个进程，则切换的过程就跟进程上下文切换⼀样；</li><li>当两个线程<strong>属于</strong>同⼀个进程，因为<strong>虚拟内存是共享的</strong>，所以在切换时，虚拟内存这些资源就保持不动，<strong>只需要切换线程的私有数据、寄存器等不共享的数据</strong>；</li></ol></li><li>所以，线程的上下文切换相比进程，开销要小很多。</li></ul><h2 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h2><ul><li>允许两个或多个进程共享一个给定的内存区，一个进程写⼊的东西，其他进程⻢上就能看到。</li><li>共享内存是最快的进程间通信方式，它是针对其他进程间通信方式运行效率低而专门设计的。</li><li><strong>缺点</strong>：当多进程竞争同一个共享资源时，会造成数据错乱的问题。</li></ul><p><img src="共享内存.png" alt="共享内存" style="zoom:50%;"></p><h2 id="虚拟内存"><a href="#虚拟内存" class="headerlink" title="虚拟内存"></a>虚拟内存</h2><ul><li>我们实际的物理内存主要是主存，但是物理主存空间有限，所以一般现代操作系统都会想办法把一部分内存块放到磁盘中，用到的时候再装入主存，但是对用户程序而言，是不需要注意实际的物理内存的，为什么呢？因为有<code>虚拟内存</code>的机制。</li><li>简单说，<strong>虚拟内存是操作系统提供的⼀种机制，将不同进程的虚拟地址和不同内存的物理地址映射起来</strong>。</li><li>每个进程都有自己独立的地址空间，再由操作系统映射到到实际的物理内存。</li><li>于是，这里就引出了两种地址的概念：<ol><li>程序所使用的内存地址叫做虚拟内存地址（Virtual Memory Address）。</li><li>实际存在硬件里面的空间地址叫物理内存地址（Physical Memory Address）。<br><img src="虚拟内存.png" alt="虚拟内存" style="zoom:50%;"></li></ol></li></ul><h3 id="为什么要使用虚拟内存？"><a href="#为什么要使用虚拟内存？" class="headerlink" title="为什么要使用虚拟内存？"></a>为什么要使用虚拟内存？</h3><ul><li>程序是运行在内存中的，程序运行时会将保存在硬盘上的程复制到RAM内存（载入内存），然后CPU执行内存中的程序代码。</li><li>如果执行的程序占用内存很大或很多，或同时执行多个程序，就会导致内存消耗殆尽。从而导致程序执行异常或崩溃。</li></ul><h3 id="虚拟内存工作原理"><a href="#虚拟内存工作原理" class="headerlink" title="虚拟内存工作原理"></a>虚拟内存工作原理</h3><ul><li>当进程开始运行时，先将一部分程序装入内存，另一部分暂时留在外存；当要执行的指令不在内存时，由系统自动完成将它们调入内存的工作；当没有足够的内存时，系统自动选择部分内存（暂不执行的程序）空间，将其中原有的内容交换到磁盘上，并释放这些内存空间供其他进程使用。</li><li>这样做的结果使程序的运行丝毫不受影响，使程序在运行中感觉到拥有一个不受内存容量约束的、虚拟的、能够满足自己需求的存储器。</li></ul>]]></content>
       
       
       <categories>
@@ -353,9 +407,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -534,9 +588,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -638,9 +692,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -742,9 +796,9 @@
       
         <tags>
             
-            <tag> 纹理 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -808,50 +862,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
-      
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>图集</title>
       <link href="/mapdepot/index.html"/>
       <url>/mapdepot/index.html</url>
@@ -863,31 +873,9 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -918,11 +906,77 @@
     
     
     <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
+      
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>子页面</title>
       <link href="/subinterface/index.html"/>
       <url>/subinterface/index.html</url>
       
         <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
