@@ -1,7 +1,7 @@
 ---
 title: 继 渲染管线
-top_img: ''
-cover: ''
+top_img: '114331201_p0.jpg'
+cover: '113328491_p0.jpg'
 categories: 
     - Unity
       - 渲染管线
