@@ -8,7 +8,7 @@
       <link href="/2024/08/31/Unity/Graphics/Three_Dimensional_Mathematics/ThreeDimensionalMathematics/"/>
       <url>/2024/08/31/Unity/Graphics/Three_Dimensional_Mathematics/ThreeDimensionalMathematics/</url>
       
-        <content type="html"><![CDATA[<h2 id="如何判断一个点在三角形（矩形、扇形）内"><a href="#如何判断一个点在三角形（矩形、扇形）内" class="headerlink" title="如何判断一个点在三角形（矩形、扇形）内"></a>如何判断一个点在三角形（矩形、扇形）内</h2><h3 id="向量点乘（Dot-Product）"><a href="#向量点乘（Dot-Product）" class="headerlink" title="向量点乘（Dot Product）"></a>向量点乘（Dot Product）</h3><ul><li>即相应元素的乘积的和：Vector1(x1, y1) · Vector2(x2, y2) = x1 · x2 + y1 · y2; <strong>注意结果不是一个向量，而是一个标量（Scalar）</strong></li><li>A · B = |A||B|Cos(θ)。θ是向量A和向量B之间的夹角，这里|A|我们称为向量A的模(norm)，也就是A的长度， 在二维空间中就是|A| = sqrt(x ^ 2 + y ^ 2)。这样我们就和容易计算两条线的夹角：Cos(θ) = A·B / (|A||B|)</li><li>这可以告诉我们如果点乘的结果（点积）<strong>为0的话就表示这两个向量垂直</strong>。当两向量平行时，点积有最大值。另外，点乘运算不仅限于2维空间，他可以推广到任意维空间。</li></ul><h3 id="叉乘（cross-product）"><a href="#叉乘（cross-product）" class="headerlink" title="叉乘（cross product）"></a>叉乘（cross product）</h3><p><img src="叉乘.png" alt="叉乘" style="zoom:100%;"></p><ul><li>二维空间中的叉乘是：Vector1(x1, y1) <code>x</code> Vector2(x2, y2) = x1 · y2 - y1 · x2。看起来像个标量，事实上叉乘的结果是个向量，方向在z轴上。<strong>上述结果是它的模</strong>。</li><li>在二维空间里，让我们暂时忽略它的方向，将结果看成一个向量，那么这个结果类似于上述的点积，我们有：A <code>x</code> B = |A||B|Sin(θ)</li><li>然而角度 θ 和上面点乘的角度有一点点不同，<strong>它是有正负的</strong>，是指从A到B的角度。</li><li>另外还有一个有用的特征那就是<strong>叉积的绝对值就是A和B为两边所形成的平行四边形的面积</strong>。也就是AB所包围三角形面积的两倍。</li><li>在<strong>三维空间</strong>里，A和B的叉乘公式为：</li></ul><p><img src="叉乘公式.png" alt="叉乘公式" style="zoom:100%;"></p><ul><li>其中 i = (1, 0, 0); j = (0, 1, 0); k = (0, 0, 1)。</li><li>根据i、j、k间关系，有：</li></ul><p><img src="叉乘公式(2).png" alt="叉乘公式(2)" style="zoom:100%;"></p><ul><li>向量A和向量B的外积结果是一个向量，有个更通俗易懂的叫法是<strong>法向量</strong>，该向量垂直于a和b向量构成的平面。</li></ul><h3 id="如何判断？"><a href="#如何判断？" class="headerlink" title="如何判断？"></a>如何判断？</h3><p><img src="判断点在三角形内.png" alt="判断点在三角形内" style="zoom:100%;"></p><h4 id="面积法"><a href="#面积法" class="headerlink" title="面积法"></a>面积法</h4><ul><li>如图：S▲ABP + S▲APC + S▲BPC = S▲ABC</li><li>利用叉乘求出各三角形面积即可（叉积的绝对值就是A和B为两边所形成的平行四边形的面积）</li></ul><h4 id="叉乘法"><a href="#叉乘法" class="headerlink" title="叉乘法"></a>叉乘法</h4><ul><li>首先看一下这个问题，如何判断某两个点在某条直线的同一侧</li></ul><p><img src="判断两点是否在同一侧.png" alt="判断两点是否在同一侧" style="zoom:100%;"></p><ul><li>根据向量的叉乘以及右手螺旋定则，AB <code>x</code> AM 的方向为向外指出屏幕，AB <code>x</code> AN 也是向外指出屏幕，但 AB <code>x</code> AO 的方向是向内指向屏幕，因此 M、N 在直线 AB 的同侧，M、O在直线AB的另一侧。</li><li>实际计算时，只需要考虑叉积的数值正负。假设以上各点坐标为A(0,0), B(4,0), M(1,2), N(3,4), O(3,-4)， 则：<ol><li>AB <code>x</code> AM = (4, 0) <code>x</code> (1, 2) = 4 · 2 - 0 · 1 = 8</li><li>AB <code>x</code> AN = (4, 0) <code>x</code> (3, 4) = 4 · 4 – 0 · 3 = 16</li><li>AB <code>x</code> AO = (4, 0) <code>x</code> (3, -4) = 4 · -4 – 0 · 3 = –16</li></ol></li><li>由上面的数值可知，可以根据数值的正负判断叉乘后向量的方向。</li><li>回到原来的问题上。</li><li>沿逆时针方向，三角形两两顶点构成三个向量，比如AB,BC,CA，分别用这三个向量与起点和P的交点构成的向量求叉乘，如ABxAP, BCxBP, CAxCP</li><li>由右手定则，如果三个结果都是正的，说明这个点都在向量的<code>左边</code>，可以推导得出这个点在三角形内。否则只要有一个是负数，就说明在<code>右边</code>，在三角形外了。</li></ul><h2 id="如何判断一条射线是否与一个三角形相交"><a href="#如何判断一条射线是否与一个三角形相交" class="headerlink" title="如何判断一条射线是否与一个三角形相交"></a>如何判断一条射线是否与一个三角形相交</h2><ul><li><strong>传统方法</strong>：<ol><li>首先判断射线是否与三角形所在的平面相交，如果相交求出交点，进而判断交点是否在三角形内；如果不相交或者交点不在三角形之内，则射线一定不与三角形相交。</li></ol></li><li><strong>Moller-Trumbore 算法</strong>：</li></ul><h2 id="如何判断两个三角形是否相交"><a href="#如何判断两个三角形是否相交" class="headerlink" title="如何判断两个三角形是否相交"></a>如何判断两个三角形是否相交</h2><ul><li>如果两个三角形相交，必定<strong>至少其中一个</strong>三角形的<strong>一条边</strong>穿过了另一个三角形的内部；</li><li>把边当作光线去跟另一个三角形求交。如果三条边只要有一条边跟三角形有交点，即可判断两三角形相交，当然关键是要判断计算出来的 t 是否合理，是否位于边长范围之内。</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><ul><li><strong><a href="https://sleepyloser.github.io/2024/08/31/Unity/Graphics/Three_Dimensional_Mathematics/ThreeDimensionalMathematics/">三维数学</a></strong></li></ul><h2 id="如何判断一个点在三角形（矩形、扇形）内"><a href="#如何判断一个点在三角形（矩形、扇形）内" class="headerlink" title="如何判断一个点在三角形（矩形、扇形）内"></a>如何判断一个点在三角形（矩形、扇形）内</h2><p><img src="判断点在三角形内.png" alt="判断点在三角形内" style="zoom:100%;"></p><h3 id="重心法"><a href="#重心法" class="headerlink" title="重心法"></a>重心法</h3><p><img src="重心法.jpg" alt="重心法" style="zoom:100%;"></p><h3 id="面积法"><a href="#面积法" class="headerlink" title="面积法"></a>面积法</h3><ul><li>如图：S▲ABP + S▲APC + S▲BPC = S▲ABC</li><li>利用叉乘求出各三角形面积即可（叉积的绝对值就是A和B为两边所形成的平行四边形的面积）</li></ul><h3 id="叉乘法"><a href="#叉乘法" class="headerlink" title="叉乘法"></a>叉乘法</h3><ul><li>首先看一下这个问题，如何判断某两个点在某条直线的同一侧</li></ul><p><img src="判断两点是否在同一侧.png" alt="判断两点是否在同一侧" style="zoom:100%;"></p><ul><li>根据向量的叉乘以及右手螺旋定则，AB <code>x</code> AM 的方向为向外指出屏幕，AB <code>x</code> AN 也是向外指出屏幕，但 AB <code>x</code> AO 的方向是向内指向屏幕，因此 M、N 在直线 AB 的同侧，M、O在直线AB的另一侧。</li><li>实际计算时，只需要考虑叉积的数值正负。假设以上各点坐标为A(0,0), B(4,0), M(1,2), N(3,4), O(3,-4)， 则：<ol><li>AB <code>x</code> AM = (4, 0) <code>x</code> (1, 2) = 4 · 2 - 0 · 1 = 8</li><li>AB <code>x</code> AN = (4, 0) <code>x</code> (3, 4) = 4 · 4 – 0 · 3 = 16</li><li>AB <code>x</code> AO = (4, 0) <code>x</code> (3, -4) = 4 · -4 – 0 · 3 = –16</li></ol></li><li>由上面的数值可知，可以根据数值的正负判断叉乘后向量的方向。</li><li>回到原来的问题上。</li><li>沿逆时针方向，三角形两两顶点构成三个向量，比如AB,BC,CA，分别用这三个向量与起点和P的交点构成的向量求叉乘，如ABxAP, BCxBP, CAxCP</li><li>由右手定则，如果三个结果都是正的，说明这个点都在向量的<code>左边</code>，可以推导得出这个点在三角形内。否则只要有一个是负数，就说明在<code>右边</code>，在三角形外了。</li></ul><h2 id="如何判断一条射线是否与一个三角形相交"><a href="#如何判断一条射线是否与一个三角形相交" class="headerlink" title="如何判断一条射线是否与一个三角形相交"></a>如何判断一条射线是否与一个三角形相交</h2><ul><li><strong>传统方法</strong>：<ol><li>首先判断射线是否与三角形所在的平面相交，如果相交求出交点，进而判断交点是否在三角形内；</li><li>如果不相交或者交点不在三角形之内，则射线一定不与三角形相交。<blockquote><p><strong>平面方程</strong></p><blockquote><p><strong>点法式</strong></p><blockquote><ul><li>已知平面上某个点坐标（维数 ≥ 3）及该平面的法向量，则该平面方程为：</li><li>A(x - x0) + B(y - y0) + C(z - z0) = 0</li><li>例如：某平面有一点为 u(1, 1, 2)，及该平面的法向量 n = (-1, -2, 1)</li><li>设：x0 = 1，y0 = 1，z0 = 2</li><li>则有：-1(x - 1) + -2(y - 1) + 1(z - 2) = 0</li><li>化简后：-x - 2y + z + 1 = 0，即为平面方程</li></ul></blockquote><p><strong>一般式</strong></p><blockquote><p><strong>已知平面两点</strong></p><blockquote><ul><li>求该平面的方程，平面方程为：</li><li>Ax + By + Cz + D = 0</li><li>例如：某平面有两点分别为 u(1, 1, 2), v(-1, -2, -3)，求该平面的方程</li><li>将两点视作两个向量, <strong>两个向量做叉乘，求得垂直于两个向量所在平面的法向量</strong></li><li>第一步：u <code>x</code> v，求法向量</li><li>第二步：将法向量代入A,B,C<br><img src="平面两点.png" alt="平面两点" style="zoom:50%;"></li></ul></blockquote><p><strong>已知平面三点</strong></p><blockquote><ul><li>求该平面的方程，平面方程为：</li><li>Ax + By + Cz + D = 0</li><li>A = (y2 - y1) · (z3 - z1) - (z2 - z1) · (y3 - y1)</li><li>B = (x3 - x1) · (z2 - z1) - (x2 - x1) · (z3 - z1)</li><li>C = (x2 - x1) · (y3 - y1) - (x3 - x1) · (y2 - y1)</li><li>D = -(A · x1 + B · y1 + C · z1)</li><li>例：某平面有三点分别为 u(1, 1, 2), v(-1, -2, -3), w(0, 1, -1)，求该平面的方程</li><li>求解后得：A = 9, B = -1, C = -3, D = -2</li><li>平面方程为：9x - y - 3z - 2 = 0<br><img src="平面三点.png" alt="平面三点" style="zoom:100%;"></li></ul></blockquote></blockquote></blockquote></blockquote></li></ol></li><li><strong>Moller-Trumbore 算法</strong>：</li></ul><h2 id="如何判断两个三角形是否相交"><a href="#如何判断两个三角形是否相交" class="headerlink" title="如何判断两个三角形是否相交"></a>如何判断两个三角形是否相交</h2><ul><li>如果两个三角形相交，必定<strong>至少其中一个</strong>三角形的<strong>一条边</strong>穿过了另一个三角形的内部；</li><li>把边当作光线去跟另一个三角形求交。如果三条边只要有一条边跟三角形有交点，即可判断两三角形相交，当然关键是要判断计算出来的 t 是否合理，是否位于边长范围之内。</li></ul><h2 id="如何判断点是否在扇形里"><a href="#如何判断点是否在扇形里" class="headerlink" title="如何判断点是否在扇形里"></a>如何判断点是否在扇形里</h2><p><img src="判断点是否在扇形里.jpg" alt="判断点是否在扇形里" style="zoom:100%;"></p><h2 id="如何判断一条射线是否与一个圆相交"><a href="#如何判断一条射线是否与一个圆相交" class="headerlink" title="如何判断一条射线是否与一个圆相交"></a>如何判断一条射线是否与一个圆相交</h2><p><img src="射线是否穿过圆.jpg" alt="射线是否穿过圆" style="zoom:100%;"><br><img src="射线是否穿过圆(2).jpg" alt="射线是否穿过圆" style="zoom:100%;"></p>]]></content>
       
       
       <categories>
@@ -35,7 +35,7 @@
       <link href="/2024/08/31/Unity/Graphics/EulerAngles_Matrices_Quaternions/EulerAnglesMatricesQuaternions/"/>
       <url>/2024/08/31/Unity/Graphics/EulerAngles_Matrices_Quaternions/EulerAnglesMatricesQuaternions/</url>
       
-        <content type="html"><![CDATA[<h2 id="欧拉角、矩阵、四元数表示旋转的区别和优缺点"><a href="#欧拉角、矩阵、四元数表示旋转的区别和优缺点" class="headerlink" title="欧拉角、矩阵、四元数表示旋转的区别和优缺点"></a>欧拉角、矩阵、四元数表示旋转的区别和优缺点</h2><ul><li><strong>欧拉角</strong>：定义了绕着三个坐标轴的旋转角，来确定刚体的旋转位置的方式，包括俯仰角pitch，偏航角yaw和滚动角roll；<ul><li><strong>优点</strong>是：比较直观，而且单个维度上的角度也比较容易插值；</li><li><strong>缺点</strong>是：它不能进行任意方向的插值，而且会导致<strong>万向节死锁</strong>的问题，旋转的次序对结果也有影响。</li></ul></li><li><strong>矩阵</strong>：<ul><li><strong>优点</strong>是：不受万向节死锁的影响，可以独一无二的表达任意旋转，并且可以通过矩阵乘法来对点或矢量进行旋转变换；现在多数CPU以及所有GPU都有内置的硬件加速点积和矩阵乘法；</li><li><strong>缺点</strong>是：不太直观，而且需要比较大的存储空间，也不太容易进行插值计算。</li></ul></li><li><strong>四元数</strong>：<ul><li><strong>好处</strong>是：能够串接旋转，能把旋转直接作用于点或者矢量，而且能够进行旋转插值。另外它所占用的存储空间也比矩阵小，四元数可以解决万向节死锁的问题。</li><li><strong>缺点</strong>是：抽象，不易理解，因为多了一个维度。</li></ul></li></ul><h3 id="欧拉角"><a href="#欧拉角" class="headerlink" title="欧拉角"></a>欧拉角</h3><h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><h4 id="应用：模型矩阵、观察矩阵、投影矩阵的推导"><a href="#应用：模型矩阵、观察矩阵、投影矩阵的推导" class="headerlink" title="应用：模型矩阵、观察矩阵、投影矩阵的推导"></a>应用：模型矩阵、观察矩阵、投影矩阵的推导</h4><ul><li><p>基本概念</p><ol><li><strong>模型矩阵M(Model)</strong>：将局部坐标变换到世界坐标；</li><li><strong>观察矩阵V(View)</strong>：将世界坐标转换为观察坐标，或者说，将物体的世界坐标，转换为在相机视角下的坐标；</li><li><strong>投影矩阵P(Projection)</strong>：将顶点坐标从观察空间变换到裁剪空间(clip space) ，后续的透视除法操作会将裁剪空间的坐标转换为标准化设备坐标系中（NDC）。</li></ol></li><li><p>推导</p></li></ul><h3 id="四元数"><a href="#四元数" class="headerlink" title="四元数"></a>四元数</h3>]]></content>
+        <content type="html"><![CDATA[<h2 id="欧拉角、矩阵、四元数表示旋转的区别和优缺点"><a href="#欧拉角、矩阵、四元数表示旋转的区别和优缺点" class="headerlink" title="欧拉角、矩阵、四元数表示旋转的区别和优缺点"></a>欧拉角、矩阵、四元数表示旋转的区别和优缺点</h2><ul><li><strong>欧拉角</strong>：定义了绕着三个坐标轴的旋转角，来确定刚体的旋转位置的方式，包括俯仰角pitch，偏航角yaw和滚动角roll；<ul><li><strong>优点</strong>是：比较直观，而且单个维度上的角度也比较容易插值；</li><li><strong>缺点</strong>是：它不能进行任意方向的插值，而且会导致<strong>万向节死锁</strong>的问题，旋转的次序对结果也有影响。</li></ul></li><li><strong>矩阵</strong>：<ul><li><strong>优点</strong>是：不受万向节死锁的影响，可以独一无二的表达任意旋转，并且可以通过矩阵乘法来对点或矢量进行旋转变换；现在多数CPU以及所有GPU都有内置的硬件加速点积和矩阵乘法；</li><li><strong>缺点</strong>是：不太直观，而且需要比较大的存储空间，也不太容易进行插值计算。</li></ul></li><li><strong>四元数</strong>：<ul><li><strong>好处</strong>是：能够串接旋转，能把旋转直接作用于点或者矢量，而且能够进行旋转插值。另外它所占用的存储空间也比矩阵小，四元数可以解决万向节死锁的问题。</li><li><strong>缺点</strong>是：抽象，不易理解，因为多了一个维度。</li></ul></li></ul><h3 id="欧拉角"><a href="#欧拉角" class="headerlink" title="欧拉角"></a>欧拉角</h3><h3 id="矩阵"><a href="#矩阵" class="headerlink" title="矩阵"></a>矩阵</h3><h4 id="应用：模型矩阵、观察矩阵、投影矩阵的推导"><a href="#应用：模型矩阵、观察矩阵、投影矩阵的推导" class="headerlink" title="应用：模型矩阵、观察矩阵、投影矩阵的推导"></a>应用：模型矩阵、观察矩阵、投影矩阵的推导</h4><ul><li><p>基本概念</p><ol><li><strong>模型矩阵M(Model)</strong>：将局部坐标变换到世界坐标；</li><li><strong>观察矩阵V(View)</strong>：将世界坐标转换为观察坐标，或者说，将物体的世界坐标，转换为在相机视角下的坐标；</li><li><strong>投影矩阵P(Projection)</strong>：将顶点坐标从观察空间变换到裁剪空间(clip space) ，后续的透视除法操作会将裁剪空间的坐标转换为标准化设备坐标系中（NDC）。</li></ol></li><li><p>推导</p></li></ul><h3 id="四元数"><a href="#四元数" class="headerlink" title="四元数"></a>四元数</h3><h2 id="向量点乘（Dot-Product）"><a href="#向量点乘（Dot-Product）" class="headerlink" title="向量点乘（Dot Product）"></a>向量点乘（Dot Product）</h2><ul><li>即相应元素的乘积的和：Vector1(x1, y1) · Vector2(x2, y2) = x1 · x2 + y1 · y2; <strong>注意结果不是一个向量，而是一个标量（Scalar）</strong></li><li>A · B = |A||B|Cos(θ)。θ是向量A和向量B之间的夹角，这里|A|我们称为向量A的模(norm)，也就是A的长度， 在二维空间中就是|A| = sqrt(x ^ 2 + y ^ 2)。这样我们就和容易计算两条线的夹角：Cos(θ) = A·B / (|A||B|)</li><li>这可以告诉我们如果点乘的结果（点积）<strong>为0的话就表示这两个向量垂直</strong>。当两向量平行时，点积有最大值。另外，点乘运算不仅限于2维空间，他可以推广到任意维空间。</li></ul><h2 id="叉乘（cross-product）"><a href="#叉乘（cross-product）" class="headerlink" title="叉乘（cross product）"></a>叉乘（cross product）</h2><p><img src="叉乘.png" alt="叉乘" style="zoom:100%;"></p><ul><li>二维空间中的叉乘是：Vector1(x1, y1) <code>x</code> Vector2(x2, y2) = x1 · y2 - y1 · x2。看起来像个标量，事实上叉乘的结果是个向量，方向在z轴上。<strong>上述结果是它的模</strong>。</li><li>在二维空间里，让我们暂时忽略它的方向，将结果看成一个向量，那么这个结果类似于上述的点积，我们有：A <code>x</code> B = |A||B|Sin(θ)</li><li>然而角度 θ 和上面点乘的角度有一点点不同，<strong>它是有正负的</strong>，是指从A到B的角度。</li><li>另外还有一个有用的特征那就是<strong>叉积的绝对值就是A和B为两边所形成的平行四边形的面积</strong>。也就是AB所包围三角形面积的两倍。</li><li>在<strong>三维空间</strong>里，A和B的叉乘公式为：</li></ul><p><img src="叉乘公式.png" alt="叉乘公式" style="zoom:100%;"></p><ul><li>其中 i = (1, 0, 0); j = (0, 1, 0); k = (0, 0, 1)。</li><li>根据i、j、k间关系，有：</li></ul><p><img src="叉乘公式(2).png" alt="叉乘公式(2)" style="zoom:100%;"></p><ul><li>向量A和向量B的外积结果是一个向量，有个更通俗易懂的叫法是<strong>法向量</strong>，该向量垂直于a和b向量构成的平面。</li></ul>]]></content>
       
       
       <categories>
@@ -101,9 +101,9 @@
       
         <tags>
             
-            <tag> 计算机组成原理 </tag>
-            
             <tag> Cache </tag>
+            
+            <tag> 计算机组成原理 </tag>
             
         </tags>
       
@@ -178,9 +178,9 @@
       
         <tags>
             
-            <tag> 计算机组成原理 </tag>
-            
             <tag> Cache </tag>
+            
+            <tag> 计算机组成原理 </tag>
             
         </tags>
       
@@ -205,9 +205,9 @@
       
         <tags>
             
-            <tag> 计算机组成原理 </tag>
-            
             <tag> Cache </tag>
+            
+            <tag> 计算机组成原理 </tag>
             
         </tags>
       
@@ -245,7 +245,7 @@
       <link href="/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/"/>
       <url>/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/</url>
       
-        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2><h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><ul><li>const修饰符用来定义常量，具有不可变性。在类中，被const修饰的成员函数，不能修改类中的数据成员；</li><li><strong>指针常量</strong>指的是该指针本身是一个常量，不能被修改，但是指针指向的对象可以被修改；</li><li><strong>常量指针</strong>指的是这个指针指向的对象是一个常量，不能被修改，但是指针本身可以被修改。</li><li>如果 const 变量是在<strong>全局作用域</strong>中声明的，它将存储在<strong>静态存储区</strong>（Static Storage Area）中。</li><li>如果 const 变量是在<strong>函数内部或代码块内部</strong>声明的，它将存储在<strong>栈</strong>（Stack）上，在函数返回时释放。</li><li><strong>const 修饰的字符串常量</strong>存储在<strong>常量存储区</strong>，在程序运行期间保持不变。</li></ul><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><ul><li>static 变量在类的声明中不占用内存（未赋值），因此必须在.cpp文件中定义类静态变量以分配内存；</li><li>文件域的静态变量和类的静态成员变量<strong>在main执行之前的静态初始化过程中分配内存并初始化</strong>（已赋值）；</li><li>局部静态变量在<strong>第一次使用时分配内存并初始化</strong>；</li><li>赋予字面值时会在<strong>编译阶段</strong>就被初始化, 加载时将其映射到内存空间。</li></ul><h4 id="静态数据的存储"><a href="#静态数据的存储" class="headerlink" title="静态数据的存储"></a>静态数据的存储</h4><ul><li><strong>全局（静态）存储区</strong>：分为 DATA 段和 BSS 段。DATA 段（全局初始化区）存放初始化的全局变量和静态变量；BSS 段（全局未初始化区）存放未初始化的全局变量和静态变量。程序运行结束时自动释放。</li><li>其中BBS段在程序执行之前会被系统自动清0，所以未初始化的全局变量和静态变量<strong>在程序执行之前</strong>已经为0。</li><li>存储在静态数据区的变量会<strong>在程序刚开始运行时</strong>就完成初始化，也是<strong>唯一</strong>的一次初始化。</li><li>在 C++ 中 static 的内部实现机制：静态数据成员要在程序一开始运行时就必须存在。因为函数在程序运行中被调用，所以静态数据成员不能在任何函数内分配空间和初始化。</li></ul><h2 id="malloc-与-new"><a href="#malloc-与-new" class="headerlink" title="malloc 与 new"></a>malloc 与 new</h2><ul><li>C使用malloc / free, C++使用new / delete, 前者是C语言中的库函数，后者是C++语言的运算符</li><li>对于自定义对象，malloc/free只进行分配内存和释放内存，无法调用其构造函数和析构函数</li><li>只有new/delete能做到，完成对象的空间分配和初始化，以及对象的销毁和释放空间</li><li>所有二者<strong>不可混用</strong></li><li>具体区别如下：<ol><li>new分配内存空间无需指定分配内存大小，malloc需要；</li><li>new返回类型指针，类型安全，malloc返回void*，再强制转换成所需要的类型；</li><li>new是从自由存储区获得内存，malloc从堆中获取内存；</li><li>对于类对象，new会调用构造函数和析构函数，malloc不会（核心）。</li></ol></li></ul><h2 id="inline-与-define"><a href="#inline-与-define" class="headerlink" title="inline 与 define"></a>inline 与 define</h2><h3 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h3><ul><li>使编译器在函数调用点上展开函数，可以避免函数调用的栈开销；</li><li>内联函数的<strong>缺点</strong>是可能造成代码膨胀，尤其是递归的函数，会造成大量内存开销，exe太大，占用CPU资源。此外，内联函数不方便调试，每次修改会重新编译头文件，增加编译时间。</li></ul><h3 id="二者区别"><a href="#二者区别" class="headerlink" title="二者区别"></a>二者区别</h3><ul><li>define宏命令是在预处理阶段对命令进行替换，inline是在编译阶段在函数调用点处直接展开函数，节省了函数调用的栈开销；</li><li>define<strong>不会</strong>对参数的类型进行检查的，因此会出现类型安全的问题。比如定义一个max命令，但是传递的时候可能会传递一个整数和一个字符串，就会出错；</li><li>内联函数在编译阶段会进行类型检查；</li><li>使用宏的时候可能要添加很多括号，比较容易出错。</li></ul><h2 id="各种排序算法的原理和时间复杂度"><a href="#各种排序算法的原理和时间复杂度" class="headerlink" title="各种排序算法的原理和时间复杂度"></a>各种排序算法的原理和时间复杂度</h2><ol><li><strong>快速排序</strong>：一轮划分，选择一个基准值，小于该基准值的元素放到左边，大于的放在右边，此时该基准值在整个序列中的位置就确定了，接着递归地对左边子序列和右边子序列进行划分。时间复杂度O(nlogn)，最坏的时间复杂度是O(n^2)。<strong>需要排序的对象越有序，快速排序的退化程度越高，即时间复杂度越趋向于O(n ^ 2)</strong>；</li><li><strong>堆排序</strong>：利用完全二叉树性质构造的一个一维数组，用数组下标代表结点，则一个结点的左孩子下标为2i+1,右孩子为2i+2，一个结点的父节点为(i-1)/2。堆排序的思想就是，构造一个最大堆或者最小堆，以最大堆为例，那么最大的值就是根节点，把这个最大值和最后一个结点交换，然后在从前n-1个结点中构造一个最大堆，再重复上述的操作，即每次将现有序列的最大值放在现有数组的最后一位，最后就会形成一个有序数组；求升序用最大堆，降序用最小堆。时间复杂度O(nlogn)；</li><li><strong>冒泡排序</strong>：从前往后两两比较，逆序则交换，不断重复直到有序；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>插入排序</strong>：类似打牌，从第二个元素开始，把每个元素插入前面有序的序列中；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>选择排序</strong>：每次选择待排序列中的最小值和未排序列中的首元素交换；时间复杂度O(n^2);</li><li><strong>归并排序</strong>：将整个序列划分成最小的&gt;=2的等长序列，排序后再合并，再排序再合并，最后合成一个完整序列。时间复杂度O(nlogn)。</li><li><strong>希尔排序</strong>：是插入排序的改进版，取一个步长划分为多个子序列进行排序，再合并（如135一个序列，246一个序列），时间复杂度O(n1.3)，最好O(n)，最坏O(n^2)；</li><li><strong>桶排序</strong>：将数组分到有限数量的桶里。每个桶再个别排序，最后依次把各个桶中的记录列出来记得到有序序列。桶排序的平均时间复杂度为线性的O(N+C)，其中C = N * (logN - logM)，M为桶的数量。最好的情况下为O(N)。</li></ol><h2 id="动态库与静态库的区别"><a href="#动态库与静态库的区别" class="headerlink" title="动态库与静态库的区别"></a>动态库与静态库的区别</h2><p><img src="动态库与静态库的区别.png" alt="动态库与静态库的区别" style="zoom:50%;"></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="const-修饰的函数能否重载？"><a href="#const-修饰的函数能否重载？" class="headerlink" title="const 修饰的函数能否重载？"></a>const 修饰的函数能否重载？</h2><ul><li><strong>const修饰的函数可以重载</strong>。const成员函数既不能改变类内的数据成员，也无法调用非const的成员函数；const类对象只能调用const成员函数。非const对象无论是否是const成员函数都能调用，但是如果有重载的非const函数，非const对象会优先调用重载后的非const函数。</li></ul><h2 id="const-与-static-关键字"><a href="#const-与-static-关键字" class="headerlink" title="const 与 static 关键字"></a>const 与 static 关键字</h2><h3 id="const"><a href="#const" class="headerlink" title="const"></a>const</h3><ul><li>const修饰符用来定义常量，具有不可变性。在类中，被const修饰的成员函数，不能修改类中的数据成员；</li><li><strong>指针常量</strong>指的是该指针本身是一个常量，不能被修改，但是指针指向的对象可以被修改；</li><li><strong>常量指针</strong>指的是这个指针指向的对象是一个常量，不能被修改，但是指针本身可以被修改。</li><li>如果 const 变量是在<strong>全局作用域</strong>中声明的，它将存储在<strong>静态存储区</strong>（Static Storage Area）中。</li><li>如果 const 变量是在<strong>函数内部或代码块内部</strong>声明的，它将存储在<strong>栈</strong>（Stack）上，在函数返回时释放。</li><li><strong>const 修饰的字符串常量</strong>存储在<strong>常量存储区</strong>，在程序运行期间保持不变。</li></ul><h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><ul><li>static 变量在类的声明中不占用内存（未赋值），因此必须在.cpp文件中定义类静态变量以分配内存；</li><li>文件域的静态变量和类的静态成员变量<strong>在main执行之前的静态初始化过程中分配内存并初始化</strong>（已赋值）；</li><li>局部静态变量在<strong>第一次使用时分配内存并初始化</strong>；</li><li>赋予字面值时会在<strong>编译阶段</strong>就被初始化, 加载时将其映射到内存空间。</li></ul><h4 id="静态数据的存储"><a href="#静态数据的存储" class="headerlink" title="静态数据的存储"></a>静态数据的存储</h4><ul><li><strong>全局（静态）存储区</strong>：分为 DATA 段和 BSS 段。DATA 段（全局初始化区）存放初始化的全局变量和静态变量；BSS 段（全局未初始化区）存放未初始化的全局变量和静态变量。程序运行结束时自动释放。</li><li>其中BBS段在程序执行之前会被系统自动清0，所以未初始化的全局变量和静态变量<strong>在程序执行之前</strong>已经为0。</li><li>存储在静态数据区的变量会<strong>在程序刚开始运行时</strong>就完成初始化，也是<strong>唯一</strong>的一次初始化。</li><li>在 C++ 中 static 的内部实现机制：静态数据成员要在程序一开始运行时就必须存在。因为函数在程序运行中被调用，所以静态数据成员不能在任何函数内分配空间和初始化。</li></ul><h2 id="malloc-与-new"><a href="#malloc-与-new" class="headerlink" title="malloc 与 new"></a>malloc 与 new</h2><ul><li>C使用malloc / free, C++使用new / delete, 前者是C语言中的库函数，后者是C++语言的运算符</li><li>对于自定义对象，malloc/free只进行分配内存和释放内存，无法调用其构造函数和析构函数</li><li>只有new/delete能做到，完成对象的空间分配和初始化，以及对象的销毁和释放空间</li><li>所有二者<strong>不可混用</strong></li><li>具体区别如下：<ol><li>new分配内存空间无需指定分配内存大小，malloc需要；</li><li>new返回类型指针，类型安全，malloc返回void*，再强制转换成所需要的类型；</li><li>new是从自由存储区获得内存，malloc从堆中获取内存；</li><li>对于类对象，new会调用构造函数和析构函数，malloc不会（核心）。</li></ol></li></ul><h2 id="inline-与-define"><a href="#inline-与-define" class="headerlink" title="inline 与 define"></a>inline 与 define</h2><h3 id="inline"><a href="#inline" class="headerlink" title="inline"></a>inline</h3><ul><li>使编译器在函数调用点上展开函数，可以避免函数调用的栈开销；</li><li>内联函数的<strong>缺点</strong>是可能造成代码膨胀，尤其是递归的函数，会造成大量内存开销，exe太大，占用CPU资源。此外，内联函数不方便调试，每次修改会重新编译头文件，增加编译时间。</li></ul><h3 id="二者区别"><a href="#二者区别" class="headerlink" title="二者区别"></a>二者区别</h3><ul><li>define宏命令是在预处理阶段对命令进行替换，inline是在编译阶段在函数调用点处直接展开函数，节省了函数调用的栈开销；</li><li>define<strong>不会</strong>对参数的类型进行检查的，因此会出现类型安全的问题。比如定义一个max命令，但是传递的时候可能会传递一个整数和一个字符串，就会出错；</li><li>内联函数在编译阶段会进行类型检查；</li><li>使用宏的时候可能要添加很多括号，比较容易出错。</li></ul><h2 id="各种排序算法的原理和时间复杂度"><a href="#各种排序算法的原理和时间复杂度" class="headerlink" title="各种排序算法的原理和时间复杂度"></a>各种排序算法的原理和时间复杂度</h2><ol><li><strong>快速排序</strong>：一轮划分，选择一个基准值，小于该基准值的元素放到左边，大于的放在右边，此时该基准值在整个序列中的位置就确定了，接着递归地对左边子序列和右边子序列进行划分。时间复杂度O(nlogn)，最坏的时间复杂度是O(n^2)。<strong>需要排序的对象越有序，快速排序的退化程度越高，即时间复杂度越趋向于O(n ^ 2)</strong>；</li><li><strong>堆排序</strong>：利用完全二叉树性质构造的一个一维数组，用数组下标代表结点，则一个结点的左孩子下标为2i+1,右孩子为2i+2，一个结点的父节点为(i-1)/2。堆排序的思想就是，构造一个最大堆或者最小堆，以最大堆为例，那么最大的值就是根节点，把这个最大值和最后一个结点交换，然后在从前n-1个结点中构造一个最大堆，再重复上述的操作，即每次将现有序列的最大值放在现有数组的最后一位，最后就会形成一个有序数组；求升序用最大堆，降序用最小堆。时间复杂度O(nlogn)；</li><li><strong>冒泡排序</strong>：从前往后两两比较，逆序则交换，不断重复直到有序；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>插入排序</strong>：类似打牌，从第二个元素开始，把每个元素插入前面有序的序列中；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>选择排序</strong>：每次选择待排序列中的最小值和未排序列中的首元素交换；时间复杂度O(n^2);</li><li><strong>归并排序</strong>：将整个序列划分成最小的&gt;=2的等长序列，排序后再合并，再排序再合并，最后合成一个完整序列。时间复杂度O(nlogn)。</li><li><strong>希尔排序</strong>：是插入排序的改进版，取一个步长划分为多个子序列进行排序，再合并（如135一个序列，246一个序列），时间复杂度O(n1.3)，最好O(n)，最坏O(n^2)；</li><li><strong>桶排序</strong>：将数组分到有限数量的桶里。每个桶再个别排序，最后依次把各个桶中的记录列出来记得到有序序列。桶排序的平均时间复杂度为线性的O(N+C)，其中C = N * (logN - logM)，M为桶的数量。最好的情况下为O(N)。</li></ol><h2 id="动态库与静态库的区别"><a href="#动态库与静态库的区别" class="headerlink" title="动态库与静态库的区别"></a>动态库与静态库的区别</h2><p><img src="动态库与静态库的区别.png" alt="动态库与静态库的区别" style="zoom:50%;"></p><h2 id="虚函数与虚表"><a href="#虚函数与虚表" class="headerlink" title="虚函数与虚表"></a>虚函数与虚表</h2><p><img src="虚函数(1).jpg" alt="虚函数与虚表" style="zoom:100%;"><br><img src="虚函数(2).jpg" alt="虚函数与虚表" style="zoom:100%;"></p>]]></content>
       
       
       <categories>
@@ -927,44 +927,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
-      
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
       
     </entry>
     
@@ -974,17 +941,6 @@
       <title>友情链接</title>
       <link href="/link/index.html"/>
       <url>/link/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1004,17 +960,6 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
@@ -1026,9 +971,64 @@
     
     
     <entry>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
+      
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
