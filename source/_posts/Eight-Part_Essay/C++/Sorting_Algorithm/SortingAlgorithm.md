@@ -25,7 +25,7 @@ void QuickSort(vector<int>& nums, int left, int right)
 
     pivot = nums[right];
     int i = left;
-    for (int j = left; j <= right - 1; ++j)
+    for (int j = left; j < right; ++j)
     {
         if (nums[j] < pivot)
         {
