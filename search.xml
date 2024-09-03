@@ -8,7 +8,7 @@
       <link href="/2024/09/02/Eight-Part_Essay/C++/Sorting_Algorithm/SortingAlgorithm/"/>
       <url>/2024/09/02/Eight-Part_Essay/C++/Sorting_Algorithm/SortingAlgorithm/</url>
       
-        <content type="html"><![CDATA[<h2 id="各种排序算法的原理和时间复杂度"><a href="#各种排序算法的原理和时间复杂度" class="headerlink" title="各种排序算法的原理和时间复杂度"></a>各种排序算法的原理和时间复杂度</h2><ul><li><strong>快速排序</strong>：一轮划分，选择一个基准值，小于该基准值的元素放到左边，大于的放在右边，此时该基准值在整个序列中的位置就确定了，接着递归地对左边子序列和右边子序列进行划分。时间复杂度O(nlogn)，最坏的时间复杂度是O(n^2)。<strong>需要排序的对象越有序，快速排序的退化程度越高，即时间复杂度越趋向于O(n ^ 2)</strong>。通过随机选择枢轴，可以有效地避免这种情况。随机选择使得每次分区都有较大概率是平衡的，从而保持了快速排序的平均时间复杂度 O(n * logn)；</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">QuickSort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> left, <span class="type">int</span> right)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (left &gt;= right)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> pivot = <span class="built_in">rand</span>() % (right - left + <span class="number">1</span>) + left;</span><br><span class="line">    <span class="built_in">swap</span>(nums[pivot], nums[right]);</span><br><span class="line"></span><br><span class="line">    pivot = nums[right];</span><br><span class="line">    <span class="type">int</span> i = left;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = left; j &lt;= right - <span class="number">1</span>; ++j)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (nums[j] &lt; pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">swap</span>(nums[i++], nums[j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">swap</span>(nums[i], nums[right]);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, left, i - <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, i + <span class="number">1</span>, right);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">SortArray</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>((<span class="type">unsigned</span>)<span class="built_in">time</span>(<span class="literal">NULL</span>));</span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, <span class="number">0</span>, nums.<span class="built_in">size</span>() - <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> nums;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="number">32</span>, <span class="number">32</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">-1</span>, <span class="number">100</span>&#125;;</span><br><span class="line">    <span class="built_in">SortArray</span>(nums);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li><strong>堆排序</strong>：利用完全二叉树性质构造的一个一维数组，用数组下标代表结点，则一个结点的左孩子下标为2i+1,右孩子为2i+2，一个结点的父节点为(i-1)/2。堆排序的思想就是，构造一个最大堆或者最小堆，以最大堆为例，那么最大的值就是根节点，把这个最大值和最后一个结点交换，然后在从前n-1个结点中构造一个最大堆，再重复上述的操作，即每次将现有序列的最大值放在现有数组的最后一位，最后就会形成一个有序数组；求升序用最大堆，降序用最小堆。时间复杂度O(nlogn)；</li><li><strong>冒泡排序</strong>：从前往后两两比较，逆序则交换，不断重复直到有序；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>插入排序</strong>：类似打牌，从第二个元素开始，把每个元素插入前面有序的序列中；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>选择排序</strong>：每次选择待排序列中的最小值和未排序列中的首元素交换；时间复杂度O(n^2);</li><li><strong>归并排序</strong>：将整个序列划分成最小的&gt;=2的等长序列，排序后再合并，再排序再合并，最后合成一个完整序列。时间复杂度O(nlogn)。</li><li><strong>希尔排序</strong>：是插入排序的改进版，取一个步长划分为多个子序列进行排序，再合并（如135一个序列，246一个序列），时间复杂度O(n1.3)，最好O(n)，最坏O(n^2)；</li><li><strong>桶排序</strong>：将数组分到有限数量的桶里。每个桶再个别排序，最后依次把各个桶中的记录列出来记得到有序序列。桶排序的平均时间复杂度为线性的O(N+C)，其中C = N * (logN - logM)，M为桶的数量。最好的情况下为O(N)。</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="各种排序算法的原理和时间复杂度"><a href="#各种排序算法的原理和时间复杂度" class="headerlink" title="各种排序算法的原理和时间复杂度"></a>各种排序算法的原理和时间复杂度</h2><ul><li><strong>快速排序</strong>：一轮划分，选择一个基准值，小于该基准值的元素放到左边，大于的放在右边，此时该基准值在整个序列中的位置就确定了，接着递归地对左边子序列和右边子序列进行划分。时间复杂度O(nlogn)，最坏的时间复杂度是O(n^2)。<strong>需要排序的对象越有序，快速排序的退化程度越高，即时间复杂度越趋向于O(n ^ 2)</strong>。通过随机选择枢轴，可以有效地避免这种情况。随机选择使得每次分区都有较大概率是平衡的，从而保持了快速排序的平均时间复杂度 O(n * logn)；</li></ul><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">QuickSort</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums, <span class="type">int</span> left, <span class="type">int</span> right)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (left &gt;= right)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> pivot = <span class="built_in">rand</span>() % (right - left + <span class="number">1</span>) + left;</span><br><span class="line">    <span class="built_in">swap</span>(nums[pivot], nums[right]);</span><br><span class="line"></span><br><span class="line">    pivot = nums[right];</span><br><span class="line">    <span class="type">int</span> i = left;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = left; j &lt; right; ++j)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (nums[j] &lt; pivot)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">swap</span>(nums[i++], nums[j]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">swap</span>(nums[i], nums[right]);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, left, i - <span class="number">1</span>);</span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, i + <span class="number">1</span>, right);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">int</span>&gt; <span class="title">SortArray</span><span class="params">(vector&lt;<span class="type">int</span>&gt;&amp; nums)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>((<span class="type">unsigned</span>)<span class="built_in">time</span>(<span class="literal">NULL</span>));</span><br><span class="line">    <span class="built_in">QuickSort</span>(nums, <span class="number">0</span>, nums.<span class="built_in">size</span>() - <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> nums;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    vector&lt;<span class="type">int</span>&gt; nums = &#123;<span class="number">1</span>, <span class="number">3</span>, <span class="number">10</span>, <span class="number">32</span>, <span class="number">32</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">-1</span>, <span class="number">100</span>&#125;;</span><br><span class="line">    <span class="built_in">SortArray</span>(nums);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> num : nums) cout &lt;&lt; num &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li><strong>堆排序</strong>：利用完全二叉树性质构造的一个一维数组，用数组下标代表结点，则一个结点的左孩子下标为2i+1,右孩子为2i+2，一个结点的父节点为(i-1)/2。堆排序的思想就是，构造一个最大堆或者最小堆，以最大堆为例，那么最大的值就是根节点，把这个最大值和最后一个结点交换，然后在从前n-1个结点中构造一个最大堆，再重复上述的操作，即每次将现有序列的最大值放在现有数组的最后一位，最后就会形成一个有序数组；求升序用最大堆，降序用最小堆。时间复杂度O(nlogn)；</li><li><strong>冒泡排序</strong>：从前往后两两比较，逆序则交换，不断重复直到有序；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>插入排序</strong>：类似打牌，从第二个元素开始，把每个元素插入前面有序的序列中；时间复杂度O(n^2)，最好情况O(n)；</li><li><strong>选择排序</strong>：每次选择待排序列中的最小值和未排序列中的首元素交换；时间复杂度O(n^2);</li><li><strong>归并排序</strong>：将整个序列划分成最小的&gt;=2的等长序列，排序后再合并，再排序再合并，最后合成一个完整序列。时间复杂度O(nlogn)。</li><li><strong>希尔排序</strong>：是插入排序的改进版，取一个步长划分为多个子序列进行排序，再合并（如135一个序列，246一个序列），时间复杂度O(n1.3)，最好O(n)，最坏O(n^2)；</li><li><strong>桶排序</strong>：将数组分到有限数量的桶里。每个桶再个别排序，最后依次把各个桶中的记录列出来记得到有序序列。桶排序的平均时间复杂度为线性的O(N+C)，其中C = N * (logN - logM)，M为桶的数量。最好的情况下为O(N)。</li></ul>]]></content>
       
       
       <categories>
@@ -513,9 +513,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -798,9 +798,9 @@
       
         <tags>
             
-            <tag> 实用工具 </tag>
-            
             <tag> 纹理 </tag>
+            
+            <tag> 实用工具 </tag>
             
         </tags>
       
@@ -902,9 +902,9 @@
       
         <tags>
             
-            <tag> 纹理 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 纹理 </tag>
             
         </tags>
       
@@ -979,11 +979,33 @@
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
+      
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
       
     </entry>
     
@@ -1001,11 +1023,44 @@
     
     
     <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
@@ -1026,61 +1081,6 @@
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
-      
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
