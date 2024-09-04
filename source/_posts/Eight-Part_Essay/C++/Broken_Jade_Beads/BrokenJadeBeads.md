@@ -24,6 +24,104 @@ tags:
 * 如果 const 变量是在**函数内部或代码块内部**声明的，它将存储在**栈**（Stack）上，在函数返回时释放。
 * **const 修饰的字符串常量**存储在**常量存储区**，在程序运行期间保持不变。
 
+#### const 修饰函数的参数
+
+* 如果参数作输出用，不论它是什么数据类型，也不论它采用“指针传递”还是“引用传递”，都不能加const修饰，否则该参数将失去输出功能。
+* 如果输入参数采用“指针传递”，那么加const修饰可以防止意外地改动该指针，起到保护作用。
+
+``` CPP
+void StringCopy(char*strDestination, const char *strSource);
+```
+
+* **对于非内部数据类型的输入参数，应该将“值传递”的方式改为“const引用传递”，目的是提高效率**。例如将 `void Func(A a)` 改为 `void Func(const A &a)`。
+* **对于内部数据类型的输入参数，不要将“值传递”的方式改为“const 引用传递”。否则既达不到提高效率的目的，又降低了函数的可理解性**。例如 `void Func(int x)` 不应该改为 `void Func(const int &x)` 。
+
+#### const 修饰函数的返回值
+
+* 如果给以“指针传递”方式的函数返回值加const修饰，那么函数返回值（即指针）的内容不能被修改，该返回值只能被赋给加const修饰的同类型指针。例如如下函数：
+
+``` CPP
+const char* GetString(void);
+```
+
+* 如下语句将出现编译错误：
+
+``` CPP
+char* str = GetString();
+```
+
+* 正确的用法时：
+
+``` CPP
+const char* str = GetString();
+```
+
+* 如果函数返回值采用“值传递方式”，由于函数会把返回值复制到外部临时的存储单元中，加const修饰没有任何价值。　例如：
+不要将函数 `int GetInt(void)` 写成 `const int GetInt(void)`。
+* 同理不要把函数 `A GetA(void)` 写成 `const A GetA(void)` ，其中A为用户自定义的数据类型。
+* 如果返回值**不是**内部数据类型，将函数 `A GetA(void)` 改写为 `const A& GetA(void)` 的确能提高效率。
+* 但此时千万千万要小心，一定要搞清楚函数究竟是想返回一个对象的“拷贝”还是仅返回“别名”就可以了，否则程序会出错。
+* 函数返回值采用“引用传递”的场合并不多，这种方式一般只出现在类的赋值函数中，目的是为了实现链式表达。
+
+``` CPP
+class A
+{
+　　A& operate = (const A &other); // 赋值函数
+};
+A  a, b, c;   // a, b, c 为A的对象
+ 
+a = b = c;    // 正常的链式赋值
+(a = b) = c;  // 不正常的链式赋值，但合法
+```
+
+* 如果将赋值函数的返回值加const修饰，那么该返回值的内容不允许被改动。上例中，语句 `a = b = c` 仍然正确，但是语句 `(a = b) = c` 则是非法的。
+
+#### const 成员函数
+
+* 任何不会修改数据成员的函数都应该声明为const类型。如果在编写const成员函数时，不慎修改了数据成员，或者调用了其它非const成员函数，编译器将指出错误。
+* 这无疑会提高程序的健壮性。以下程序中，类stack的成员函数GetCount仅用于计数，从逻辑上讲GetCount应当为const函数。编译器将指出GetCount函数中的错误。
+
+#### 补充：const放在后面有什么意思？
+
+``` CPP
+AcGePoint3dstartPoint() const;
+```
+
+* const放在后面跟前面有区别么？准确的说const是修饰this指向的对象的
+* 譬如，我们定义了
+
+``` CPP
+class A
+{
+public:
+　　f(int);
+};
+```
+
+* 这里 `f` 函数其实有两个参数，第一个是 `A* const this` , 另一个才是int类型的参数
+* 如果我们不想 `f` 函数改变参数的值，可以把函数原型改为 `f(const int)` ,但如果我们不允许 `f` 改变this指向的对象呢？因为this是隐含参数，const没法直接修饰它，就加在函数的后面了，表示this的类型是 `const A* const this`。
+* const修饰 `*this` 是本质，至于说“表示该成员函数不会修改类的数据。否则会编译报错”之类的说法只是一个现象，根源就是因为 `*this` 是const类型的。
+
+``` CPP
+class  Stack
+{
+public:
+    void Push(int elem);
+    int Pop(void);
+    int GetCount(void) const; // const 成员函数
+private:
+    int m_num;
+    int m_data[100];
+};
+ 
+int Stack::GetCount(void) const
+{
+    ++m_num;      // 编译错误，企图修改数据成员m_num
+    Pop();        // 编译错误，企图调用非const函数
+    return m_num;
+} 
+```
+
 ### static
 
 * static 变量在类的声明中不占用内存（未赋值），因此必须在.cpp文件中定义类静态变量以分配内存；
@@ -37,6 +135,8 @@ tags:
 * 其中BBS段在程序执行之前会被系统自动清0，所以未初始化的全局变量和静态变量**在程序执行之前**已经为0。
 * 存储在静态数据区的变量会**在程序刚开始运行时**就完成初始化，也是**唯一**的一次初始化。
 * 在 C++ 中 static 的内部实现机制：静态数据成员要在程序一开始运行时就必须存在。因为函数在程序运行中被调用，所以静态数据成员不能在任何函数内分配空间和初始化。
+
+## volatile
 
 ## malloc 与 new
 
