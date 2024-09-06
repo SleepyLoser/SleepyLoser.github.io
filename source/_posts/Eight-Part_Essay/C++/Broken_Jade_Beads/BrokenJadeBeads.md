@@ -81,7 +81,7 @@ a = b = c;    // 正常的链式赋值
 * 任何不会修改数据成员的函数都应该声明为const类型。如果在编写const成员函数时，不慎修改了数据成员，或者调用了其它非const成员函数，编译器将指出错误。
 * 这无疑会提高程序的健壮性。以下程序中，类stack的成员函数GetCount仅用于计数，从逻辑上讲GetCount应当为const函数。编译器将指出GetCount函数中的错误。
 
-#### 补充：const放在后面有什么意思？
+#### 补充：const放在后面是什么意思？
 
 ``` CPP
 AcGePoint3dstartPoint() const;
@@ -94,7 +94,7 @@ AcGePoint3dstartPoint() const;
 class A
 {
 public:
-　　f(int);
+　　f(int p);
 };
 ```
 
