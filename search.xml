@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Unity渲染优化的4种批处理</title>
+      <link href="/2024/09/11/Unity/Performance_Optimization/Rendering_Optimization/RenderingOptimization/"/>
+      <url>/2024/09/11/Unity/Performance_Optimization/Rendering_Optimization/RenderingOptimization/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Static-Batching（静态批处理）"><a href="#Static-Batching（静态批处理）" class="headerlink" title="Static Batching（静态批处理）"></a>Static Batching（静态批处理）</h2><ul><li><code>静态批处理</code> 是一种 <code>draw call batching</code> 方法, 它组合不移动的网格以减少 <code>Draw Calls</code>。它将组合的网格转换为世界空间，并为它们构建一个共享顶点和索引缓冲区。然后，Unity 执行单个绘制调用，该调用使用此组合网格一次绘制批处理中的所有对象。静态批处理可以显著减少绘制调用的数量。</li><li><code>静态批处理</code> 比 <code>动态批处理</code> 更高效，因为 <code>静态批处理</code> 不会转换 CPU 上的顶点。有关静态批处理的性能影响的更多信息，请参阅 <a href="#jump2">性能影响</a>。</li></ul><h3 id="使用静态批处理"><a href="#使用静态批处理" class="headerlink" title="使用静态批处理"></a>使用静态批处理</h3><ul><li>Unity 可以在<strong>构建时</strong>和<strong>运行时</strong>执行静态批处理。作为一般规则，如果在构建应用程序之前场景中存在游戏对象，请使用 <code>Editor</code> 在构建时对游戏对象进行批处理。如果在运行时创建游戏对象及其网格，请使用 <a href="#jump1">运行时 API</a>。</li><li>使用 <code>运行时 API</code> 时，您可以更改静态批处理根的转换属性。这意味着您可以移动、旋转或缩放构成静态批处理的<strong>整个网格组合</strong>。您<strong>无法更改单个网格</strong>的 <code>transform</code> 属性。</li><li><strong>注意</strong>：要使用运行时静态批处理，您还<strong>必须</strong>将网格设置为启用 <code>读/写</code>。</li></ul><h4 id="构建时的静态批处理"><a href="#构建时的静态批处理" class="headerlink" title="构建时的静态批处理"></a>构建时的静态批处理</h4><ul><li>您可以在 Editor 中启用构建时的静态批处理。</li><li>要在构建时执行静态批处理：<ol><li>转到 <strong>Edit &gt; Project Settings &gt; Player</strong>。</li><li>在 <strong>Other Settings （其他设置）</strong> 中，启用 <strong>Static Batching （静态批处理）</strong>。</li><li>在 <code>Scene</code> 视图或 <code>Hierarchy</code> 中，选择要批处理的游戏对象，然后在 <code>Inspector</code> 中查看它。<ul><li><strong>提示</strong>：可以同时选择多个游戏对象，以便为所有游戏对象启用静态批处理。</li></ul></li><li>在游戏对象的 <code>Static Editor Flags</code> 中，启用 <code>Batching Static</code>。</li></ol></li><li>如果指定的静态网格满足常见使用信息中描述的条件，则 Unity 会自动将指定的静态网格批处理到相同的 <code>Draw Call</code> 中。</li><li><strong>注意</strong>：如果在构建时执行静态批处理，则 Unity 在运行时<strong>不会</strong>使用任何 CPU 资源来生成静态批处理的网格数据。</li></ul><h4 id="运行时的静态批处理"><a href="#运行时的静态批处理" class="headerlink" title="运行时的静态批处理"></a><span id="jump1">运行时的静态批处理</span></h4><ul><li>为了在运行时批处理静态网格，Unity 提供了 <code>StaticBatchingUtility</code> 类。静态 <code>StaticBatchingUtility.Combine</code> 方法将您传入的游戏对象组合在一起，并为静态批处理做好准备。</li><li>与构建时的静态批处理不同，运行时的批处理不需要您启用 <code>Static Batching Player Setting</code>。</li></ul><h4 id="性能影响"><a href="#性能影响" class="headerlink" title="性能影响"></a><span id="jump2">性能影响</span></h4><ul><li>使用静态批处理需要额外的 CPU 内存来存储组合的几何体。</li><li>如果多个游戏对象使用相同的网格，则 Unity 会为<strong>每个</strong>游戏对象创建一个网格副本，并将每个副本插入到组合网格中。这意味着相同的几何体在组合网格中多次出现。</li><li>无论您使用的是 <code>编辑器</code> 还是 <a href="#jump1">运行时 API</a> 来准备用于静态批处理的游戏对象，Unity 都会执行此操作。</li><li>如果要保持较小的内存占用，可能必须牺牲渲染性能并避免对某些游戏对象进行静态批处理。例如，在茂密的森林环境中将树木标记为静态可能会对内存产生严重影响。</li><li><strong>注</strong>： 静态批处理可以包含的顶点数存在限制。每个静态批处理最多可以包含 <code>64000</code> 个顶点。如果有更多，Unity 会创建另一个 <code>batch</code>。</li></ul><h2 id="Dynamic-Batching（动态批处理）"><a href="#Dynamic-Batching（动态批处理）" class="headerlink" title="Dynamic Batching（动态批处理）"></a>Dynamic Batching（动态批处理）</h2><ul><li>动态批处理是一种 <code>draw call batching</code> 方法，可对移动的游戏对象进行批处理以减少 <code>Draw Calls</code>。动态批处理在 <code>Unity 运行时动态生成的网格</code> 和 <code>几何体（例如粒子系统）</code> 之间的工作方式不同（见下文）。</li></ul><h3 id="使用动态批处理"><a href="#使用动态批处理" class="headerlink" title="使用动态批处理"></a>使用动态批处理</h3><ul><li>Unity 始终对动态几何体（如 Particle Systems）使用动态批处理</li><li>要对网格使用动态批处理：<ol><li>转到 <strong>Edit &gt; Project Settings &gt; Player</strong>。</li><li>在 <strong>Other Settings （其他设置）</strong> 中，启用 <strong>Dynamic Batching （动态批处理）</strong>。</li></ol></li></ul><h3 id="网格的动态批处理"><a href="#网格的动态批处理" class="headerlink" title="网格的动态批处理"></a>网格的动态批处理</h3><ul><li>网格的动态批处理的工作原理是<strong>将所有顶点转换为世界空间</strong>。在 <code>CPU</code> 上，而不是在 <code>GPU</code> 上。这意味着，仅当转换工作比执行 <code>Draw Call</code> 占用的资源更少时，动态批处理才是一种优化。</li><li>Unity 可以对阴影投射物使用动态批处理，即使它们的材质不同，只要 Unity 需要的阴影通道材质值相同即可。例如，多个 crate 可以使用具有不同纹理的材质。尽管材质资源不同，但差异<strong>与阴影投射物通道无关</strong>，Unity 可以在阴影渲染步骤中为 crate 游戏对象批处理阴影。</li></ul><h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><ul><li>在以下情况下，Unity 要么根本无法使用动态批处理，要么只能在有限范围内应用动态批处理：<ol><li>Unity 无法将动态批处理应用于包含超过 <code>900</code> 个顶点属性（ <code>position（位置）</code> , <code>normal（法线）</code> , <code>color（颜色）</code> , 和 <code>texture coordinates（纹理坐标）</code> ）和 <code>225</code> 个顶点的网格。这是因为网格的动态批处理每个顶点都有开销。例如，如果着色器使用 <code>顶点位置</code> 、<code>顶点法线</code> 和单个 <code>UV</code> ，则 Unity 最多可以批处理 <code>225</code> 个顶点。但是，如果着色器使用 <code>顶点位置</code> 、<code>顶点法线</code> 、<code>UV0</code> 、<code>UV1</code> 和 <code>顶点切线</code>，则 Unity 只能批处理 <code>180</code> 个顶点。</li><li>如果游戏对象使用不同的材质实例，则 Unity 无法将它们一起批处理，即使它们本质上相同。<strong>唯一</strong>的例外是 <code>阴影投射物渲染</code> 。</li><li>具有光照贴图的游戏对象具有额外的渲染器参数。这意味着，如果要批量光照贴图游戏对象，它们<strong>必须</strong>指向相同的光照贴图位置。</li><li>Unity <strong>无法</strong>将动态批处理完全应用于<strong>使用多通道着色器</strong>的游戏对象。几乎所有 Unity 着色器都支持前向渲染中的多个光源。为了实现这一点，他们为每个光源处理一个额外的渲染通道。Unity <strong>仅对第一个渲染通道进行批处理</strong>。它无法对其他每像素光源的绘制调用进行批处理。</li></ol></li></ul><h3 id="动态生成的几何图形的动态批处理"><a href="#动态生成的几何图形的动态批处理" class="headerlink" title="动态生成的几何图形的动态批处理"></a>动态生成的几何图形的动态批处理</h3><ul><li>以下渲染器会动态生成几何图形，例如粒子和线条，您可以使用动态批处理对其进行优化：<ol><li>Built-in Particle Systems</li><li>Line Renderers</li><li>Trail Renderers</li></ol></li><li>动态生成的几何体的动态批处理与网格的动态批处理不同：<ol><li>对于每个渲染器，Unity 会将所有动态可批处理的内容构建到一个大型顶点缓冲区中。</li><li>渲染器设置批处理的材质状态。</li><li>然后，Unity 将顶点缓冲区绑定到 GPU。</li><li>对于批处理中的每个 Renderer，Unity 会更新顶点缓冲区中的偏移量并提交新的 <code>Draw Call</code> 。</li></ol></li><li>此方法类似于 Unity 提交 <code>静态批处理</code> 的 <code>Draw Call</code> 的方式。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - 性能优化 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> UGUI </tag>
+            
+            <tag> 性能优化 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>const 与 static</title>
       <link href="/2024/09/10/Eight-Part_Essay/C++/Const_And_Static/ConstAndStatic/"/>
       <url>/2024/09/10/Eight-Part_Essay/C++/Const_And_Static/ConstAndStatic/</url>
@@ -838,7 +865,7 @@
       <link href="/2024/07/24/Unity/Performance_Optimization/Optimize_UI_One/OptimizeUI_One/"/>
       <url>/2024/07/24/Unity/Performance_Optimization/Optimize_UI_One/OptimizeUI_One/</url>
       
-        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><h3 id="合并UI元素"><a href="#合并UI元素" class="headerlink" title="合并UI元素"></a>合并UI元素</h3><ul><li>将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素</li><li>将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li></ul><h3 id="使用合批技术"><a href="#使用合批技术" class="headerlink" title="使用合批技术"></a>使用合批技术</h3><blockquote><p>将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</p></blockquote><p><strong>静态合批:</strong></p><ul><li>静态合批是将静态（不移动）GameObjects组合成大网格，然后进行绘制。</li><li>静态合批使用比较简单，PlayerSettings中开启static batching，然后对需要静态合批物体的Static打钩即可，unity会自动合并被标记为static的对象，前提它们共享相同的材质，并且不移动，被标记为static的物体不能在游戏中移动，旋转或缩放。</li><li>静态批处理需要额外的内存来存储合并的几何体。</li><li>注意如果多个GameObject在静态批处理之前共享相同的几何体，则会在编辑器或运行时为每个GameObject创建几何体的副本，这会增大内存的开销。例如，在密集的森林级别将树标记为静态可能会产生严重的内存影响。此时就必须去权衡利弊，为了更少的内存占用，可能需要避免某些GameObjects的静态批处理，尽管这必须要牺牲一定的渲染性能。</li></ul><p><strong>动态合批:</strong></p><blockquote><p>动态合批是将一些足够小的网格，在CPU上转换它们的顶点，将许多相似的顶点组合在一起，并一次性绘制它们。<br><strong>无论静态还是动态合批都要求使用相同的材质</strong>，动态合批有以下限制：</p></blockquote><ul><li>动态合批处理动态的GameObjects的每个顶点都有一定的开销，因此动态合批处理仅应用于包含不超过900个顶点属性和不超过300个顶点的网格。(<code>如果shader中使用Vertex Position, Normal和single UV，可以批量处理最多300个顶点，而如果shader中使用Vertex Position, Normal, UV0, UV1和Tangent，则只能使用180个顶点。</code>注意：将来可能会更改属性计数限制。)</li><li>如果GameObjects在Transform上包含镜像，则不会对其进行动态合批处理（例如，scale 为1的GameObject A和scale为-1的GameObject B无法一起动态合批处理）</li><li>使用不同的Material实例会导致GameObjects不能一起批处理，即使它们基本相同。阴影渲染(shadow caster)是一个例外</li><li>带有光照贴图的GameObjects有额外的渲染器参数：保存光照贴图的索引和偏移/缩放。一般来说，动态光照贴图的GameObjects应指向完全相同的光照贴图位置才能被动态合批处理</li><li>使用多个pass的shader不会被动态合批处理。</li></ul><p><strong>Github上Unity官方总结了25种不能被合批处理的情况 :</strong> <a href="https://github.com/Unity-Technologies/BatchBreakingCause">https://github.com/Unity-Technologies/BatchBreakingCause</a></p><h3 id="使用UI-Canvas"><a href="#使用UI-Canvas" class="headerlink" title="使用UI Canvas"></a>使用UI Canvas</h3><ul><li>添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall(动静分离)。</li></ul><h2 id="大量同屏玩家头顶UI的优化案例"><a href="#大量同屏玩家头顶UI的优化案例" class="headerlink" title="大量同屏玩家头顶UI的优化案例: "></a>大量同屏玩家头顶UI的优化案例: <psw>《华夏》手游 头顶UI性能优化</psw></h2><p><img src="bf947f9535b549c6a54357977b2137e4.png" alt="优化案例" style="zoom:50%;"></p><h3 id="图文混排"><a href="#图文混排" class="headerlink" title="图文混排"></a>图文混排</h3><ul><li>图文混排的方案有很多，我们采用了UGUI支持富文本的特性，使用Quad关键字占位，在需要加载Image的时候，在对应ImageHolder下创建Image。</li><li>这也是我们能将所有头顶UI的<strong>Batch降到3个</strong>的基础：所有角色的Text在一个Canvas下，ImageHolder在另一个Canvas下，变化较大的血条在第三个Canvas下。发生变更时，由于<strong>UGUI合并Batch是以Canvas为单位的</strong>，同一个Canvas下的所有物体会被合并到一个Mesh中。这样一来可以减少血条这种变化较大的物体的变化导致整个Canvas的刷新。</li></ul><h3 id="UI图集采用2048-2048"><a href="#UI图集采用2048-2048" class="headerlink" title="UI图集采用2048*2048"></a>UI图集采用2048*2048</h3><ul><li>图集采用2048 <em> 2048。一张图集容纳所有常用资源。由于UGUI的Batch规则是<em>*相同材质（Shader、层级等也要相同）的物体会被Batch到一起</em></em>。所以我们直接将所有常用资源合并到一张图集中。此处的常用资源的概念是指主界面及常驻界面的资源，以及头顶的Image资源。这样做的好处是主界面、常驻界面以及头顶UI的Image只要在Hierarchy中是相邻的，就能100%在一个Batch中完成。对于所有界面来说95%以上的Image资源都在同一个图集中。对于Batch优化，或者是UI开发，都是非常方便的。</li></ul><h3 id="Outline描边优化"><a href="#Outline描边优化" class="headerlink" title="Outline描边优化"></a>Outline描边优化</h3><ul><li>详情见<a href="https://sleepyloser.github.io/2024/08/09/Unity/Performance_Optimization/Outline_Stroke_Optimization/OutlineStrokeOptimization/">一种UGUI的Outline描边优化方案</a></li><li>实际上在后续进一步优化中，我们将描边Shader中原始纹理与描边融合的部分写到了一个Pass中，所以此处性能得到了进一步的提升。数据如下：</li></ul><p><img src="Outline.png" alt="进一步优化Outline" style="zoom:50%;"></p><ul><li>可以看到进一步优化后三角形数量与无效果时的三角形数量一致。顶点数量仅增加了2个（增加的2个顶点数量是因为UGUI顶点帮助函数将共享顶点全部拆分导致）</li></ul><h3 id="预加载字体"><a href="#预加载字体" class="headerlink" title="预加载字体"></a>预加载字体</h3><ul><li>视野中进入新的角色时常常会观察到一次明显的CPU Spike，继续看调用栈发现最耗时的是Font.cacheFontForText,实际上这是动态字体Dynamic Text在扩充Texture。在新的文字进入时，如果文字纹理的Texture剩余空间不足，Unity会新开辟一个原来纹理2倍的新纹理，并将原来纹理上的所有文字都要Copy到新的纹理上。这个过程是相当耗时的，而且完全随机可能会造成游戏卡顿影响体验。</li><li>我们的做法是在游戏进程刚开始的时候，将3500个常用汉字和ASCII字符全部RequestCharactersInTexture, 相当于缓存所有常用汉字及字符。（此处省略3628字的常用汉字+ASCII字符）。</li><li>这样操作以后解决了两个问题：第一点是Font.cacheFontForText基本消失不见了，游戏的一开始已经分配了2048*1024的纹理，足够很长一段时间的文字使用了。第二点就是字体花屏的问题，准确的说这是非常偶现的一个Bug，怀疑与Unity在重新分配一张大的纹理的操作有关。这样修改以后文字花屏的Bug再也没有收到报告了。</li></ul><h3 id="分帧处理"><a href="#分帧处理" class="headerlink" title="分帧处理"></a>分帧处理</h3><ul><li>同一时刻视野内可能出现大量的角色，为了避免卡顿，这里可以采用分帧处理的方式，现将需要处理的角色ID缓存起来，虽然处理总量不变，但是可以1帧处理几个甚至几帧处理1个以减少单帧的压力。对于平顺帧率有非常大的帮助。</li></ul><h3 id="缓冲池"><a href="#缓冲池" class="headerlink" title="缓冲池"></a>缓冲池</h3><ul><li>UI的资源加载耗时不容小觑，既然部分UI（例如这里的头顶UI）是可以复用的，就可以使用缓存池预先缓存一定数量的UI。另外，Enable和Disable其实对性能的影响同样不小，缓存池这里可以不必真正的执行SetActive操作，而是逻辑标记一下就可以了。在缓存池中缓存的节点直接挪到很远很远的地方，让UICamera看不到就好了（也可以加上CanvasGroup让UI隐形）。</li><li>但是这里需要注意的一点是，逻辑标记Deactive的节点上的脚本一定要注意停掉主逻辑。</li></ul><h3 id="减少刷新次数"><a href="#减少刷新次数" class="headerlink" title="减少刷新次数"></a>减少刷新次数</h3><ul><li>头顶UI的信息是分很多层的，不同的事件驱动不同层的刷新，其他没有变更的层的信息缓存即可。在同一帧中如果收到了多个刷新事件，要求多次刷新同一层的信息或者同时刷新多层的信息（事实上这种情况经常发生），可以模仿UGUI的做法SetDirty()，将对应的层置脏，其他层继续使用缓存的信息。在这一帧的末尾甚至下一帧的末尾执行一次刷新。这样可以显著减少头顶UI的刷新次数。</li></ul><h3 id="动态元素和静态元素分离"><a href="#动态元素和静态元素分离" class="headerlink" title="动态元素和静态元素分离"></a>动态元素和静态元素分离</h3><ul><li>在头顶UI中变化比较频繁的是血条，文字和图片变化相对较少。这部分就可以采用血条在一个Canvas中，文字在一个Canvas中，图片在另一个Canvas中的方案。尽量减少同一个Canvas下变化的物体的数量。</li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="DrawCall优化方案"><a href="#DrawCall优化方案" class="headerlink" title="DrawCall优化方案"></a>DrawCall优化方案</h2><ul><li>在优化UGUI的DrawCall时，我们可以采取以下几种方法:</li></ul><h3 id="合并UI元素"><a href="#合并UI元素" class="headerlink" title="合并UI元素"></a>合并UI元素</h3><ul><li>将多个相邻的UI元素合并成一个元素，这样可以减少DrawCall的数量。可以使用Unity的Sprite Packer工具来自动合并UI元素</li><li>将多个UI元素的纹理合并成一个Atlas，这样可以减少DrawCall的数量。可以使用Unity的Sprite Atlas功能来实现。</li></ul><h3 id="使用合批技术"><a href="#使用合批技术" class="headerlink" title="使用合批技术"></a>使用合批技术</h3><blockquote><p>将多个UI元素合并成一个批次，这样可以减少DrawCall的数量。可以使用Unity的Batching功能来实现合批。</p></blockquote><h4 id="静态合批"><a href="#静态合批" class="headerlink" title="静态合批"></a>静态合批</h4><ul><li>静态合批是将静态（不移动）GameObjects组合成大网格，然后进行绘制。</li><li>静态合批使用比较简单，PlayerSettings中开启static batching，然后对需要静态合批物体的Static打钩即可，unity会自动合并被标记为static的对象，前提它们共享相同的材质，并且不移动，被标记为static的物体不能在游戏中移动，旋转或缩放。</li><li>静态批处理需要额外的内存来存储合并的几何体。</li><li>注意如果多个GameObject在静态批处理之前共享相同的几何体，则会在编辑器或运行时为每个GameObject创建几何体的副本，这会增大内存的开销。例如，在密集的森林级别将树标记为静态可能会产生严重的内存影响。此时就必须去权衡利弊，为了更少的内存占用，可能需要避免某些GameObjects的静态批处理，尽管这必须要牺牲一定的渲染性能。</li></ul><h4 id="动态合批"><a href="#动态合批" class="headerlink" title="动态合批"></a>动态合批</h4><blockquote><p>动态合批是将一些足够小的网格，在CPU上转换它们的顶点，将许多相似的顶点组合在一起，并一次性绘制它们。<br><strong>无论静态还是动态合批都要求使用相同的材质</strong>，动态合批有以下限制：</p></blockquote><ul><li>动态合批处理动态的GameObjects的每个顶点都有一定的开销，因此动态合批处理仅应用于包含不超过900个顶点属性和不超过300个顶点的网格。(<code>如果shader中使用Vertex Position, Normal和single UV，可以批量处理最多300个顶点，而如果shader中使用Vertex Position, Normal, UV0, UV1和Tangent，则只能使用180个顶点。</code>注意：将来可能会更改属性计数限制。)</li><li>如果GameObjects在Transform上包含镜像，则不会对其进行动态合批处理（例如，scale 为1的GameObject A和scale为-1的GameObject B无法一起动态合批处理）</li><li>使用不同的Material实例会导致GameObjects不能一起批处理，即使它们基本相同。阴影渲染(shadow caster)是一个例外</li><li>带有光照贴图的GameObjects有额外的渲染器参数：保存光照贴图的索引和偏移/缩放。一般来说，动态光照贴图的GameObjects应指向完全相同的光照贴图位置才能被动态合批处理</li><li>使用多个pass的shader不会被动态合批处理。</li></ul><p><strong>Github上Unity官方总结了25种不能被合批处理的情况 :</strong> <a href="https://github.com/Unity-Technologies/BatchBreakingCause">https://github.com/Unity-Technologies/BatchBreakingCause</a></p><h4 id="合批条件"><a href="#合批条件" class="headerlink" title="合批条件"></a>合批条件</h4><h5 id="模型静态合批条件"><a href="#模型静态合批条件" class="headerlink" title="模型静态合批条件"></a>模型静态合批条件</h5><ul><li><code>Gameobject</code> 标记为 <code>static</code></li><li><code>Mesh</code> 开启 <code>read/write</code></li><li>材质一致</li></ul><h5 id="UI合批条件"><a href="#UI合批条件" class="headerlink" title="UI合批条件"></a>UI合批条件</h5><ul><li>无需标记为 <code>static</code></li><li><code>Depth</code> 值一致</li><li>材质一致：小图标采用图集，未设置材质将默认为UI/Default视为同一材质</li><li>贴图一致：文字引用的贴图为Font Texture，视为同一贴图</li></ul><h3 id="使用UI-Canvas"><a href="#使用UI-Canvas" class="headerlink" title="使用UI Canvas"></a>使用UI Canvas</h3><ul><li>添加Canvas将会打断和之前元素DrawCall的合并，每个Canvas都会开始一个全新的DrawCall(动静分离)。</li></ul><h2 id="大量同屏玩家头顶UI的优化案例"><a href="#大量同屏玩家头顶UI的优化案例" class="headerlink" title="大量同屏玩家头顶UI的优化案例: "></a>大量同屏玩家头顶UI的优化案例: <psw>《华夏》手游 头顶UI性能优化</psw></h2><p><img src="bf947f9535b549c6a54357977b2137e4.png" alt="优化案例" style="zoom:50%;"></p><h3 id="图文混排"><a href="#图文混排" class="headerlink" title="图文混排"></a>图文混排</h3><ul><li>图文混排的方案有很多，我们采用了UGUI支持富文本的特性，使用Quad关键字占位，在需要加载Image的时候，在对应ImageHolder下创建Image。</li><li>这也是我们能将所有头顶UI的<strong>Batch降到3个</strong>的基础：所有角色的Text在一个Canvas下，ImageHolder在另一个Canvas下，变化较大的血条在第三个Canvas下。发生变更时，由于<strong>UGUI合并Batch是以Canvas为单位的</strong>，同一个Canvas下的所有物体会被合并到一个Mesh中。这样一来可以减少血条这种变化较大的物体的变化导致整个Canvas的刷新。</li></ul><h3 id="UI图集采用2048-2048"><a href="#UI图集采用2048-2048" class="headerlink" title="UI图集采用2048*2048"></a>UI图集采用2048*2048</h3><ul><li>图集采用2048 <em> 2048。一张图集容纳所有常用资源。由于UGUI的Batch规则是<em>*相同材质（Shader、层级等也要相同）的物体会被Batch到一起</em></em>。所以我们直接将所有常用资源合并到一张图集中。此处的常用资源的概念是指主界面及常驻界面的资源，以及头顶的Image资源。这样做的好处是主界面、常驻界面以及头顶UI的Image只要在Hierarchy中是相邻的，就能100%在一个Batch中完成。对于所有界面来说95%以上的Image资源都在同一个图集中。对于Batch优化，或者是UI开发，都是非常方便的。</li></ul><h3 id="Outline描边优化"><a href="#Outline描边优化" class="headerlink" title="Outline描边优化"></a>Outline描边优化</h3><ul><li>详情见<a href="https://sleepyloser.github.io/2024/08/09/Unity/Performance_Optimization/Outline_Stroke_Optimization/OutlineStrokeOptimization/">一种UGUI的Outline描边优化方案</a></li><li>实际上在后续进一步优化中，我们将描边Shader中原始纹理与描边融合的部分写到了一个Pass中，所以此处性能得到了进一步的提升。数据如下：</li></ul><p><img src="Outline.png" alt="进一步优化Outline" style="zoom:50%;"></p><ul><li>可以看到进一步优化后三角形数量与无效果时的三角形数量一致。顶点数量仅增加了2个（增加的2个顶点数量是因为UGUI顶点帮助函数将共享顶点全部拆分导致）</li></ul><h3 id="预加载字体"><a href="#预加载字体" class="headerlink" title="预加载字体"></a>预加载字体</h3><ul><li>视野中进入新的角色时常常会观察到一次明显的CPU Spike，继续看调用栈发现最耗时的是Font.cacheFontForText,实际上这是动态字体Dynamic Text在扩充Texture。在新的文字进入时，如果文字纹理的Texture剩余空间不足，Unity会新开辟一个原来纹理2倍的新纹理，并将原来纹理上的所有文字都要Copy到新的纹理上。这个过程是相当耗时的，而且完全随机可能会造成游戏卡顿影响体验。</li><li>我们的做法是在游戏进程刚开始的时候，将3500个常用汉字和ASCII字符全部RequestCharactersInTexture, 相当于缓存所有常用汉字及字符。（此处省略3628字的常用汉字+ASCII字符）。</li><li>这样操作以后解决了两个问题：第一点是Font.cacheFontForText基本消失不见了，游戏的一开始已经分配了2048*1024的纹理，足够很长一段时间的文字使用了。第二点就是字体花屏的问题，准确的说这是非常偶现的一个Bug，怀疑与Unity在重新分配一张大的纹理的操作有关。这样修改以后文字花屏的Bug再也没有收到报告了。</li></ul><h3 id="分帧处理"><a href="#分帧处理" class="headerlink" title="分帧处理"></a>分帧处理</h3><ul><li>同一时刻视野内可能出现大量的角色，为了避免卡顿，这里可以采用分帧处理的方式，现将需要处理的角色ID缓存起来，虽然处理总量不变，但是可以1帧处理几个甚至几帧处理1个以减少单帧的压力。对于平顺帧率有非常大的帮助。</li></ul><h3 id="缓冲池"><a href="#缓冲池" class="headerlink" title="缓冲池"></a>缓冲池</h3><ul><li>UI的资源加载耗时不容小觑，既然部分UI（例如这里的头顶UI）是可以复用的，就可以使用缓存池预先缓存一定数量的UI。另外，Enable和Disable其实对性能的影响同样不小，缓存池这里可以不必真正的执行SetActive操作，而是逻辑标记一下就可以了。在缓存池中缓存的节点直接挪到很远很远的地方，让UICamera看不到就好了（也可以加上CanvasGroup让UI隐形）。</li><li>但是这里需要注意的一点是，逻辑标记Deactive的节点上的脚本一定要注意停掉主逻辑。</li></ul><h3 id="减少刷新次数"><a href="#减少刷新次数" class="headerlink" title="减少刷新次数"></a>减少刷新次数</h3><ul><li>头顶UI的信息是分很多层的，不同的事件驱动不同层的刷新，其他没有变更的层的信息缓存即可。在同一帧中如果收到了多个刷新事件，要求多次刷新同一层的信息或者同时刷新多层的信息（事实上这种情况经常发生），可以模仿UGUI的做法SetDirty()，将对应的层置脏，其他层继续使用缓存的信息。在这一帧的末尾甚至下一帧的末尾执行一次刷新。这样可以显著减少头顶UI的刷新次数。</li></ul><h3 id="动态元素和静态元素分离"><a href="#动态元素和静态元素分离" class="headerlink" title="动态元素和静态元素分离"></a>动态元素和静态元素分离</h3><ul><li>在头顶UI中变化比较频繁的是血条，文字和图片变化相对较少。这部分就可以采用血条在一个Canvas中，文字在一个Canvas中，图片在另一个Canvas中的方案。尽量减少同一个Canvas下变化的物体的数量。</li></ul>]]></content>
       
       
       <categories>
@@ -993,11 +1020,11 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
@@ -1007,50 +1034,6 @@
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/font_bilibili.css"/>
-      <url>/css/font_bilibili.css</url>
-      
-        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1070,11 +1053,44 @@
     
     
     <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/js/cursor.js"/>
       <url>/js/cursor.js</url>
       
         <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
       
     </entry>
     
@@ -1103,11 +1119,22 @@
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title></title>
+      <link href="/css/font_bilibili.css"/>
+      <url>/css/font_bilibili.css</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
