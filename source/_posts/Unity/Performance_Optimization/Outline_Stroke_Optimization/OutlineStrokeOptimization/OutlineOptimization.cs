@@ -29,11 +29,12 @@ namespace HaruoYaguchi.UI
             // 3 将着色器或其引用方（例如某个材质）放置到“Resources”文件夹中。
             base.graphic.material = new Material(shader);
 
+            // UIVertex的非必须成员的数据默认不会被传递进Shader。所以我们需要修改UI组件的Canvas的additionalShaderChannels属性，让uv1和uv2成员也传入Shader。
             AdditionalCanvasShaderChannels v1 = base.graphic.canvas.additionalShaderChannels;
             AdditionalCanvasShaderChannels v2 = AdditionalCanvasShaderChannels.TexCoord1;
             if ((v1 & v2) != v2)
             {
-                base.graphic.canvas.additionalShaderChannels |= v2;   
+                base.graphic.canvas.additionalShaderChannels |= v2;
             }
             v2 = AdditionalCanvasShaderChannels.TexCoord2;
             if ((v1 & v2) != v2)

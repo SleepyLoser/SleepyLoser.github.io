@@ -82,3 +82,7 @@ tags:
   3. 然后，Unity 将顶点缓冲区绑定到 GPU。
   4. 对于批处理中的每个 Renderer，Unity 会更新顶点缓冲区中的偏移量并提交新的 `Draw Call` 。
 * 此方法类似于 Unity 提交 `静态批处理` 的 `Draw Call` 的方式。
+
+## SRP Batcher
+
+## GPU Instancing

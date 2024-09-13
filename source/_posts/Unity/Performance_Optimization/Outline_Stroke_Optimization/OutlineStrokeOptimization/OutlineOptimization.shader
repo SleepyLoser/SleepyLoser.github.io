@@ -113,6 +113,7 @@ Shader "HaruoYaguchi/UI/OutlineOptimization"
 
             fixed SampleAlpha(int pIndex, v2f IN)
             {
+                // 沿当前像素采样的 12 个方向偏移
                 const fixed sinArray[12] = { 0, 0.5, 0.866, 1, 0.866, 0.5, 0, -0.5, -0.866, -1, -0.866, -0.5 };
                 const fixed cosArray[12] = { 1, 0.866, 0.5, 0, -0.5, -0.866, -1, -0.866, -0.5, 0, 0.5, 0.866 };
                 float2 pos = IN.texcoord + _MainTex_TexelSize.xy * float2(cosArray[pIndex], sinArray[pIndex]) * _OutlineWidth;
@@ -124,7 +125,7 @@ Shader "HaruoYaguchi/UI/OutlineOptimization"
                 
                 fixed4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
                 
-                if (_OutlineWidth > 0) 
+                if (_OutlineWidth > 0)
                 {
                     color.w *= IsInRect(IN.texcoord, IN);
                     half4 val = half4(_OutlineColor.x, _OutlineColor.y, _OutlineColor.z, 0);
