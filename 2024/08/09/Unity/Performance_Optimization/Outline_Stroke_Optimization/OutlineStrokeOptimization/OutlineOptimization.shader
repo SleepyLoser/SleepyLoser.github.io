@@ -124,7 +124,7 @@ Shader "HaruoYaguchi/UI/OutlineOptimization"
                 
                 fixed4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
                 
-                if (_OutlineWidth > 0) 
+                if (_OutlineWidth > 0)
                 {
                     color.w *= IsInRect(IN.texcoord, IN);
                     half4 val = half4(_OutlineColor.x, _OutlineColor.y, _OutlineColor.z, 0);

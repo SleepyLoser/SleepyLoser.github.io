@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Text 与 TextMeshPro</title>
+      <link href="/2024/09/13/Unity/Graphics/Text_And_TMP/TextAndTMP/"/>
+      <url>/2024/09/13/Unity/Graphics/Text_And_TMP/TextAndTMP/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Text"><a href="#Text" class="headerlink" title="Text"></a>Text</h2><ul><li>Text基于位图的渲染技术</li></ul><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ul><li>Text会根据所给定的字符串生成相关的<strong>图集</strong>，然后对图集进行<strong>采样</strong>就可以渲染出文字了。文本字形是作为独立的面片（quad）进行渲染的，每个字符都是一个面片。</li><li><code>OnPopulateMesh</code>（会在Rebuild时调用）<ol><li>根据组件的配置生成一个 <code>TextGenerationSettings</code> ，用来生成后面的信息。</li><li>调用 <code>TextGenerator.PopulateWithErrors</code> 生成 Mesh 的<strong>顶点</strong>、<strong>顶点颜色</strong>、<strong>UV</strong>和<strong>三角形</strong>信息。</li><li>计算偏移量（例如左对齐需要紧靠左边），最后遍历 <code>TextGenerator</code> 的顶点数组，将它们的位置除以 <code>pixelsPerUnit</code>（每单元像素）并加上偏移量（如果有的话），得到的结果填到 <code>VertexHelper</code>（<strong>可以拿到顶点信息</strong>）。</li></ol></li></ul><h3 id="字符图集"><a href="#字符图集" class="headerlink" title="字符图集"></a>字符图集</h3><ul><li>被加载的每个不同的Font对象都会维护自己的纹理集。在Unity的实现中，这些字体在运行时根据Text组件中出现的字符构建一个<strong>字形图集(glyph atlas)</strong>。</li><li>动态字体为<strong>每种不同的结合（尺寸、样式、字符）</strong>在其纹理集中维护了一个字形。也就是说，如果一个UI中有两个Text组件，都显示了字符 “A” ，那么：<ol><li>如果两个Text组件尺寸相同，那么字体图集中会有一个字形。</li><li>如果两个Text组件尺寸不同，那么字体图集中会有两个不同尺寸的字母 “A” 。</li><li>如果一个Text组件的样式是粗体而另一个不是，那么字体图集中会含有一个粗体的“A”和一个普通的“A”。</li></ol></li><li>当使用动态字体的Text对象遇到了字体纹理集（对应字符图集）中没有的情况，<strong>必须重建字体纹理集</strong>。</li><li>如果新的字形能够加入当前图集，那么将其加入图集并上传到图形设备。</li><li>但是如果当前的图集放不下，那么系统会尝试重建图集。重建图集的过程：<ol><li><strong>尝试回收掉不用的字符</strong>。以相同的大小重建图集，只使用当前活动的Text组件上显示的字形。</li><li><strong>回收后还是放不下就要扩容</strong>。例如，一个512x512的图集或被扩充到512x1024的图集。</li></ol></li><li>所以，为了避免频繁的重建字符图集，Text使用的字符最好在使用前就填充到字符图集中。<ol><li>如果使用的字体仅需要支持部分字符集（比如只需要几个固定的字），那就可以使用非动态字体并预先配置对想要使用的字体集的支持。</li><li>字符集不固定或者很多（比如整个Unicode集合），那么字体必须设为动态，可以将出现频率高的字符在游戏运行时填充（使用 <code>Font.RequestCharactersInTexture</code> ）</li></ol></li></ul><h3 id="使用静态字体集"><a href="#使用静态字体集" class="headerlink" title="使用静态字体集"></a>使用静态字体集</h3><ul><li>待补充</li></ul><h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul><li>由于使用的是<strong>点阵字贴图（贴图存的是颜色值）</strong>，所以放大缩小文本（更改scale）会使字体编的模糊。</li><li>前面提到了Text的动态图集是<strong>增量式扩大</strong>，这种方式在文本量很小的情况下贴图很小，很舒服，但随着文本量的增加，会<strong>频繁的发生重建以及扩容</strong>，可能会引起卡顿。</li><li>前面提到了字符图集是按Text组件的设置存储的，所以会出现下面的情况：</li></ul><p><img src="大字体.png" alt="大字体导致扩容" style="zoom:100%;"></p><ul><li>这些字块贴图会<strong>占用整张文本贴图的空间</strong>，导致过快的撑满一张贴图，引起扩大重建。而且字号很大的Text所生成的贴图也很大，很占空间，这也是提倡不要使用Text组件 <code>BestFit</code> 功能的一个主要原因，<code>BestFit</code> 功能会造成<strong>文本字号的不可控</strong>，导致创建出许多不同字号的字块贴图。</li><li><strong>不支持富文本标签</strong>的全部功能、也不支持所有的文本效果，而且一些文本效果实现很不好（描边、阴影等都是通过增加顶点并偏移的方式，正常项目中很少会用到）。</li></ul><h2 id="TextMeshPro"><a href="#TextMeshPro" class="headerlink" title="TextMeshPro"></a>TextMeshPro</h2><ul><li>TextMeshPro基于SDF算法（即基于网格的文本渲染技术）。这种实现方式不会出现缩放时的失真并且不会根据不同的字号创建不同的贴图。</li></ul><h3 id="SDF算法"><a href="#SDF算法" class="headerlink" title="SDF算法"></a>SDF算法</h3><ul><li>对于字块，贴图上记录的不是像素的颜色信息，而是每个像素到字形边缘的距离。</li><li>当文本放大缩小时，TextMeshPro对像素到字形边缘的距离进行插值，而不是对颜色插值，也就是说此处得到的一个字形的<strong>轮廓区域</strong>，<strong>并没有马上得到每个像素的颜色</strong></li><li>如果用01来表示的话，<strong>相当于就是把落在字块上的像素全部标1，然后再进行上色</strong>。这样就不存在对颜色插值不准确造成的失真问题，因为对距离的插值总是可以得到一个清晰的字形轮廓。</li><li>待补充</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> Unity - UI </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+            <tag> UGUI </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Unity渲染优化的4种批处理</title>
       <link href="/2024/09/11/Unity/Performance_Optimization/Rendering_Optimization/RenderingOptimization/"/>
       <url>/2024/09/11/Unity/Performance_Optimization/Rendering_Optimization/RenderingOptimization/</url>
@@ -124,9 +151,9 @@
       
         <tags>
             
-            <tag> 数学 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 数学 </tag>
             
         </tags>
       
@@ -151,9 +178,9 @@
       
         <tags>
             
-            <tag> 数学 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 数学 </tag>
             
         </tags>
       
@@ -178,9 +205,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -205,9 +232,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -282,9 +309,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -309,9 +336,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -746,9 +773,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 渲染管线 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -1042,17 +1069,6 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>图集</title>
       <link href="/mapdepot/index.html"/>
       <url>/mapdepot/index.html</url>
@@ -1064,11 +1080,22 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -1086,22 +1113,22 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/cursor.js"/>
-      <url>/js/cursor.js</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
       
-        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title></title>
+      <link href="/js/cursor.js"/>
+      <url>/js/cursor.js</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[var CURSOR;Math.lerp = (a, b, n) => (1 - n) * a + n * b;const getStyle = (el, attr) => {    try {        return window.getComputedStyle            ? window.getComputedStyle(el)[attr]            : el.currentStyle[attr];    } catch (e) {}    return "";};class Cursor {    constructor() {        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    move(left, top) {        this.cursor.style["left"] = `${left}px`;        this.cursor.style["top"] = `${top}px`;    }    create() {        if (!this.cursor) {            this.cursor = document.createElement("div");            this.cursor.id = "cursor";            this.cursor.classList.add("hidden");            document.body.append(this.cursor);        }        var el = document.getElementsByTagName('*');        for (let i = 0; i < el.length; i++)            if (getStyle(el[i], "cursor") == "pointer")                this.pt.push(el[i].outerHTML);        document.body.appendChild((this.scr = document.createElement("style")));        // 这里改变鼠标指针的颜色 由svg生成        this.scr.innerHTML = `* {cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' width='8px' height='8px'><circle cx='4' cy='4' r='4' opacity='.5'/></svg>") 4 4, auto}`;    }    refresh() {        this.scr.remove();        this.cursor.classList.remove("hover");        this.cursor.classList.remove("active");        this.pos = {curr: null, prev: null};        this.pt = [];        this.create();        this.init();        this.render();    }    init() {        document.onmouseover  = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.add("hover");        document.onmouseout   = e => this.pt.includes(e.target.outerHTML) && this.cursor.classList.remove("hover");        document.onmousemove  = e => {(this.pos.curr == null) && this.move(e.clientX - 8, e.clientY - 8); this.pos.curr = {x: e.clientX - 8, y: e.clientY - 8}; this.cursor.classList.remove("hidden");};        document.onmouseenter = e => this.cursor.classList.remove("hidden");        document.onmouseleave = e => this.cursor.classList.add("hidden");        document.onmousedown  = e => this.cursor.classList.add("active");        document.onmouseup    = e => this.cursor.classList.remove("active");    }    render() {        if (this.pos.prev) {            this.pos.prev.x = Math.lerp(this.pos.prev.x, this.pos.curr.x, 0.15);            this.pos.prev.y = Math.lerp(this.pos.prev.y, this.pos.curr.y, 0.15);            this.move(this.pos.prev.x, this.pos.prev.y);        } else {            this.pos.prev = this.pos.curr;        }        requestAnimationFrame(() => this.render());    }}(() => {    CURSOR = new Cursor();    // 需要重新获取列表时，使用 CURSOR.refresh()})();]]></content>
       
     </entry>
     
