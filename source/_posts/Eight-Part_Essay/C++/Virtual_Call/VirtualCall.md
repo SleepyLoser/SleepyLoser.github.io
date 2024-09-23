@@ -8,3 +8,5 @@ categories:
 tags: 
     - C++
 ---
+
+## 虚调用的定义
