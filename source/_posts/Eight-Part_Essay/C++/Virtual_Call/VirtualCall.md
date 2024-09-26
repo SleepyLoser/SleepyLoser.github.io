@@ -30,7 +30,7 @@ class A
 public:
     virtual void show() 
     {
-        cout<<"In A"<<endl;
+        cout << "In A" << endl;
     }
 };
 
@@ -39,7 +39,7 @@ class B : public A
 public:
     void show() 
     {
-        cout<<"In B"<<endl;
+        cout << "In B" << endl;
     }
 };
 
@@ -62,3 +62,90 @@ int main()
 ### 构造函数和析构函数中调用虚函数
 
 * 在构造函数和析构函数中调用虚函数，对虚函数的调用实际上是实调用。这是虚函数被“实调用”的另一个例子。
+* 从概念上说，在一个对象的构造函数运行完毕之前，这个对象还没有完全诞生，所以在构造函数中调用虚函数，实际上都是实调用。
+* 析构时，在销毁一个对象时，先调用该对象所属类的析构函数，然后再调用其基类的析构函数。所以，**在调用基类的析构函数时，派生类已经被析构了**，派生类数据成员已经失效，无法动态的调用派生类的虚函数（在某些情况下会报错，例如纯虚函数）。
+
+``` CPP
+#include <iostream>
+using namespace std;
+
+class A 
+{
+public:
+    virtual void show() 
+    {
+        cout << "in A" << endl;
+    }
+    A(){ show(); }
+    ~A(){ show(); }
+};
+
+class B : public A 
+{
+public:
+    void show() 
+    {
+        cout << "in B" << endl;
+    }
+};
+
+int main() 
+{
+    A a;
+    B* pb = new B();
+    cout << "after new" << endl;
+    delete pb;
+    cout << "after delete" << endl;
+}
+```
+
+程序的执行结果是：
+
+``` CPP
+in A
+in A
+after new
+in A
+after delete
+in A
+```
+
+* 在构造类 `B` 的对象时，会先调用基类 `A` 的构造函数，如果在构造函数中对 `show()` 的调用是虚调用，那么应该打印出 `“in B”` 。析构也是如此，对虚函数的调用是实调用。
+* 因此，一般情况下，应该避免在构造函数和析构函数中调用虚函数，如果一定要这样做，必须清楚这时对虚函数的调用其实是实调用。
+
+## 虚调用一定要借助于指针或引用来实现吗
+
+* 答案是否定的。在实际应用中，绝大多数的虚调用的确是显示借助于指针或者引用来实现，但是可以通过间接的方式来实现虚调用。
+
+``` CPP
+#include <iostream>
+using namespace std;
+
+class A 
+{
+public:
+    virtual void show() 
+    {
+        cout << "in A" << endl;
+    }
+    void callfunc(){ show(); }
+};
+
+class B : public A 
+{
+public:
+    void show() 
+    {
+        cout<<"in B"<<endl;
+    }
+};
+
+int main() 
+{
+    B b;
+    b.callfunc();
+}
+```
+
+* 程序的执行结果是：`in B` 。在这个程序中，看不到一个指针或者引用，却发生了虚调用。
+* 函数调用 `b.callfunc()` 执行的实际上是 `A::func()` 。如果在 `class A` 中去掉函数 `show()` 前面的关键字 `virtual`，那么程序的输出结果是：`in A` 。也就是说，在函数 `callfunc()` 中，函数调用 `show()` 是一个虚调用，它是在运行时才决定使用派生类中的虚函数还是使用基类中的虚函数。
