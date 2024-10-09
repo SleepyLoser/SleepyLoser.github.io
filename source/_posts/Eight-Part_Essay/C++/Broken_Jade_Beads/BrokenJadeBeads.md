@@ -86,7 +86,7 @@ int main()
 * 这样，上面的调用语句将会导致编译错误，因为不能使用隐式转换将 `int` 类型的值转换为 `MyInt` 类型。必须使用显式转换。
 * 所以大家日常可以使用 `explicit` 关键字可以防止不必要的隐式转换，提高代码的可读性和安全性。尤其是**构造函数参数只有一种类型**的，强烈建议加上 `explicit`。
 
-## extern
+## <span id="extern">extern</span>
 
 * 一般而言，C++全局变量的作用范围仅限于当前的文件，但同时C++也支持分离式编译，允许将程序分割为若干个文件被独立编译。于是就需要在文件间共享变量数据，这里 `extern` 就发挥了作用。
 * `extern` 用于指示变量或函数的定义在另一个源文件中，并在当前源文件中声明。 说明该符号具有外部链接 `(external linkage)` 属性。也就是告诉编译器: 这个符号在别处定义了，你先编译，到时候链接器会去别的地方找这个符号定义的地址。
@@ -134,9 +134,180 @@ int sum(int a, int b)
 
 ### extern 的作用
 
+#### 声明变量但不定义
+
+* 声明变量或函数的存在，但不进行定义，让编译器在链接时在其他源文件中查找定义。这使得不同的源文件可以共享相同的变量或函数。当链接器在一个全局变量声明前看到 `extern` 关键字，它会尝试在其他文件中寻找这个变量的定义。这里强调全局且非常量的原因是，全局非常量的变量默认是外部链接的。
+
+``` CPP
+//fileA.cpp
+int i = 1;              //声明并定义全局变量i
+
+//fileB.cpp
+extern int i;           //声明i，链接全局变量
+
+//fileC.cpp
+extern int i = 2;       //错误，多重定义
+int i;                  //错误，这是一个定义，导致多重定义
+main()
+{
+    extern int i;       //正确
+    int i = 5;          //正确，新的局部变量i;
+}
+```
+
+#### 常量全局变量的外部链接
+
+* 全局常量默认是内部链接的，所以想要在文件间传递全局常量量需要在定义时指明   `extern` ，如下所示：
+
+``` CPP
+//fileA.cpp
+extern const int i = 1;        //定义
+
+//fileB.cpp                    
+extern const int i;            //声明
+```
+
+* 而下面这种用法则会报链接错误，找不到 `i` 的定义：
+
+``` CPP
+//fileA.cpp
+const int i = 1;        //定义 (不用 extern 修饰)
+
+//fileB.cpp                    
+extern const int i;     //声明
+```
+
+#### 编译和链接过程
+
+* 编译链接过程中，`extern` 的作用如下：
+  1. 在**编译期**，`extern` 用于告诉编译器某个变量或函数的定义在其他源文件中，编译器会为它生成一个符号表项，并在当前源文件中建立一个对该符号的引用。这个引用是一个未定义的符号，编译器在后续的链接过程中会在其他源文件中查找这个符号的定义。
+  2. 在**链接期**，链接器将多个目标文件合并成一个可执行文件，并且在当前源文件中声明的符号，会在其它源文件中找到对应的定义，并将它们链接起来。
+
+``` CPP
+// file1.cpp
+#include <iostream>
+extern int global_var;
+
+int main() 
+{
+    std::cout << global_var << std::endl;
+    return 0;
+}
+
+// file2.cpp
+int global_var = 42;
+```
+
+* 在上面的示例中，`file1.cpp` 文件中的 `main` 函数使用了全局变量 `global_var` ，但是 `global_var` 的定义是在 `file2.cpp` 中的，因此在 `file1.cpp` 中需要使用 `extern` 声明该变量。
+* 在**编译**时，编译器会为 `global_var` 生成一个符号表项，并在 `file1.cpp` 中建立一个对该符号的引用。
+* 在**链接**时，链接器会在其他源文件中查找 `global_var` 的定义，并将其链接起来。
+
 ## extern "C"
 
+* 正如这篇文章 [extern](#extern) 所说，`extern` 是指示链接可见性和符号规则，而 `extern "C"` 则是 C++ 语言提供的一种机制，用于在 C++ 代码中调用 C 语言编写的函数和变量。如果不用 `extern "C"`，由于 C++ 和 C 语言在编译和链接时使用的命名规则不同，这会导致 C++ 代码无法调用 C 语言编写的函数或变量（链接时找不到符号）。
+
+### 函数的命名规则
+
+* 对于 C++ 语言，**由于需要支持重载**，所以一个函数的链接名（Linkage Name）是由函数的名称、参数类型和返回值类型等信息组成的，**用于在编译和链接时唯一标识该函数**。
+* 函数的链接名的生成规则在不同的编译器和操作系统上可能有所不同，一般是由编译器自动处理，不需要手动指定，这个规则常常叫做 [Name Mangling](https://en.wikipedia.org/wiki/Name_mangling)
+* 下面介绍一些常见的规则：
+  1. **Microsoft Visual C++ 编译器（Windows）**：函数的名称会被编译器修改为一个以 "_" 开头的名称，并加上参数类型和返回值类型等信息，以避免链接冲突。例如，函数 `int add(int a, int b)` 的链接名可能是 `_add_int_int`。
+  2. **GCC 编译器（Linux）**：也会加上参数类型和返回值类型等信息。例如，函数 `int add(int a, int b)` 的链接名可能是 `_Z3addii`。
+  3. **Clang 编译器（MacOS）**：函数的链接名的生成规则与 GCC 编译器类似，但稍有不同。例如，函数 `int add(int a, int b)` 的链接名可能是 `_Z3addii`。
+* 而 C 语言的链接函数名规则又和 上面三个 C++ 不一样，通过在 C++ 代码中使用 `extern "C"` 关键字，可以将 C++ 编译器的命名规则转换为 C 语言的命名规则，从而使得 C++ 代码可以调用 C 语言的函数或变量。
+
+### extern "C"语法
+
+``` CPP
+// extern "C" 的语法格式如下：
+extern "C"
+{
+    // C 语言函数或变量的声明
+}
+```
+
+* 使用 `extern "C"` 声明的函数或变量会采用 C 语言的链接规则，即符号的名称和调用约定与 C 语言相同。下面是一个代码示例。
+
+``` C
+// C 语言代码
+#include <stdio.h>
+
+void print_message(const char* message) 
+{
+    printf("%s\n", message);
+}
+```
+
+``` CPP
+// C++ 代码
+extern "C" 
+{
+    // 声明 C 语言函数
+    void print_message(const char* message);
+}
+
+int main() 
+{
+    // 调用 C 语言函数
+    print_message("Hello, world!");
+    return 0;
+}
+```
+
+* 在上面的代码中，使用 `extern "C"` 声明了 C 语言编写的 `print_message` 函数，使得它可以在 C++ 代码中被调用。在 `main` 函数中，使用 C 语言的语法和命名规则来调用 `print_message` 函数，输出 `"Hello, world!"`。
+* 需要注意 `extern "C"` 关键字**只对函数的名称和调用约定起作用，对于函数的参数类型和返回值类型没有影响**。所以，在使用 `extern "C"` 声明函数时，需要保证函数的参数类型和返回值类型与 C 语言的定义相同，否则可能会导致编译错误或运行时错误。
+
 ## mutable
+
+* `mutable` 是C++中的一个关键字，用于修饰类的成员变量，表示该成员变量即使在一个 `const` 成员函数中也可以被修改。`mutable` 的中文意思是“可变的，易变的”，跟 `constant`（即 C++ 中的 `const`）是反义词。因为在 C++ 中，如果一个成员函数被声明为 `const`，那么它不能修改类的任何成员变量，除非这个成员变量被声明为 `mutable` 。
+* 这个关键字主要应用场景是：如果需要在 `const` 函数里面修改一些跟类状态无关的数据成员，那么这个函数就应该被 `mutable` 来修饰，并且放在函数后后面关键字位置。
+
+``` CPP
+#include <iostream>
+
+class Counter 
+{
+public:
+    Counter() : count(0), cache_valid(false), cached_value(0) {}
+
+    int get_count() const 
+    {
+        if (!cache_valid) 
+        {
+            // 模拟一个耗时的计算过程
+            cached_value = count * 2;
+            cache_valid = true;
+        }
+
+        return cached_value;
+    }
+
+    void increment() 
+    {
+        count++;
+        cache_valid = false; // 使缓存无效，因为count已经更改
+    }
+
+private:
+    int count;
+    mutable bool cache_valid; // 缓存是否有效的标志
+    mutable int cached_value; // 缓存的值
+};
+
+int main() 
+{
+    Counter counter;
+    counter.increment();
+    counter.increment();
+
+    std::cout << "Count: " << counter.get_count() << std::endl; // 输出 4
+
+    return 0;
+}
+```
+
+* 上面定义了一个 `Counter` 类，该类具有一个计数成员变量 `count` 。还有两个 `mutable` 成员变量：`cache_valid` 和 `cached_value` 。这两个变量用于在 `get_count` 函数中缓存计算结果，从而提高性能。`get_count` 函数被声明为 `const` ，因为它在逻辑上不会更改类的状态。然而，需要更新 `cache_valid` 和 `cached_value` 变量以提高性能。为了在 `const` 成员函数中修改这两个变量，将它们声明为 `mutable` 。
+* 这个例子不那么贴切的展示了 `mutable` 关键字的用途：即允许在 `const` 成员函数中修改特定的成员变量，以支持内部实现所需的功能，同时仍然保持外部不变性。
 
 ## malloc 与 new
 
