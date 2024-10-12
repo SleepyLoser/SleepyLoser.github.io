@@ -124,6 +124,58 @@ protected:
 
 <img src="C++对象模型.png" alt="C++对象模型" style="zoom:50%;">
 
+* 首先，每个多态对象都有一个指向其 `vtable` 的指针，称为 `vptr` 。`RTTI`（就是上面图中的 `type_info` 结构）通常与 `vtable` 关联。`dynamic_cast` 就是利用 `RTTI` 来执行运行时类型检查和安全类型转换。
+* 以下是 `dynamic_cast` 的工作原理的简化描述：
+  1. 首先，`dynamic_cast` 通过查询对象的 `vptr` 来获取其 `RTTI`（这也是为什么 `dynamic_cast` 要求对象有虚函数）
+  2. 然后，`dynamic_cast` 比较请求的目标类型与从 `RTTI` 获得的实际类型。如果目标类型是实际类型或其基类，则转换成功。
+  3. 如果目标类型是派生类，`dynamic_cast` 会检查**类层次结构**，以确定转换是否合法。如果在**类层次结构**中找到了目标类型，则转换成功；否则，转换失败。
+  4. **转换成功时，`dynamic_cast` 返回转换后的指针或引用**。
+  5. **转换失败时，对于指针类型，`dynamic_cast` 返回空指针；对于引用类型，它会抛出一个 `std::bad_cast` 异常**。
+* 因为 `dynamic_cast` 依赖于运行时类型信息，**它的性能可能低于其他类型转换操作**（如 `static_cast` ），**`static_cast` 是编译器静态转换，编译时期就完成了**。
+
 ### const_cast
+
+* 用法: `const_cast <new_type> (expression)`, **`new_type` 必须是一个指针、引用或者指向对象类型成员的指针**。
+
+#### 修改const对象
+
+* 当需要修改 `const` 对象时，可以使用 `const_cast` 来删除 `const` 属性。
+
+``` CPP
+const int a = 42;
+int* mutable_ptr = const_cast<int*>(&a); // 删除 const 属性，使得可以修改a的值
+*mutable_ptr = 43; // 修改a的值
+```
+
+##### 修改局部变量
+
+* 程序能正常运行，且常量被修改了，但是有一个问题：输出 `a` 的值和 `*mutable_ptr` 的值并不相同，`a` 的值还是 `42` ，而 `*mutable_ptr` 的值是 `43` , 而且 `mutable_ptr` 确实指向 `a` 所在的地址空间。
+* 这是什么原因呢？难道一个地址空间可以存储不同的俩个值？当然不能。这就是 C++ 中的**常量折叠**：`const` 变量（即常量）值放在编译器的符号表中，计算时编译器直接从表中取值，省去了访问内存的时间，这是编译器进行的优化。`a` 是 `const` 变量，编译器对 `a` 在预处理的时候就进行了替换。编译器只对 `const` 变量的值读取一次。所以打印的是 `39` 。`a` 实际存储的值被指针 `mutable_ptr` 所改变。但是为什么能改变呢，从其存储地址可以看出来，其存储在堆栈中。
+
+##### 修改全局变量
+
+* 程序编译通过，但运行时错误。编译器提示 `a` 存储的空间不可写，也就是没有写权限，不能修改其值。原因是 `a` 是全局变量，全局变量存储在静态存储区，且只有可读属性，无法修改其值。
+
+##### 使用 volatile 关键字
+
+* [碎玉零珠 —— C++](https://sleepyloser.github.io/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/) 中有详细介绍，就不赘述了。
+
+#### const对象调用非const成员函数
+
+* 当需要使用 `const` 对象调用非 `const` 成员函数时，可以使用 `const_cast` 删除对象的 `const` 属性。
+
+``` CPP
+class MyClass 
+{
+public:
+    void non_const_function() { /* ... */ }
+};
+
+const MyClass my_const_obj;
+MyClass* mutable_obj_ptr = const_cast<MyClass*>(&my_const_obj); // 删除const属性，使得可以调用非const成员函数
+mutable_obj_ptr->non_const_function(); // 调用非const成员函数
+```
+
+* 不过上述行为都不是很安全，可能导致未定义的行为，因此应谨慎使用。
 
 ### reinterpret_cast
