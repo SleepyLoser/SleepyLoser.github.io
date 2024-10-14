@@ -179,3 +179,16 @@ mutable_obj_ptr->non_const_function(); // 调用非const成员函数
 * 不过上述行为都不是很安全，可能导致未定义的行为，因此应谨慎使用。
 
 ### reinterpret_cast
+
+* 用法: `reinterpret_cast <new_type> (expression)`, `reinterpret_cast` 用于在不同类型之间进行低级别的转换。
+* 首先从英文字面的意思理解，`interpret` 是 `“解释，诠释”` 的意思，加上前缀 `“re”` ，就是 `“重新诠释”` 的意思；`cast` 在这里可以翻译成 `“转型”`（在侯捷大大翻译的《深度探索C++对象模型》、《Effective C++（第三版）》中，`cast` 都被翻译成了转型），这样整个词顺下来就是 `“重新诠释的转型”` 。它仅仅是重新解释底层比特（也就是对指针所指的那片比特位换个类型做解释），而不进行任何类型检查。因此，`reinterpret_cast` 可能导致未定义的行为，应谨慎使用。
+
+#### 指针类型间的转换
+
+* 在某些情况下，需要在不同指针类型之间进行转换，如将一个 `int` 指针转换为 `char` 指针。这在 C 语言中用的非常多，C语言中就是直接使用 `()` 进行强制类型转换
+
+``` CPP
+int a = 42;
+int* int_ptr = &a;
+char* char_ptr = reinterpret_cast<char*>(int_ptr); // 将int指针转换为char指针
+```
