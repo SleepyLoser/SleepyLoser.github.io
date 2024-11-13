@@ -141,12 +141,12 @@ bool GetHeader()
 
 ``` CSharp
 /// <summary>
-/// GIF的宽度（以像素为单位）
+/// GIF的屏幕逻辑宽度（以像素为单位）
 /// </summary>
 public UInt16 width;
 
 /// <summary>
-/// GIF的高度（以像素为单位）
+/// GIF的屏幕逻辑高度（以像素为单位）
 /// </summary>
 public UInt16 height;
 
@@ -261,3 +261,9 @@ void GetGlobalColorTable()
 * 至此，GIF 文件的全局配置就完成了，接下来是每一帧的配置or数据。
 
 ### 图像标识符（Image Descriptor）
+
+* 一个GIF文件中可以有**多个图像块**，每个图像块都有图像标识符，描述了当前帧的一些属性。
+
+<img src="ImageDescriptor.webp" alt="图像标识符" style="zoom:100%;">
+
+* 图像标识符以 `','(0x2c)` 作为开始标志。接着定义了当前帧的 `偏移量` 和 `宽高` 。
