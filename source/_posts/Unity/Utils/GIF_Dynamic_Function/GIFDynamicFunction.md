@@ -181,12 +181,12 @@ public GlobalFlag globalFlag;
 /// <summary>
 /// 背景颜色在全局颜色列表中的索引
 /// </summary>
-public int backgroundColorIndex;
+public byte backgroundColorIndex;
 
 /// <summary>
 /// 全局像素的宽度与高度的比值
 /// </summary>
-public int pixelAspectRatio;
+public byte pixelAspectRatio;
 
 /// <summary>
 /// 解析逻辑屏幕标识符
@@ -206,8 +206,8 @@ void AnalyzeLogicalScreenDescriptor()
     globalFlag.globalColorTableSize = 2 << (packedByte & 7);
     this.globalFlag = globalFlag;
 
-    backgroundColorIndex = Convert.ToInt32(bytes[index++]);
-    pixelAspectRatio = Convert.ToInt32(bytes[index++]);
+    backgroundColorIndex = bytes[index++];
+    pixelAspectRatio = bytes[index++];
 }
 ```
 
@@ -226,7 +226,7 @@ void AnalyzeLogicalScreenDescriptor()
 /// <summary>
 /// GIF的全局颜色列表
 /// </summary>
-public UInt32[] globalColorTable = null;
+public byte[, ] globalColorTable = null;
 
 /// <summary>
 /// 获取GIF的全局颜色列表
@@ -235,35 +235,233 @@ void GetGlobalColorTable()
 {
     if (!globalFlag.globalColorTableFlag)
     {
+        #if UNITY_EDITOR
+        UnityEngine.Debug.LogWarning("该GIF不包含全局颜色列表");
+        #endif
         return;
     }
 
-    int numberOfColorsByte = globalFlag.globalColorTableSize * 3;
-    globalColorTable = new UInt32[numberOfColorsByte];
+    // int numberOfColorsByte = globalFlag.sizeOfGlobalColorTable * 3;
+    globalColorTable = new byte[globalFlag.sizeOfGlobalColorTable, 3];
     int colorTableIndex = 0;
     try
     {
-        while (colorTableIndex < numberOfColorsByte)
+        while (colorTableIndex < globalFlag.sizeOfGlobalColorTable)
         {
-            int r = bytes[index++] & 0xff;
-            int g = bytes[index++] & 0xff;
-            int b = bytes[index++] & 0xff;
-            globalColorTable[colorTableIndex++] = 0xff000000 | (UInt32)(r << 16) | (UInt32)(g << 8) | (UInt32)b;
+            // int r = bytes[index++] & 0xff;
+            // int g = bytes[index++] & 0xff;
+            // int b = bytes[index++] & 0xff;
+            // globalColorTable[colorTableIndex++] = 0xff000000 | (UInt32)(r << 16) | (UInt32)(g << 8) | (UInt32)b;
+            globalColorTable[colorTableIndex, 0] = bytes[index++];
+            globalColorTable[colorTableIndex, 1] = bytes[index++];
+            globalColorTable[colorTableIndex, 2] = bytes[index++];
+            ++colorTableIndex;
         }
+        #if UNITY_EDITOR
+        UnityEngine.Debug.Log("成功解析GIF全局颜色列表");
+        #endif
     }
-    catch (System.Exception e)
+    catch (Exception e)
     {
+        #if UNITY_EDITOR
+        UnityEngine.Debug.LogError("获取全局颜色列表失败：" + e);
+        #endif
         throw;
     }
 }
 ```
 
-* 至此，GIF 文件的全局配置就完成了，接下来是每一帧的配置or数据。
+* 至此，GIF 文件的全局配置就完成了，接下来是每一帧的配置 or 数据。
 
 ### 图像标识符（Image Descriptor）
 
 * 一个GIF文件中可以有**多个图像块**，每个图像块都有图像标识符，描述了当前帧的一些属性。
 
-<img src="ImageDescriptor.webp" alt="图像标识符" style="zoom:100%;">
+<img src="ImageDescriptor.png" alt="图像标识符" style="zoom:100%;">
 
 * 图像标识符以 `','(0x2c)` 作为开始标志。接着定义了当前帧的 `偏移量` 和 `宽高` 。
+* 最后5个标志的意义分别为：
+  1. `m` - 局部颜色列表标志（Local Color Table Flag）：若为1，表示有一个局部彩色表（Local Color Table）将紧跟在这个图像描述块（ImageDescriptor）之后；若为0，表示图像描述块（Image Descriptor）后面没有局部彩色表(Local Color Table)，该图像要使用全局彩色表（GlobalColor Table），忽略 `pixel` 值。
+  2. `i` - 交插显示标志(Interlace Flag)：若为0，表示该图像不是交插图像；若为1表示该图像是交插图像。使用该位标志可知道图像数据是如何存放的。
+  3. `s` - 局部颜色排序标志：与全局彩色表（GlobalColor Table）中（Sort Flag）域的含义相同。
+  4. `r` - 保留（未被使用，必须初始化为0）。
+  5. `pixel` - 局部颜色列表大小：用来计算局部彩色表（Global Color Table）中包含的字节数。
+* 交插显示标志将在图片的解码时单独解释。
+
+#### 基于颜色列表的图像数据
+
+* 基于颜色列表的图像数据**必须**紧跟在图像标识符后面。数据的第一个字节表示 `LZW` 编码初始表大小的位数。**图像数据（Image Data）由数据子块（Data Sub-blocks）序列组成**。
+
+<img src="基于颜色列表的图像数据.webp" alt="基于颜色列表的图像数据" style="zoom:100%;">
+
+* 数据块的结构：
+
+<img src="数据块的结构.webp" alt="数据块的结构" style="zoom:100%;">
+
+* 每个数据块，第一个字节表示当前块的大小，这个大小不包括第一个字节。这是一个可变长度的数据块，字节数在 `0 ~ 255` 之间。
+
+``` CSharp
+/// <summary>
+/// 图像标识符
+/// </summary>
+[Serializable]
+public struct ImageDescriptor
+{
+    /// <summary>
+    /// 图像标识符分割符（固定为0x2c，即 ',' ）
+    /// </summary>
+    public byte imageSeparator;
+
+    /// <summary>
+    /// X方向偏移量
+    /// </summary>
+    public UInt16 xOffset;
+
+    /// <summary>
+    /// Y方向偏移量
+    /// </summary>
+    public UInt16 yOffset;
+
+    /// <summary>
+    /// 图像宽度
+    /// </summary>
+    public UInt16 imageWidth;
+
+    /// <summary>
+    /// 图像高度
+    /// </summary>
+    public UInt16 imageHeight;
+
+    /// <summary>
+    /// 局部颜色列表标志（若为1，表示有一个局部彩色表（Local Color Table）将紧跟在这个图像描述块（ImageDescriptor）之后；若为0，表示图像描述块（Image Descriptor）后面没有局部彩色表（Local Color Table），该图像要使用全局彩色表（GlobalColor Table））
+    /// </summary>
+    public bool localColorTableFlag;
+
+    /// <summary>
+    /// 交插显示标志（若为0，表示该图像不是交插图像；若为1表示该图像是交插图像。使用该位标志可知道图像数据是如何存放的）
+    /// </summary>
+    public bool interlaceFlag;
+
+    /// <summary>
+    /// 局部颜色排序标志（与全局彩色表（GlobalColor Table）中（Sort Flag）域的含义相同）
+    /// </summary>
+    public bool sortFlag;
+
+    /// <summary>
+    /// 保留（未被使用，必须初始化为0）
+    /// </summary>
+    public byte reserved;
+
+    /// <summary>
+    /// 局部颜色列表大小（用来计算局部彩色表（Global Color Table）中包含的字节数）
+    /// </summary>
+    public int localColorTableSize;
+
+    /// <summary>
+    /// 用于存储GIF的局部颜色列表（如果存在的话）
+    /// </summary>
+    public byte[, ] localColorTable;
+
+    /// <summary>
+    /// LZW编码初始表大小的位数
+    /// </summary>
+    public byte lzwMinimumCodeSize;
+
+    /// <summary>
+    /// 图像数据（块）
+    /// </summary>
+    [Serializable]
+    public struct ImageData
+    {
+        /// <summary>
+        /// 块大小，不包括blockSize所占的这个字节
+        /// </summary>
+        public int blockSize;
+
+        /// <summary>
+        /// 块数据，8-bit的字符串
+        /// </summary>
+        public byte[] dataValue;
+    }
+}
+
+/// <summary>
+/// 用于存储GIF的图像标识符（按照帧顺序排列）
+/// </summary>
+public List<ImageDescriptor> imageDescriptors = new List<ImageDescriptor>();
+
+/// <summary>
+/// 用于存储GIF的图像数据块（按照帧顺序排列）
+/// </summary>
+public List<ImageDescriptor.ImageData> imageDatas = new List<ImageDescriptor.ImageData>();
+
+/// <summary>
+/// 获取GIF的图像标识符
+/// </summary>
+void GetImageDescriptor()
+{
+    ImageDescriptor imageDescriptor = new ImageDescriptor();
+    imageDescriptor.imageSeparator = bytes[index++];
+
+    imageDescriptor.xOffset = BitConverter.ToUInt16(bytes, index);
+    index += 2;
+    imageDescriptor.yOffset = BitConverter.ToUInt16(bytes, index);
+    index += 2;
+    imageDescriptor.imageWidth = BitConverter.ToUInt16(bytes, index);
+    index += 2;
+    imageDescriptor.imageHeight = BitConverter.ToUInt16(bytes, index);
+    index += 2;
+    
+    byte packedByte = bytes[index++];
+    imageDescriptor.localColorTableFlag = (packedByte & 0x80) != 0;
+    imageDescriptor.interlaceFlag = (packedByte & 0x40) != 0;
+    imageDescriptor.sortFlag = (packedByte & 0x20) != 0;
+    imageDescriptor.reserved = 0;
+    imageDescriptor.localColorTableSize = (int)Math.Pow(2, (packedByte & 0x07) + 1);
+
+    if (imageDescriptor.localColorTableFlag)
+    {
+        imageDescriptor.localColorTable = new byte[imageDescriptor.localColorTableSize, 3];
+        int colorTableIndex = 0;
+        while (colorTableIndex < imageDescriptor.localColorTableSize)
+        {
+            imageDescriptor.localColorTable[colorTableIndex, 0] = bytes[index++];
+            imageDescriptor.localColorTable[colorTableIndex, 1] = bytes[index++];
+            imageDescriptor.localColorTable[colorTableIndex, 2] = bytes[index++];
+            ++colorTableIndex;
+        }
+    }
+
+    imageDescriptor.lzwMinimumCodeSize = bytes[index++];
+
+    // 数据块，如果需要可重复多次
+    while (true)
+    {
+        int blockSize = bytes[index++];
+        if (blockSize.Equals(0x00))
+        {
+            // #if UNITY_EDITOR
+            // UnityEngine.Debug.Log("基于颜色列表的图像数据为空");
+            // #endif
+            break;
+        }
+
+        ImageDescriptor.ImageData imageData = new ImageDescriptor.ImageData();
+        imageData.blockSize = blockSize;
+        imageData.dataValue = new byte[blockSize];
+        for (int i = 0; i < blockSize; ++i)
+        {
+            imageData.dataValue[i] = bytes[index++];
+        }
+
+        imageDatas.Add(imageData);
+    }
+    
+    imageDescriptors.Add(imageDescriptor);
+    // #if UNITY_EDITOR
+    // UnityEngine.Debug.LogFormat("成功解析图像标识符{0}", imageDescriptors.Count);
+    // #endif
+}
+```
+
+### 图形控制扩展（Graphic Control Extension）
