@@ -273,9 +273,9 @@ void GetGlobalColorTable()
 
 * 至此，GIF 文件的全局配置就完成了，接下来是每一帧的配置 or 数据。
 
-### 图像标识符（Image Descriptor）
+### 图像块（Image Block）
 
-* 一个GIF文件中可以有**多个图像块**，每个图像块都有图像标识符，描述了当前帧的一些属性。
+* 一个GIF文件中可以有**多个图像块**，每个图像块都有**图像标识符（Image Descriptor）**，描述了当前帧的一些属性。
 
 <img src="ImageDescriptor.png" alt="图像标识符" style="zoom:100%;">
 
@@ -302,10 +302,10 @@ void GetGlobalColorTable()
 
 ``` CSharp
 /// <summary>
-/// 图像标识符
+/// 图像块
 /// </summary>
 [Serializable]
-public struct ImageDescriptor
+public struct ImageBlock
 {
     /// <summary>
     /// 图像标识符分割符（固定为0x2c，即 ',' ）
@@ -371,7 +371,7 @@ public struct ImageDescriptor
     /// 图像数据（块）
     /// </summary>
     [Serializable]
-    public struct ImageData
+    public struct ImageDataBlock
     {
         /// <summary>
         /// 块大小，不包括blockSize所占的这个字节
@@ -381,60 +381,60 @@ public struct ImageDescriptor
         /// <summary>
         /// 块数据，8-bit的字符串
         /// </summary>
-        public byte[] dataValue;
+        public byte[] data;
     }
 }
 
 /// <summary>
-/// 用于存储GIF的图像标识符（按照帧顺序排列）
+/// 用于存储GIF的图像块（按照帧顺序排列）
 /// </summary>
-public List<ImageDescriptor> imageDescriptors = new List<ImageDescriptor>();
+public List<ImageBlock> imageDescriptors = new List<ImageBlock>();
 
 /// <summary>
 /// 用于存储GIF的图像数据块（按照帧顺序排列）
 /// </summary>
-public List<ImageDescriptor.ImageData> imageDatas = new List<ImageDescriptor.ImageData>();
+public List<ImageBlock.ImageDataBlock> imageDatas = new List<ImageBlock.ImageDataBlock>();
 
 /// <summary>
-/// 获取GIF的图像标识符
+/// 获取GIF的图像块
 /// </summary>
-void GetImageDescriptor()
+void GetImageBlock()
 {
-    ImageDescriptor imageDescriptor = new ImageDescriptor();
-    imageDescriptor.imageSeparator = bytes[index++];
+    ImageBlock imageBlock = new ImageBlock();
+    imageBlock.imageSeparator = bytes[index++];
 
-    imageDescriptor.xOffset = BitConverter.ToUInt16(bytes, index);
+    imageBlock.xOffset = BitConverter.ToUInt16(bytes, index);
     index += 2;
-    imageDescriptor.yOffset = BitConverter.ToUInt16(bytes, index);
+    imageBlock.yOffset = BitConverter.ToUInt16(bytes, index);
     index += 2;
-    imageDescriptor.imageWidth = BitConverter.ToUInt16(bytes, index);
+    imageBlock.imageWidth = BitConverter.ToUInt16(bytes, index);
     index += 2;
-    imageDescriptor.imageHeight = BitConverter.ToUInt16(bytes, index);
+    imageBlock.imageHeight = BitConverter.ToUInt16(bytes, index);
     index += 2;
     
     byte packedByte = bytes[index++];
-    imageDescriptor.localColorTableFlag = (packedByte & 0x80) != 0;
-    imageDescriptor.interlaceFlag = (packedByte & 0x40) != 0;
-    imageDescriptor.sortFlag = (packedByte & 0x20) != 0;
-    imageDescriptor.reserved = 0;
-    imageDescriptor.localColorTableSize = (int)Math.Pow(2, (packedByte & 0x07) + 1);
+    imageBlock.localColorTableFlag = (packedByte & 0x80) != 0;
+    imageBlock.interlaceFlag = (packedByte & 0x40) != 0;
+    imageBlock.sortFlag = (packedByte & 0x20) != 0;
+    imageBlock.reserved = 0;
+    imageBlock.localColorTableSize = (int)Math.Pow(2, (packedByte & 0x07) + 1);
 
-    if (imageDescriptor.localColorTableFlag)
+    if (imageBlock.localColorTableFlag)
     {
-        imageDescriptor.localColorTable = new byte[imageDescriptor.localColorTableSize, 3];
+        imageBlock.localColorTable = new byte[imageBlock.localColorTableSize, 3];
         int colorTableIndex = 0;
-        while (colorTableIndex < imageDescriptor.localColorTableSize)
+        while (colorTableIndex < imageBlock.localColorTableSize)
         {
-            imageDescriptor.localColorTable[colorTableIndex, 0] = bytes[index++];
-            imageDescriptor.localColorTable[colorTableIndex, 1] = bytes[index++];
-            imageDescriptor.localColorTable[colorTableIndex, 2] = bytes[index++];
+            imageBlock.localColorTable[colorTableIndex, 0] = bytes[index++];
+            imageBlock.localColorTable[colorTableIndex, 1] = bytes[index++];
+            imageBlock.localColorTable[colorTableIndex, 2] = bytes[index++];
             ++colorTableIndex;
         }
     }
 
-    imageDescriptor.lzwMinimumCodeSize = bytes[index++];
+    imageBlock.lzwMinimumCodeSize = bytes[index++];
 
-    // 数据块，如果需要可重复多次
+    // 图像数据块，如果需要可重复多次
     while (true)
     {
         int blockSize = bytes[index++];
@@ -446,22 +446,32 @@ void GetImageDescriptor()
             break;
         }
 
-        ImageDescriptor.ImageData imageData = new ImageDescriptor.ImageData();
-        imageData.blockSize = blockSize;
-        imageData.dataValue = new byte[blockSize];
+        ImageBlock.ImageDataBlock imageDataBlock = new ImageBlock.ImageDataBlock();
+        imageDataBlock.blockSize = blockSize;
+        imageDataBlock.data = new byte[blockSize];
         for (int i = 0; i < blockSize; ++i)
         {
-            imageData.dataValue[i] = bytes[index++];
+            imageDataBlock.data[i] = bytes[index++];
         }
 
-        imageDatas.Add(imageData);
+        imageDatas.Add(imageDataBlock);
     }
     
-    imageDescriptors.Add(imageDescriptor);
-    // #if UNITY_EDITOR
-    // UnityEngine.Debug.LogFormat("成功解析图像标识符{0}", imageDescriptors.Count);
-    // #endif
+    imageDescriptors.Add(imageBlock);
 }
 ```
 
 ### 图形控制扩展（Graphic Control Extension）
+
+* 在 `89a` 版本，GIF 添加了图形控制扩展块。放在一个图像块(图像标识符)的**前面**，用来控制紧跟在它后面的第一个图像的显示。
+
+<img src="图形控制拓展.webp" alt="图形控制拓展" style="zoom:100%;">
+
+* **处置方法（Disposal Method）**：指出处置图形的方法，当值为：
+  1. `0` - 不使用处置方法。
+  2. `1` - 不处置图形，把图形从当前位置移去。
+  3. `2` - 恢复到背景色。
+  4. `3` - 恢复到先前状态。
+  5. `4-7` - 自定义用户输入标志（Use Input Flag）：指出是否期待用户有输入之后才继续进行下去，值为真表示期待，值为否表示不期待。用户输入可以是按回车键、鼠标点击等，可以和延迟时间一起使用。在设置的延迟时间内用户有输入则马上继续进行，没有输入则等待延迟时间结束再继续。
+* 透明颜色标志（Transparent Color Flag）：值为真表示使用透明颜色。
+* 利用延迟时间，我们可以展示出速度不均匀的 GIF 。
