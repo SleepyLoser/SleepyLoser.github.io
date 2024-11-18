@@ -67,13 +67,14 @@ public class GifPostprocessor : AssetPostprocessor
 
 * 上述代码的作用是后处理的过程中，识别出所有的 `.gif.bytes` 文件，创建一个 `GifData` 资产，并且删掉原有的文本资产。此时，第一步导入 GIF 图已经完成。
 
-## 解码 GIF 图
+## 解码 GIF（以文章末的源码为标准，文章中的代码仅供参考，不保证正确性（其实是懒得改））
 
 * GIF 的文件结构
 
 <img src="GIF结构.webp" alt="GIF的文件结构" style="zoom:100%;">
 
 * GIF 格式的文件结构整体上分为三部分：文件头、GIF 数据流、文件结尾。其中，GIF 数据流分为全局配置和图像块。
+* GIF 使用**大端**存储字节
 
 ### GIF署名（Signature）和版本号（Version）
 
@@ -367,6 +368,12 @@ public struct ImageBlock
     /// </summary>
     public byte lzwMinimumCodeSize;
 
+    
+    /// <summary>
+    /// 用于存储图像块中的数据块
+    /// </summary>
+    public List<ImageDataBlock> imageDataBlocks;
+
     /// <summary>
     /// 图像数据（块）
     /// </summary>
@@ -376,7 +383,7 @@ public struct ImageBlock
         /// <summary>
         /// 块大小，不包括blockSize所占的这个字节
         /// </summary>
-        public int blockSize;
+        public UInt16 blockSize;
 
         /// <summary>
         /// 块数据，8-bit的字符串
@@ -388,12 +395,7 @@ public struct ImageBlock
 /// <summary>
 /// 用于存储GIF的图像块（按照帧顺序排列）
 /// </summary>
-public List<ImageBlock> imageDescriptors = new List<ImageBlock>();
-
-/// <summary>
-/// 用于存储GIF的图像数据块（按照帧顺序排列）
-/// </summary>
-public List<ImageBlock.ImageDataBlock> imageDatas = new List<ImageBlock.ImageDataBlock>();
+public List<ImageBlock> imageBlocks = null;
 
 /// <summary>
 /// 获取GIF的图像块
@@ -437,7 +439,7 @@ void GetImageBlock()
     // 图像数据块，如果需要可重复多次
     while (true)
     {
-        int blockSize = bytes[index++];
+        UInt16 blockSize = bytes[index++];
         if (blockSize.Equals(0x00))
         {
             // #if UNITY_EDITOR
@@ -454,10 +456,18 @@ void GetImageBlock()
             imageDataBlock.data[i] = bytes[index++];
         }
 
+        if (imageDatas == null)
+        {
+            imageDatas = new List<ImageBlock.ImageDataBlock>();
+        }
         imageDatas.Add(imageDataBlock);
     }
     
-    imageDescriptors.Add(imageBlock);
+    if (imageBlocks == null)
+    {
+        imageBlocks = new List<ImageBlock>();
+    }
+    imageBlocks.Add(imageBlock);
 }
 ```
 
@@ -467,11 +477,212 @@ void GetImageBlock()
 
 <img src="图形控制拓展.webp" alt="图形控制拓展" style="zoom:100%;">
 
-* **处置方法（Disposal Method）**：指出处置图形的方法，当值为：
-  1. `0` - 不使用处置方法。
-  2. `1` - 不处置图形，把图形从当前位置移去。
-  3. `2` - 恢复到背景色。
-  4. `3` - 恢复到先前状态。
-  5. `4-7` - 自定义用户输入标志（Use Input Flag）：指出是否期待用户有输入之后才继续进行下去，值为真表示期待，值为否表示不期待。用户输入可以是按回车键、鼠标点击等，可以和延迟时间一起使用。在设置的延迟时间内用户有输入则马上继续进行，没有输入则等待延迟时间结束再继续。
-* 透明颜色标志（Transparent Color Flag）：值为真表示使用透明颜色。
-* 利用延迟时间，我们可以展示出速度不均匀的 GIF 。
+* 对于上图中的第四个字节的八位：
+  * 前三位（7~5）：保留（未使用）。
+  * 中间三位（4~2）**处置方法（Disposal Method）**：指出处置图形的方法，当值为：
+    1. `0` - 不使用处置方法。
+    2. `1` - 不处置图形，把图形从当前位置移去。
+    3. `2` - 恢复到背景色。
+    4. `3` - 恢复到先前状态。
+    5. `4 ~ 7` - 保留（未使用 / 未定义）
+  * 倒数第二位（1）- **自定义用户输入标志（User Input Flag）**：指出是否期待用户有输入之后才继续进行下去，值为真表示期待，值为否表示不期待。用户输入可以是按回车键、鼠标点击等，可以和延迟时间一起使用。在设置的延迟时间内用户有输入则马上继续进行，没有输入则等待延迟时间结束再继续。利用延迟时间，我们可以展示出速度不均匀的 GIF 。
+  * 倒数第一位（0）**透明颜色标志（Transparent Color Flag）**：值为真表示使用透明颜色。解码器会通过透明色索引在颜色列表中找到改颜色，标记为透明，当渲染图像时，标记为透明色的颜色将不会绘制，显示下面的背景。
+
+``` CSharp
+/// <summary>
+/// 图形控制扩展
+/// </summary>
+[Serializable]
+public struct GraphicControlExtension
+{
+    /// <summary>
+    /// 标识这是一个扩展块，固定值 0x21
+    /// </summary>
+    public byte extensionIntroducer;
+
+    /// <summary>
+    /// 标识这是一个图形控制扩展块，固定值 0xF9
+    /// </summary>
+    public byte GraphicControlLabel;
+
+    /// <summary>
+    /// 图形控制扩展块大小，不包括块终结器，固定值 4
+    /// </summary>
+    public byte blockSize;
+
+    /// <summary>
+    /// `0` - 不使用处置方法；
+    /// `1` - 不处置图形，把图形从当前位置移去；
+    /// `2` - 恢复到背景色；
+    /// `3` - 恢复到先前状态；
+    /// </summary>
+    public UInt16 disposalMethod;
+
+    /// <summary>
+    /// 值为 1 表示使用透明颜色
+    /// </summary>
+    public bool transparentColorFlag;
+
+    /// <summary>
+    /// 单位 1/100 秒，如果值不为 1 ，表示暂停规定的时间后再继续往下处理数据流
+    /// </summary>
+    public UInt16 delayTime;
+
+    /// <summary>
+    /// 透明色索引值
+    /// </summary>
+    public byte transparentColorIndex;
+
+    /// <summary>
+    /// 标识块终结，固定值 0
+    /// </summary>
+    public byte blockTerminator;
+}
+/// <summary>
+/// 用于存储GIF的图形控制扩展（按照帧顺序排列）
+/// </summary>
+public List<GraphicControlExtension> graphicControlExtensions = null;
+
+/// <summary>
+/// 获取图形控制扩展，标识符固定值为0xf9
+/// </summary>
+void GetGraphicControlExtension()
+{
+    GraphicControlExtension graphicControlExtension = new GraphicControlExtension();
+
+    graphicControlExtension.extensionIntroducer = 0x21;
+    graphicControlExtension.GraphicControlLabel = bytes[index++];
+    graphicControlExtension.blockSize = bytes[index++];
+
+    switch (bytes[index] & 28) // 28 : 0b00011100
+    {
+        case 4: // 4 : 0b00000100
+            graphicControlExtension.disposalMethod = 1;
+            break;
+        case 8: // 8 : 0b00001000
+            graphicControlExtension.disposalMethod = 2;
+            break;
+        case 12: // 12 : 0b00001100
+            graphicControlExtension.disposalMethod = 3;
+            break;
+        default:
+            graphicControlExtension.disposalMethod = 0;
+            break;
+    }
+    graphicControlExtension.transparentColorFlag = (bytes[index++] & 1) != 0;
+
+    graphicControlExtension.delayTime = BitConverter.ToUInt16(bytes, index);
+    index += 2;
+
+    graphicControlExtension.transparentColorIndex = bytes[index++];
+
+    graphicControlExtension.blockTerminator = bytes[index++];
+
+    if (graphicControlExtensions == null)
+    {
+        graphicControlExtensions = new List<GraphicControlExtension>();
+    }
+    graphicControlExtensions.Add(graphicControlExtension);
+}
+```
+
+### 注释扩展块（Comment Extension）
+
+* 注释扩展块的内容用来说明图形、作者或者其他任何非图形数据和控制信息的文本信息。结构如下图，其中的注释数据是序列数据子块（Data Sub-blocks），每块最多 255 个字节，最少 1 个字节。
+
+<img src="注释扩展块.png" alt="注释扩展块" style="zoom:100%;">
+
+``` CSharp
+/// <summary>
+/// 注释扩展块
+/// </summary>
+[Serializable]
+public struct CommentExtension
+{
+    /// <summary>
+    /// 标识符，固定值 0x21
+    /// </summary>
+    public byte extensionIntroducer;
+
+    /// <summary>
+    /// 注释标签，固定值 0xfe
+    /// </summary>
+    public byte commentLabel;
+
+    /// <summary>
+    /// 块结束符，固定值 0x00
+    /// </summary>
+    public byte blockTerminator;
+
+    /// <summary>
+    /// 注释数据块列表
+    /// </summary>
+    public List<CommentDataBlock> commentDataBlocksList;
+
+    /// <summary>
+    /// 注释扩展块中的注释数据块
+    /// </summary>
+    [Serializable]
+    public struct CommentDataBlock
+    {
+        /// <summary>
+        /// 注释数据大小
+        /// </summary>
+        public byte blockSize;
+        /// <summary>
+        /// 注释数据
+        /// </summary>
+        public byte[] commentData;
+    }
+}
+
+/// <summary>
+/// 用于存储GIF的注释扩展块（按照帧顺序排列）
+/// </summary>
+public List<CommentExtension> commentExtensions = null;
+
+/// <summary>
+/// 获取注释扩展块
+/// </summary>
+void GetCommentExtension()
+{
+    CommentExtension commentExtension = new CommentExtension();
+
+    commentExtension.extensionIntroducer = 0x21;
+    commentExtension.commentLabel = bytes[index++];
+
+    while (true)
+    {
+        // 块结束符 0
+        if (bytes[index].Equals(0x00))
+        {
+            commentExtension.blockTerminator = 0;
+            ++index;
+            break;
+        }
+
+        CommentExtension.CommentDataBlock commentDataBlock = new CommentExtension.CommentDataBlock();
+        commentDataBlock.blockSize = bytes[index++];
+
+        commentDataBlock.commentData = new byte[commentDataBlock.blockSize];
+        for (int i = 0; i < commentDataBlock.blockSize; ++i)
+        {
+            commentDataBlock.commentData[i] = bytes[index++];
+        }
+    }
+
+    if (commentExtensions == null)
+    {
+        commentExtensions = new List<CommentExtension>();
+    }
+    commentExtensions.Add(commentExtension);
+}
+```
+
+### 无格式文本扩展块（图像说明扩充块）
+
+### 结束块
+
+* 结束块（GIFTrailer）表示 GIF 文件的结尾，它包含一个固定的数值：`0x3B` 。
+
+<img src="文件终结.webp" alt="文件终结" style="zoom:100%;">
