@@ -679,10 +679,286 @@ void GetCommentExtension()
 }
 ```
 
-### 无格式文本扩展块（图像说明扩充块）
+### 无格式文本扩展块（PlainText Extension）（图像说明扩充块）
 
-### 结束块
+* 无格式文本扩展块（PlainText Extension）包含 `文本数据` 和 `描绘文本` 所须的参数。文本数据用 `7` 位的 ASCII 字符编码并以图形形式显示。扩展块的结构如下图。
 
-* 结束块（GIFTrailer）表示 GIF 文件的结尾，它包含一个固定的数值：`0x3B` 。
+<img src="无格式文本扩展块.png" alt="无格式文本扩展块" style="zoom:100%;">
+
+* `BlockSize`用来指定该图像扩充块的长度，其取值固定为 `13` 。
+* `Text Grid Left Position` 用来指定文字显示方格相对于逻辑屏幕左上角的 `X` 坐标（以像素为单位）。
+* `Text Grid Top Position` 用来指定文字显示方格相对于逻辑屏幕左上角的 `Y` 坐标。
+* `Text Grid Width` 用来指定文字显示方格的宽度。
+* `Text Grid Height` 用来指定文字显示方格的高度。
+* `Character Cell Width` 用来指定字符的宽度。
+* `Character Cell Height` 用来指定字符的高度。
+* `Text Foreground Color Index` 用来指定字符的前景色。
+* `Text Background Color Index` 用来指定字符的背景色。
+
+``` CSharp
+/// <summary>
+/// 无格式文本扩展块（图像说明扩充块）
+/// </summary>
+[Serializable]
+public struct PlainTextExtension
+{
+    /// <summary>
+    /// 扩展标识符，固定值 0x21
+    /// </summary>
+    public byte extensionIntroducer;
+    
+    /// <summary>
+    /// 无格式文本标识符，固定值 0x01
+    /// </summary>
+    public byte plainTextLabel;
+    
+    /// <summary>
+    /// 块大小
+    /// </summary>
+    public byte blockSize;
+
+    /// <summary>
+    /// 块结束符，固定值 0x00
+    /// </summary>
+    public byte blockTerminator;
+    
+    /// <summary>
+    /// 无格式文本数据块列表
+    /// </summary>
+    public List<PlainTextDataBlock> plainTextDataBlocks;
+
+    /// <summary>
+    /// 无格式文本数据块
+    /// </summary>
+    [Serializable]
+    public struct PlainTextDataBlock
+    {
+        /// <summary>
+        /// 块大小
+        /// </summary>
+        public byte blockSize;
+        
+        /// <summary>
+        /// 无格式文本数据
+        /// </summary>
+        public byte[] plainTextData;
+    }
+}
+
+/// <summary>
+/// 无格式文本扩展块列表
+/// </summary>
+public List<PlainTextExtension> plainTextExtensions = null;
+
+/// <summary>
+/// 获取无格式文本扩展块（图像说明扩充块）
+/// </summary>
+void GetPlainTextExtension()
+{
+    PlainTextExtension plainTextExtension = new PlainTextExtension();
+
+    plainTextExtension.extensionIntroducer = 0x21;
+    plainTextExtension.plainTextLabel = bytes[index++];
+    plainTextExtension.blockSize = bytes[index++];
+
+    // Text Grid Left Position(2 Bytes) 不支持
+    index += 2;
+    // Text Grid Top Position(2 Bytes) 不支持
+    index += 2;
+    // Text Grid Width(2 Bytes) 不支持
+    index += 2;
+    // Text Grid Height(2 Bytes) 不支持
+    index += 2;
+    // Character Cell Width(1 Bytes) 不支持
+    ++index;
+    // Character Cell Height(1 Bytes) 不支持
+    ++index;
+    // Text Foreground Color Index(1 Bytes) 不支持
+    ++index;
+    // Text Background Color Index(1 Bytes) 不支持
+    ++index;
+
+    while (true)
+    {
+        if (bytes[index].Equals(0x00))
+        {
+            plainTextExtension.blockTerminator = 0;
+            ++index;
+            break;
+        }
+        PlainTextExtension.PlainTextDataBlock plainTextDataBlock = new PlainTextExtension.PlainTextDataBlock();
+        plainTextDataBlock.blockSize = bytes[index++];
+
+        plainTextDataBlock.plainTextData = new byte[plainTextDataBlock.blockSize];
+        for (int i = 0; i < plainTextDataBlock.blockSize; ++i)
+        {
+            plainTextDataBlock.plainTextData[i] = bytes[index++];
+        }
+
+        if (plainTextExtension.plainTextDataBlocks == null)
+        {
+            plainTextExtension.plainTextDataBlocks = new List<PlainTextExtension.PlainTextDataBlock>();
+        }
+        plainTextExtension.plainTextDataBlocks.Add(plainTextDataBlock);
+    }
+
+    if (plainTextExtensions == null)
+    {
+        plainTextExtensions = new List<PlainTextExtension>();
+    }
+    plainTextExtensions.Add(plainTextExtension);
+}
+```
+
+### 应用扩展块（Application Extension）
+
+* 应用扩展块（ApplicationExtension）包含制作该图像文件的应用程序的相关信息，它的结构如下图
+
+<img src="应用扩展块.png" alt="应用扩展块" style="zoom:100%;">
+
+* `Block Size` 用来指定该应用程序扩充块的长度，其取值固定为 `12` 。
+* `Identifier` 用来指定应用程序名称。
+* `Authentication` 用来指定应用程序的识别码。
+
+``` CSharp
+/// <summary>
+/// 应用扩展块
+/// </summary>
+[Serializable]
+public struct ApplicationExtension
+{
+    /// <summary>
+    /// 扩展标识符，固定值 0x21
+    /// </summary>
+    public byte extensionIntroducer;
+    
+    /// <summary>
+    /// 应用扩展块标识符，固定值 0xFF
+    /// </summary>
+    public byte extensionLabel;
+    
+    /// <summary>
+    /// 块大小，固定值 0x0b（12）
+    /// </summary>
+    public byte blockSize;
+    
+    /// <summary>
+    /// 应用程序标识符
+    /// </summary>
+    public string applicationIdentifier;
+    
+    /// <summary>
+    /// 应用程序识别码
+    /// </summary>
+    public string applicationAuthenticationCode;
+
+    /// <summary>
+    /// 块结束符，固定值 0x00
+    /// </summary>
+    public byte blockTerminator;
+    
+    /// <summary>
+    /// 应用程序数据块列表
+    /// </summary>
+    public List<ApplicationDataBlock> applicationDataBlocks;
+
+    /// <summary>
+    /// GIF 循环次数（0 表示无限）
+    /// </summary>
+    public int loopCount;
+
+    /// <summary>
+    /// 应用程序数据块
+    /// </summary>
+    [Serializable]
+    public struct ApplicationDataBlock
+    {
+        /// <summary>
+        /// 块大小
+        /// </summary>
+        public byte blockSize;
+        
+        /// <summary>
+        /// 应用程序数据
+        /// </summary>
+        public byte[] applicationData;
+    }
+}
+public ApplicationExtension applicationExtension = new ApplicationExtension();
+
+/// <summary>
+/// 获取应用扩展块
+/// </summary>
+void GetApplicationExtension()
+{
+    StringBuilder sb = new StringBuilder();
+
+    applicationExtension.extensionIntroducer = 0x21;
+    applicationExtension.extensionLabel = bytes[index++];
+    applicationExtension.blockSize = bytes[index++];
+
+    for (int i = 0; i < 8; ++i)
+    {
+        sb.Append(bytes[index++]);
+    }
+    applicationExtension.applicationIdentifier = sb.ToString();
+    sb.Clear();
+
+    for (int i = 0; i < 3; ++i)
+    {
+        sb.Append(bytes[index++]);
+    }
+    applicationExtension.applicationAuthenticationCode = sb.ToString();
+
+    while (true)
+    {
+        if (bytes[index].Equals(0x00))
+        {
+            applicationExtension.blockTerminator = 0;
+            ++index;
+            break;
+        }
+        
+        ApplicationExtension.ApplicationDataBlock applicationDataBlock = new ApplicationExtension.ApplicationDataBlock();
+        applicationDataBlock.blockSize = bytes[index++];
+
+        applicationDataBlock.applicationData = new byte[applicationDataBlock.blockSize];
+        for (int i = 0; i < applicationDataBlock.blockSize; ++i)
+        {
+            applicationDataBlock.applicationData[i] = bytes[index++];
+        }
+
+        if (applicationExtension.applicationDataBlocks == null)
+        {
+            applicationExtension.applicationDataBlocks = new List<ApplicationExtension.ApplicationDataBlock>();
+        }
+        applicationExtension.applicationDataBlocks.Add(applicationDataBlock);
+    }
+
+    if (applicationExtension.applicationDataBlocks == null || applicationExtension.applicationDataBlocks.Count < 1 ||
+        applicationExtension.applicationDataBlocks[0].applicationData.Length < 3 ||
+        applicationExtension.applicationDataBlocks[0].applicationData[0] != 0x01)
+    {
+        applicationExtension.loopCount = 0;
+    }
+    else
+    {
+        applicationExtension.loopCount = BitConverter.ToUInt16(applicationExtension.applicationDataBlocks[0].applicationData, 1);
+    }
+}
+```
+
+### 结束块（GIF Trailer）
+
+* 结束块（GIF Trailer）表示 GIF 文件的结尾，它包含一个固定的数值：`0x3B` 。
 
 <img src="文件终结.webp" alt="文件终结" style="zoom:100%;">
+
+``` CSharp
+/// <summary>
+/// 标识 GIF 文件结束，固定值 0x3b
+/// </summary>
+public byte trailer;
+```
+
+## GIF 转纹理
