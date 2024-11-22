@@ -26,11 +26,10 @@ using UnityEngine;
 
 public class GifData : ScriptableObject
 {
-    public byte[] gifBytes;
-    public void SetGifBytes(byte[] gifBytes)
-    {
-        this.gifBytes = gifBytes;
-    }
+    /// <summary>
+    /// GIF的解码器，可获取解码内容
+    /// </summary>
+    [HideInInspector] public GifDecoder gifDecoder;
 }
 ```
 
@@ -43,6 +42,13 @@ using UnityEngine;
 
 public class GifPostprocessor : AssetPostprocessor
 {
+    /// <summary>
+    /// 用于对导入的资源进行预处理
+    /// </summary>
+    /// <param name="importedAssets">所有导入的文件的路径</param>
+    /// <param name="deletedAssets">未使用</param>
+    /// <param name="movedAssets">未使用</param>
+    /// <param name="movedFromAssetPaths">未使用</param>
     public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
     {
         foreach (string assetPath in importedAssets)
@@ -53,16 +59,44 @@ public class GifPostprocessor : AssetPostprocessor
                 if (textAsset != null)
                 {
                     GifData gifData = ScriptableObject.CreateInstance<GifData>();
-                    gifData.SetGifBytes(textAsset.bytes);
+                    GifDecoder gifDecoder = new GifDecoder(gifData, textAsset.bytes);
+
                     string gifDataAssetPath = Path.ChangeExtension(assetPath, ".asset");
                     AssetDatabase.CreateAsset(gifData, gifDataAssetPath);
-                    // 自动为 .gif.bytes 文件创建一个 TextAsset , 删除原始的 TextAsset
+                    // 自动为.gif.bytes文件创建一个TextAsset , 删除原始的TextAsset
                     AssetDatabase.DeleteAsset(assetPath);
                 }
             }
         }
     }
 }
+
+// 附 GifDecoder 的构造函数 与 解码入口
+
+/// <summary>
+/// GifDecoder的构造函数
+/// </summary>
+/// <param name="gifData">GifData类型的数据</param>
+/// <param name="bytes">GIF的二进制数据</param>
+public GifDecoder(GifData gifData, byte[] bytes)
+{
+    this.bytes = bytes;
+    GifDecode();
+    gifData.gifDecoder = this;
+}
+
+/// <summary>
+/// GIF解码入口
+/// </summary>
+void GifDecode()
+{
+    GetHeader();
+    AnalyzeLogicalScreenDescriptor();
+    GetGlobalColorTable();
+    // -------------------- 完成全局配置
+    GetGifBlock();
+}
+// 函数详情见下文
 ```
 
 * 上述代码的作用是后处理的过程中，识别出所有的 `.gif.bytes` 文件，创建一个 `GifData` 资产，并且删掉原有的文本资产。此时，第一步导入 GIF 图已经完成。
@@ -86,14 +120,12 @@ public class GifPostprocessor : AssetPostprocessor
 /// <summary>
 /// 遍历字节数组时的下标
 /// </summary>
-int index = 0;
+private int index = 0;
 
 /// <summary>
 /// GIF的二进制数据
 /// </summary>
-readonly byte[] bytes;
-
-readonly StringBuilder sb = new StringBuilder();
+private readonly byte[] bytes;
 
 /// <summary>
 /// GIF署名
