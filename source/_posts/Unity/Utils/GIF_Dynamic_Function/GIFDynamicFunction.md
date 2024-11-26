@@ -994,3 +994,7 @@ public byte trailer;
 ```
 
 ## GIF 转纹理
+
+* 待补充（内容有点多，想偷懒）
+
+## 播放 GIF
