@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>TCP 长连接和短连接</title>
+      <link href="/2024/11/27/Eight-Part_Essay/Computer_Network/TCP_Long_And_Short_Connections/TCPLongAndShortConnections/"/>
+      <url>/2024/11/27/Eight-Part_Essay/Computer_Network/TCP_Long_And_Short_Connections/TCPLongAndShortConnections/</url>
+      
+        <content type="html"><![CDATA[<h2 id="TCP-长连接和短连接"><a href="#TCP-长连接和短连接" class="headerlink" title="TCP 长连接和短连接"></a>TCP 长连接和短连接</h2><h3 id="什么是长连接和短连接"><a href="#什么是长连接和短连接" class="headerlink" title="什么是长连接和短连接"></a>什么是长连接和短连接</h3><ul><li><strong>长连接（long connnection）</strong>，指在一个连接上可以连续发送多个数据包，在连接保持期间，如果没有数据包发送，需要双方发链路检测包。</li><li><strong>短连接（short connnection）</strong>，是相对于长连接而言的概念，指的是在数据传送过程中，只在需要发送数据时才去建立一个连接，数据发送完成后则断开此连接，即每次连接只完成一项业务的发送。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网路 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>局域网中的主机之间通信</title>
+      <link href="/2024/11/27/Eight-Part_Essay/Computer_Network/Communication_Between_Hosts/CommunicationBetweenHosts/"/>
+      <url>/2024/11/27/Eight-Part_Essay/Computer_Network/Communication_Between_Hosts/CommunicationBetweenHosts/</url>
+      
+        <content type="html"><![CDATA[<h2 id="局域网中的主机之间通信"><a href="#局域网中的主机之间通信" class="headerlink" title="局域网中的主机之间通信"></a>局域网中的主机之间通信</h2><ul><li>局域网中的主机间通信分为 2 种：<ol><li>两台主机处于同一网段</li><li>两台主机之间处于不同网段</li></ol></li></ul><h3 id="局域网中处于同一网段中的主机通信"><a href="#局域网中处于同一网段中的主机通信" class="headerlink" title="局域网中处于同一网段中的主机通信"></a>局域网中处于同一网段中的主机通信</h3><ul><li>假如：主机 <code>A</code> 要和主机 <code>B</code> 通信，主机 <code>A</code> 知道主机 <code>B</code> 的 IP 地址。知道 IP 地址是通信的前提。首先，要通进行通信，IP 地址和 MAC 地址是必不可少的，IP 地址已经知道了，那么主机 <code>A</code> 必须要知道主机 <code>B</code> 的 MAC 地址，先在 <code>ARP</code> 表中查看有无该 IP 地址，如果有，就找出对应的硬件 MAC 地址，如果没有，<strong>主机 <code>A</code> 广播发送 <code>ARP</code> 请求来获取目的 MAC 地址，说 who is 192.168.1.102 ?</strong></li></ul><p><img src="处于同一网段.png" alt="局域网中处于同一网段中的主机通信" style="zoom:100%;"></p><ul><li>当 IP 地址是 <code>192.168.1.102</code> 的主机 <code>B</code> 收到后，会回复主机 <code>A</code> ，说 <strong>“我是 <code>192.168.1.102</code> ，我的 MAC 地址是：xx-xx-xx-xx-xx-xx”（ARP应答）</strong>。这样一来，主机 <code>A</code> 就知道主机 <code>B</code> 的 MAC 地址了，当然，由于主机 <code>A</code> 在广播发送的 <code>ARP</code> 报文时，主机 <code>A</code> 的 MAC 地址被作为源 MAC 地址而封装在 MAC 帧中，所以主机 <code>B</code> 收到广播报文后也会知道主机 <code>A</code> 的 MAC 地址，这时，主机 <code>A</code> 的源 IP 地址、目的 IP 地址、源 MAC 地址和目的 MAC 地址都能确定了，就能够进行通信了。这也就是平时说的同一网段中的主机相互通信。</li></ul><h3 id="不同网段间主机通信"><a href="#不同网段间主机通信" class="headerlink" title="不同网段间主机通信"></a>不同网段间主机通信</h3><ul><li>这里的不同网段，指的是不在同一子网下。</li><li>假如：主机 <code>A</code> 要和主机 <code>D</code> 进行通信，那么同样的，主机 <code>A</code> 如果广播发送 <code>ARP</code> 请求，询问 <code>192.168.1.22</code> 在哪里，很显然，主机 <code>A</code> 和主机 <code>D</code> 不在同一个网段内，路由器默认不转发广播报文，那么主机 <code>D</code> 就收不到 <code>ARP</code> 请求，也就无法回应主机 <code>A</code> ，主机 <code>A</code> 也就无从获取主机 <code>D</code> 的MAC地址。</li></ul><p><img src="处于不同网段.png" alt="不同网段间主机通信" style="zoom:100%;"></p><ul><li>其实，<strong>主机 <code>A</code> 会首先检查目的 IP 地址是否与自己在同一网段</strong>，如果在，就直接广播 <code>ARP</code> 请求来获取目的主机的 MAC 地址，<strong>如果不在同一网段，又配置有网关地址的话，那么主机 <code>A</code> 就通过 <code>ARP</code> 请求，询问 <code>192.168.0.1</code>（网关）在哪里</strong>，网关收到后就会回应主机 <code>A</code> ，把网关的 MAC 地址告诉主机 <code>A</code> ，当获取到网关的 MAC 地址后，把网关的 MAC 地址作为 MAC 帧中的目的 MAC 地址，然后就把数据丢给网关 <code>192.168.0.1</code> ，网关根据路由表，转发给下一个路由器，再由下一个路由器交付给主机 <code>D</code> 所在的网络，即网关，网关再通过 <code>ARP</code> ，找到目的主机 <code>D</code> ，完成数据交付。</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 八股文 - 计算机网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计算机网路 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>智能指针</title>
       <link href="/2024/11/20/Eight-Part_Essay/C++/Smart_Pointer/SmartPointer/"/>
       <url>/2024/11/20/Eight-Part_Essay/C++/Smart_Pointer/SmartPointer/</url>
@@ -434,9 +484,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 数学 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -569,9 +619,9 @@
       
         <tags>
             
-            <tag> 渲染管线 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 渲染管线 </tag>
             
         </tags>
       
@@ -596,9 +646,9 @@
       
         <tags>
             
-            <tag> 渲染管线 </tag>
-            
             <tag> 图形学 </tag>
+            
+            <tag> 渲染管线 </tag>
             
         </tags>
       
@@ -623,9 +673,9 @@
       
         <tags>
             
-            <tag> 图形学 </tag>
-            
             <tag> 数学 </tag>
+            
+            <tag> 图形学 </tag>
             
         </tags>
       
@@ -1122,6 +1172,17 @@
     
     
     <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>文章分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -1149,17 +1210,6 @@
       <url>/css/font_bilibili.css</url>
       
         <content type="html"><![CDATA[@font-face {  font-family: "iconfont"; /* Project id 4618728 */  src: url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff2?t=1720753741868') format('woff2'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.woff?t=1720753741868') format('woff'),       url('//at.alicdn.com/t/c/font_4618728_a1sycske8op.ttf?t=1720753741868') format('truetype');}.iconfont {  font-family: "iconfont" !important;  font-size: 20px;  font-style: normal;  -webkit-font-smoothing: antialiased;  -moz-osx-font-smoothing: grayscale;}.icon-bilibili-:before {  content: "\e609";}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -1199,17 +1249,6 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
@@ -1221,9 +1260,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1237,6 +1276,17 @@
       <url>/subinterface/index.html</url>
       
         <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
