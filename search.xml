@@ -8,7 +8,7 @@
       <link href="/2024/11/27/Eight-Part_Essay/Computer_Network/TCP_Long_And_Short_Connections/TCPLongAndShortConnections/"/>
       <url>/2024/11/27/Eight-Part_Essay/Computer_Network/TCP_Long_And_Short_Connections/TCPLongAndShortConnections/</url>
       
-        <content type="html"><![CDATA[<h2 id="TCP-长连接和短连接"><a href="#TCP-长连接和短连接" class="headerlink" title="TCP 长连接和短连接"></a>TCP 长连接和短连接</h2><h3 id="什么是长连接和短连接"><a href="#什么是长连接和短连接" class="headerlink" title="什么是长连接和短连接"></a>什么是长连接和短连接</h3><ul><li><strong>长连接（long connnection）</strong>，指在一个连接上可以连续发送多个数据包，在连接保持期间，如果没有数据包发送，需要双方发链路检测包。</li><li><strong>短连接（short connnection）</strong>，是相对于长连接而言的概念，指的是在数据传送过程中，只在需要发送数据时才去建立一个连接，数据发送完成后则断开此连接，即每次连接只完成一项业务的发送。</li></ul><p><img src="长连接短连接.png" alt="长连接短连接" style="zoom:100%;"></p><h3 id="TCP-长短连接的优势"><a href="#TCP-长短连接的优势" class="headerlink" title="TCP 长短连接的优势"></a>TCP 长短连接的优势</h3><h4 id="TCP-短连接"><a href="#TCP-短连接" class="headerlink" title="TCP 短连接"></a>TCP 短连接</h4><ul><li>模拟一下TCP短连接的情况：<code>client</code> 向 <code>server</code> 发起连接请求，<code>server</code> 接到请求，然后双方建立连接。<code>client</code> 向 <code>server</code> 发送消息，<code>server</code> 回应 <code>client</code> ，然后一次读写就完成了，这时候双方任何一个都可以发起 <code>close</code> 操作，不过一般都是 <code>client</code> 先发起 <code>close</code> 操作。</li><li>从上面的描述看，短连接一般只会在 <code>client/server</code> 间传递一次读写操作。</li><li><strong>短连接优点</strong>：管理起来方便，存在的连接都是有效的连接，不需要额外的控制手段。</li></ul><h4 id="TCP-长连接"><a href="#TCP-长连接" class="headerlink" title="TCP 长连接"></a>TCP 长连接</h4><ul><li>模拟一下TCP长连接的情况，<code>client</code> 向 <code>server</code> 发起连接，<code>server</code> 接受 <code>client</code> 连接，双方建立连接。<code>Client</code> 与 <code>server</code> 完成一次读写之后，它们之间的连接并不会主动关闭，后续的读写操作会继续使用这个连接。下面介绍一下 TCP 的<strong>保活功能</strong>。</li><li>TCP 的保活功能主要为服务器应用提供。如果客户端已经消失而连接未断开，则会使得服务器上保留一个半开放的连接，而服务器又在等待来自客户端的数据，此时服务器将永远等待客户端的数据。保活功能就是试图在服务端器端检测到这种半开放的连接。</li><li>如果一个给定的连接在<strong>两小时内</strong>没有任何的动作，则服务器就向客户发一个探测报文段，客户主机必须处于以下 <code>4</code> 个状态之一：<ol><li><strong>客户主机依然正常运行，并从服务器可达</strong>。客户的 TCP 响应正常，而服务器也知道对方是正常的，服务器在<strong>两小时</strong>后将保证定时器复位。</li><li><strong>客户主机已经崩溃，并且关闭或者正在重新启动</strong>。在任何一种情况下，客户的 TCP 都没有响应。服务端将不能收到对探测的响应，并在 <code>75秒</code> 后超时。服务器总共发送 <code>10</code> 个这样的探测 ，每个间隔 <code>75秒</code> 。如果服务器没有收到一个响应，它就认为客户主机已经关闭并终止连接。</li><li><strong>客户主机崩溃并已经重新启动</strong>。服务器将收到一个对其保证探测的响应，这个响应是一个复位，使得服务器终止这个连接。</li><li><strong>客户机正常运行，但是服务器不可达</strong>。这种情况与 <code>2</code> 类似，TCP 能发现的就是没有收到探查的响应。</li></ol></li><li>在长连接的应用场景下，client 端一般不会主动关闭它们之间的连接，client 与 server 之间的连接如果一直不关闭的话，会存在一个问题：随着客户端连接越来越多，server 早晚有扛不住的时候，这时候 server 端需要采取一些策略，如关闭一些长时间没有读写事件发生的连接，这样可以避免一些恶意连接导致 server 端服务受损。如果条件再允许就可以以客户端机器为颗粒度，限制每个客户端的最大长连接数，这样可以完全避免某个蛋疼的客户端连累后端服务。</li></ul><p>长连接和短连接的产生在于 client 和 server 采取的关闭策略，具体的应用场景采用具体的策略，没有十全十美的选择，只有合适的选择。</p><h3 id="HTTP-与-TCP-IP"><a href="#HTTP-与-TCP-IP" class="headerlink" title="HTTP 与 TCP / IP"></a>HTTP 与 TCP / IP</h3><ul><li>关于HTTP和TCP/IP各协议的详细介绍：<a href="https://blog.csdn.net/yeahPeng11/article/details/117486184">计算机网络 - 学习总结篇</a></li></ul><h4 id="HTTP-协议与-TCP-IP-协议的关系"><a href="#HTTP-协议与-TCP-IP-协议的关系" class="headerlink" title="HTTP 协议与 TCP / IP 协议的关系"></a>HTTP 协议与 TCP / IP 协议的关系</h4>]]></content>
+        <content type="html"><![CDATA[<h2 id="TCP-长连接和短连接"><a href="#TCP-长连接和短连接" class="headerlink" title="TCP 长连接和短连接"></a>TCP 长连接和短连接</h2><h3 id="什么是长连接和短连接"><a href="#什么是长连接和短连接" class="headerlink" title="什么是长连接和短连接"></a>什么是长连接和短连接</h3><ul><li><strong>长连接（long connnection）</strong>，指在一个连接上可以连续发送多个数据包，在连接保持期间，如果没有数据包发送，需要双方发链路检测包。</li><li><strong>短连接（short connnection）</strong>，是相对于长连接而言的概念，指的是在数据传送过程中，只在需要发送数据时才去建立一个连接，数据发送完成后则断开此连接，即每次连接只完成一项业务的发送。</li></ul><p><img src="长连接短连接.png" alt="长连接短连接" style="zoom:100%;"></p><h3 id="TCP-长短连接的优势"><a href="#TCP-长短连接的优势" class="headerlink" title="TCP 长短连接的优势"></a>TCP 长短连接的优势</h3><h4 id="TCP-短连接"><a href="#TCP-短连接" class="headerlink" title="TCP 短连接"></a>TCP 短连接</h4><ul><li>模拟一下TCP短连接的情况：<code>client</code> 向 <code>server</code> 发起连接请求，<code>server</code> 接到请求，然后双方建立连接。<code>client</code> 向 <code>server</code> 发送消息，<code>server</code> 回应 <code>client</code> ，然后一次读写就完成了，这时候双方任何一个都可以发起 <code>close</code> 操作，不过一般都是 <code>client</code> 先发起 <code>close</code> 操作。</li><li>从上面的描述看，短连接一般只会在 <code>client/server</code> 间传递一次读写操作。</li><li><strong>短连接优点</strong>：管理起来方便，存在的连接都是有效的连接，不需要额外的控制手段。</li></ul><h4 id="TCP-长连接"><a href="#TCP-长连接" class="headerlink" title="TCP 长连接"></a>TCP 长连接</h4><ul><li>模拟一下TCP长连接的情况，<code>client</code> 向 <code>server</code> 发起连接，<code>server</code> 接受 <code>client</code> 连接，双方建立连接。<code>Client</code> 与 <code>server</code> 完成一次读写之后，它们之间的连接并不会主动关闭，后续的读写操作会继续使用这个连接。下面介绍一下 TCP 的<strong>保活功能</strong>。</li><li>TCP 的保活功能主要为服务器应用提供。如果客户端已经消失而连接未断开，则会使得服务器上保留一个半开放的连接，而服务器又在等待来自客户端的数据，此时服务器将永远等待客户端的数据。保活功能就是试图在服务端器端检测到这种半开放的连接。</li><li>如果一个给定的连接在<strong>两小时内</strong>没有任何的动作，则服务器就向客户发一个探测报文段，客户主机必须处于以下 <code>4</code> 个状态之一：<ol><li><strong>客户主机依然正常运行，并从服务器可达</strong>。客户的 TCP 响应正常，而服务器也知道对方是正常的，服务器在<strong>两小时</strong>后将保证定时器复位。</li><li><strong>客户主机已经崩溃，并且关闭或者正在重新启动</strong>。在任何一种情况下，客户的 TCP 都没有响应。服务端将不能收到对探测的响应，并在 <code>75秒</code> 后超时。服务器总共发送 <code>10</code> 个这样的探测 ，每个间隔 <code>75秒</code> 。如果服务器没有收到一个响应，它就认为客户主机已经关闭并终止连接。</li><li><strong>客户主机崩溃并已经重新启动</strong>。服务器将收到一个对其保证探测的响应，这个响应是一个复位，使得服务器终止这个连接。</li><li><strong>客户机正常运行，但是服务器不可达</strong>。这种情况与 <code>2</code> 类似，TCP 能发现的就是没有收到探查的响应。</li></ol></li><li>在长连接的应用场景下，client 端一般不会主动关闭它们之间的连接，client 与 server 之间的连接如果一直不关闭的话，会存在一个问题：随着客户端连接越来越多，server 早晚有扛不住的时候，这时候 server 端需要采取一些策略，如关闭一些长时间没有读写事件发生的连接，这样可以避免一些恶意连接导致 server 端服务受损。如果条件再允许就可以以客户端机器为颗粒度，限制每个客户端的最大长连接数，这样可以完全避免某个蛋疼的客户端连累后端服务。</li></ul><p>长连接和短连接的产生在于 client 和 server 采取的关闭策略，具体的应用场景采用具体的策略，没有十全十美的选择，只有合适的选择。</p><h3 id="HTTP-与-TCP-IP"><a href="#HTTP-与-TCP-IP" class="headerlink" title="HTTP 与 TCP / IP"></a>HTTP 与 TCP / IP</h3><ul><li>关于HTTP和TCP/IP各协议的详细介绍：<a href="https://blog.csdn.net/yeahPeng11/article/details/117486184">计算机网络 - 学习总结篇</a></li></ul><h4 id="HTTP-协议与-TCP-IP-协议的关系"><a href="#HTTP-协议与-TCP-IP-协议的关系" class="headerlink" title="HTTP 协议与 TCP / IP 协议的关系"></a>HTTP 协议与 TCP / IP 协议的关系</h4><ul><li><strong>HTTP 协议的长连接和短连接，本质上是 TCP 协议的长连接和短连接</strong></li><li>HTTP 属于应用层协议，在传输层使用 TCP 协议，在网络层使用 IP 协议。</li><li>IP 协议主要解决网络路由和寻址问题，TCP 协议主要解决如何在 IP 层之上可靠地传递数据包，使得网络上接收端收到发送端所发出的所有包，并且接受顺序与发送顺序一致。TCP 协议是可靠的、面向连接的。</li><li><strong>TCP 才负责连接，只有负责传输的这一层才需要建立连接</strong></li><li>在 <code>HTTP/1.0</code> 中默认使用短连接。从 <code>HTTP/1.1</code> 起，默认使用长连接。</li></ul><h4 id="如何理解HTTP协议是无状态的"><a href="#如何理解HTTP协议是无状态的" class="headerlink" title="如何理解HTTP协议是无状态的"></a>如何理解HTTP协议是无状态的</h4><ul><li>HTTP 协议是无状态的，指的是 HTTP 协议对事务处理没有记忆能力，服务器不知道客户端是什么状态。即第一次和第二次发起对应的请求之间没有任何联系。</li></ul><h3 id="长轮询与短轮询"><a href="#长轮询与短轮询" class="headerlink" title="长轮询与短轮询"></a>长轮询与短轮询</h3><h4 id="什么是长轮询与短轮询"><a href="#什么是长轮询与短轮询" class="headerlink" title="什么是长轮询与短轮询"></a>什么是长轮询与短轮询</h4><ul><li><strong>短轮询</strong>：比如你现在要做一个电商中商品详情的页面，这个详情界面中有一个字段是库存量。而这个库存量需要实时的变化，保持和服务器里实际的库存一致。最简单的一种方式，就是不停地去请求服务器中的库存量是多少，然后刷新到这个页面当中，这其实就是所谓的短轮询。这种方式有明显的坏处，如果有 1000 个人停留在某个商品详情页面，那就是说会有 1000 个客户端不停的去请求服务器获取库存量，这显然是不合理的。</li><li><strong>长轮询</strong>：短轮询去服务端查询的时候，不管库存量有没有变化，服务器就立即返回结果了。而长轮询则不是，在长轮询中，服务器如果检测到库存量没有变化的话，将会把当前请求挂起一段时间（这个时间也叫作超时时间，一般是几十秒）。在这个时间里，服务器会去检测库存量有没有变化，检测到变化就立即返回，否则就一直等到超时为止。</li><li>但是长轮询也是有坏处的，因为把请求挂起同样会导致资源的浪费，假设还是 1000 个人停留在某个商品详情页面，那就很有可能服务器这边挂着 1000 个线程，在不停检测库存量，这依然是有问题的。</li></ul><h4 id="长短轮询和长短连接的区别"><a href="#长短轮询和长短连接的区别" class="headerlink" title="长短轮询和长短连接的区别"></a>长短轮询和长短连接的区别</h4><ul><li><strong>长短轮询</strong>：区别在于决定的方式。一个 TCP 连接是否为长连接，是通过设置 HTTP 的 Connection Header 来决定的，而且是需要两边（服务器端与应用端）都设置才有效。而一种轮询方式是否为长轮询，是根据服务端的处理方式来决定的，与客户端没有关系。</li><li><strong>长短连接</strong>：区别在于实现的方式。连接的长短是通过协议来规定和实现的。而轮询的长短，是服务器通过编程的方式手动挂起请求来实现的。</li></ul>]]></content>
       
       
       <categories>
@@ -1238,22 +1238,22 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
       
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -1271,22 +1271,22 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
