@@ -8,7 +8,7 @@
       <link href="/2024/12/02/Unity/Utils/Global_Interception_Of_UI_Click_Events/GlobalInterceptionOfUIClickEvents/"/>
       <url>/2024/12/02/Unity/Utils/Global_Interception_Of_UI_Click_Events/GlobalInterceptionOfUIClickEvents/</url>
       
-        <content type="html"><![CDATA[<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2>]]></content>
+        <content type="html"><![CDATA[<h2 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h2><ul><li>Unity 点击事件都是基于 <code>IPointerClickHandler</code> 接口，凡是实现了该接口的对象都会触发点击事件</li></ul><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IPointerClickHandler</span> : <span class="title">IEventSystemHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnPointerClick</span>(<span class="params">PointerEventData eventData</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><ul><li>继续查在哪调用的，从 <code>EventSystem</code> 里面找到了 <code>BaseInputModule</code></li></ul><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> BaseInputModule m_CurrentInputModule;</span><br></pre></td></tr></table></figure><ul><li>它就是跟 <code>EventSystem</code> 挂载一起的 <code>StandaloneInputModule</code> 继承的基类</li><li>然后看 <code>StandaloneInputModule</code> 里面的代码，全局查找 <code>IPointerClickHandler</code></li></ul>]]></content>
       
       
       <categories>
@@ -1263,33 +1263,22 @@
     
     
     <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>图集</title>
       <link href="/mapdepot/index.html"/>
       <url>/mapdepot/index.html</url>
       
         <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -1307,9 +1296,20 @@
     
     
     <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
