@@ -1,7 +1,7 @@
 ---
 title: 智能指针
-top_img: ''
-cover: ''
+top_img: '111557774_p0.png'
+cover: '101188292_p0.png'
 categories: 
     - 八股文
       - C++
