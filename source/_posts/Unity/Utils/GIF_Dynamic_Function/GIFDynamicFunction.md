@@ -101,7 +101,7 @@ void GifDecode()
 
 * 上述代码的作用是后处理的过程中，识别出所有的 `.gif.bytes` 文件，创建一个 `GifData` 资产，并且删掉原有的文本资产。此时，第一步导入 GIF 图已经完成。
 
-## 解码 GIF（以文章末的源码为标准，文章中的代码仅供参考，不保证正确性（其实是懒得改））
+## 解码 GIF（以源码为标准，文章中的代码仅供参考，不保证正确性（其实是懒得改））
 
 * GIF 的文件结构
 
@@ -998,3 +998,103 @@ public byte trailer;
 * 待补充（内容有点多，想偷懒）
 
 ## 播放 GIF
+
+* 根据 GIF 状态、循环次数循环赋值纹理即可
+
+``` CSharp
+/// <summary>
+/// GIF 状态
+/// </summary>
+public enum State
+{
+    /// <summary>
+    /// GIF 未初始化
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// GIF 正在加载纹理
+    /// </summary>
+    Loading,
+
+    /// <summary>
+    /// GIF 纹理已加载完毕
+    /// </summary>
+    Ready,
+
+    /// <summary>
+    /// GIF 正在播放
+    /// </summary>
+    Playing,
+
+    /// <summary>
+    /// GIF 已暂停
+    /// </summary>
+    Pause
+}
+
+/// <summary>
+/// 播放 GIF
+/// </summary>
+/// <param name="gifData">GIF 数据</param>
+/// <param name="rawImage">指定 GIF 在哪个 RawImage 上播放</param>
+/// <param name="rawImageHashCode">RawImage 的哈希值</param>
+/// <returns>迭代器</returns>
+private IEnumerator PlayGif(GifData gifData, RawImage rawImage, int rawImageHashCode)
+{
+    gifState[gifData.name][rawImageHashCode] = State.Playing;
+    gifRawImage[rawImageHashCode] = rawImage;
+
+    int loopCount = gifData.gifDecoder.applicationExtension.loopCount;
+    int nowLoopCount = 0;
+    int gifTextureIndex = 0;
+    float delayTime = -1f;
+
+    while (true)
+    {
+        switch (gifState[gifData.name][rawImageHashCode])
+        {
+            case State.None:
+                yield break;
+            case State.Ready:
+                yield break;
+            case State.Playing:
+                if (delayTime > Time.time)
+                {
+                    yield return null;
+                    break;
+                }
+                if (gifTextureIndex >= gifTextureWarehouse[gifData.name].Count)
+                {
+                    gifTextureIndex = 0;
+                    if (loopCount > 0)
+                    {
+                        ++nowLoopCount;
+                        if (nowLoopCount >= loopCount)
+                        {
+                            yield break;
+                        }
+                    }
+                }
+                rawImage.texture = gifTextureWarehouse[gifData.name][gifTextureIndex].texture2d;
+                delayTime = Time.time + gifTextureWarehouse[gifData.name][gifTextureIndex].delayTime;
+                ++gifTextureIndex;
+                yield return null;
+                break;
+            case State.Pause:
+                yield return null;
+                break;
+            default:
+                yield break;
+        }
+    }
+}
+```
+
+## 后记
+
+* 其余代码几乎均为业务逻辑代码，可自行观看源码，不难理解就不赘述了
+* 以下是该工具未来可能会优化的部分
+  1. 使用对象池对纹理进行复用
+  2. 批处理多协程 GIF 的播放（渲染合批）
+* 附该工具 GitHub 地址：[Unity-Gif](s)

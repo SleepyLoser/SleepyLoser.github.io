@@ -1,7 +1,7 @@
 ---
 title: TCP 长连接和短连接
-top_img: ''
-cover: ''
+top_img: '111431244_p0.png'
+cover: '124572396_p0.png'
 categories: 
     - 八股文
       - 计算机网络

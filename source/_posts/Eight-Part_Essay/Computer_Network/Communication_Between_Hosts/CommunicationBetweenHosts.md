@@ -1,7 +1,7 @@
 ---
 title: 局域网中的主机之间通信
-top_img: ''
-cover: ''
+top_img: '123214280_p0.png'
+cover: '124929117_p0.png'
 categories: 
     - 八股文
       - 计算机网络

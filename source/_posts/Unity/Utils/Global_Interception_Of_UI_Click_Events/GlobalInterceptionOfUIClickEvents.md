@@ -1,7 +1,7 @@
 ---
 title: Unity 全局控制 UI 点击事件（拓展：全局控制其它涉及到 EventSystem 的事件（输入、射线投射和发送事件））
-top_img: ''
-cover: ''
+top_img: '111102699_p0.jpg'
+cover: '123068644_p0.png'
 categories: 
     - Unity
       - 工具类
