@@ -101,7 +101,7 @@ void GifDecode()
 
 * 上述代码的作用是后处理的过程中，识别出所有的 `.gif.bytes` 文件，创建一个 `GifData` 资产，并且删掉原有的文本资产。此时，第一步导入 GIF 图已经完成。
 
-## 解码 GIF（以源码为标准，文章中的代码仅供参考，不保证正确性（其实是懒得改））
+## 获取 GIF 数据（以源码为标准，文章中的代码仅供参考，不保证正确性（其实是懒得改））
 
 * GIF 的文件结构
 
@@ -993,7 +993,7 @@ void GetApplicationExtension()
 public byte trailer;
 ```
 
-## GIF 转纹理
+## GIF 解码
 
 * 待补充（内容有点多，想偷懒）
 
@@ -1097,4 +1097,6 @@ private IEnumerator PlayGif(GifData gifData, RawImage rawImage, int rawImageHash
 * 以下是该工具未来可能会优化的部分
   1. 使用对象池对纹理进行复用
   2. 批处理多协程 GIF 的播放（渲染合批）
-* 附该工具 GitHub 地址：[Unity-Gif](s)
+* 以下是该工具未来可能会添加的功能
+  1. 在线获取 GIF 并播放
+* 附该工具的 GitHub 地址：[UnityGif](https://github.com/SleepyLoser/UnityGif)
