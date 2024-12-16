@@ -1094,9 +1094,9 @@ private IEnumerator PlayGif(GifData gifData, RawImage rawImage, int rawImageHash
 ## 后记
 
 * 其余代码几乎均为业务逻辑代码，可自行观看源码，不难理解就不赘述了
-* 以下是该工具未来可能会优化的部分
+* 以下是该工具未来可能会优化的部分：
   1. 使用对象池对纹理进行复用
-  2. 批处理多协程 GIF 的播放（渲染合批）
-* 以下是该工具未来可能会添加的功能
+  2. 批处理多个协程 GIF 的播放（渲染合批）
+* 以下是该工具未来可能会添加的功能：
   1. 在线获取 GIF 并播放
 * 附该工具的 GitHub 地址：[UnityGif](https://github.com/SleepyLoser/UnityGif)

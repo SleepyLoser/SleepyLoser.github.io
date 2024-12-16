@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>记录</title>
+    <g id="记录" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.06450021,1.76150085 L10.5130031,3.21249286 C6.6470099,3.21249286 3.51300314,6.34649961 3.51300314,10.2124929 C3.51300314,14.0784861 6.6470099,17.2124929 10.5130031,17.2124929 C14.3789964,17.2124929 17.5130031,14.0784861 17.5130031,10.2124929 C17.5130031,8.27966141 16.7293106,6.52947057 15.4627506,5.26274539" id="路径" stroke="#333333" transform="translate(10.513003, 9.486997) rotate(45.000000) translate(-10.513003, -9.486997) "></path>
+        <polyline id="路径-15" stroke="#333333" points="10 6.5 10 10 12.5 11.5"></polyline>
+    </g>
+</svg>
