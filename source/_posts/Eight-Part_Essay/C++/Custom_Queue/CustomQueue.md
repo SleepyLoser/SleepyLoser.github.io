@@ -42,13 +42,13 @@ public:
 };
 
 template <typename T>
-MyQueue<T>::MyQueue() : _front(0), _rear(-1), _size(0), _capacity(4)
+MyQueue<T>::MyQueue() : _front(0), _rear(0), _size(0), _capacity(4)
 {
     _data = new T[4];
 }
 
 template <typename T>
-MyQueue<T>::MyQueue(int capacity) : _front(0), _rear(-1), _size(0), _capacity(capacity)
+MyQueue<T>::MyQueue(int capacity) : _front(0), _rear(0), _size(0), _capacity(capacity)
 {
     _data = new T[capacity];
 }
@@ -100,11 +100,11 @@ bool MyQueue<T>::empty()
 template <typename T>
 void MyQueue<T>::push(T element)
 {
-    if (_size == _capacity)
+    if (_rear == _capacity)
     {
         _capacity *= 2;
         T* newData = new T[_capacity];
-        for (int i = 0; i < _size; ++i)
+        for (int i = 0; i < _rear; ++i)
         {
             newData[i] = _data[i];
         }
@@ -112,8 +112,8 @@ void MyQueue<T>::push(T element)
         _data = newData;
         newData = nullptr;
     }
-    ++_rear;
     _data[_rear] = element;
+    ++_rear;
     ++_size;
 }
 ```

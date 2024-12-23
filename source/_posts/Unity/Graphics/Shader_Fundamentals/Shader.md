@@ -8,8 +8,6 @@ categories:
 tags: 
     - 图形学
     - Shader
-# {% asset_link unity_shaders_book.pdf TestTitle %}
-# [B站](https://www.bilibili.com/)
 ---
 
 ## Unity Shader 基础
