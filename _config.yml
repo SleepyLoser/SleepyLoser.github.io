@@ -103,6 +103,7 @@ theme: butterfly
 deploy:
   type: 'git'
   repo: 'https://github.com/SleepyLoser/SleepyLoser.github.io'
+  token: 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
 
 # 本地搜索
 search:
