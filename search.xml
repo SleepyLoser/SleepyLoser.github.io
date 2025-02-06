@@ -553,11 +553,11 @@
     
     
     <entry>
-      <title>继 渲染管线</title>
-      <link href="/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/"/>
-      <url>/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/</url>
+      <title>渲染管线</title>
+      <link href="/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/"/>
+      <url>/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/</url>
       
-        <content type="html"><![CDATA[<h2 id="渲染管线中各个阶段的可控性"><a href="#渲染管线中各个阶段的可控性" class="headerlink" title="渲染管线中各个阶段的可控性"></a>渲染管线中各个阶段的可控性</h2><div class="table-container"><table><thead><tr><th>阶段名</th><th>具体步骤</th><th>可控程度</th><th>由谁控制</th></tr></thead><tbody><tr><td>应用阶段</td><td></td><td>完全可控</td><td>应用程序编程</td></tr><tr><td>几何阶段</td><td>顶点着色</td><td>完全可控</td><td>Vertex Shader</td></tr><tr><td></td><td>几何着色</td><td>完全可控</td><td>Geometry Shader</td></tr><tr><td></td><td>投影</td><td>完全可控</td><td>Vertex Shader 中编程</td></tr><tr><td></td><td>视锥体裁剪</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>屏幕映射</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>背面剔除</td><td>可配置</td><td>Shader 中的选项，cull back</td></tr><tr><td>光栅化</td><td>三角形设置</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>三角形遍历</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td>逐像素阶段</td><td>顶点属性插值</td><td>不可控</td><td>硬件中的 Attribute Setup 组件负责</td></tr><tr><td></td><td>Early Z-Test（深度测试）</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>片元着色</td><td>完全可控</td><td>Fragment Shader</td></tr><tr><td></td><td>混合</td><td>可配置</td><td>Shader中的选项，blend命令等</td></tr></tbody></table></div>]]></content>
+        <content type="html"><![CDATA[<h2 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h2><ul><li>渲染的三个阶段一般分为：<code>应用阶段</code>、<code>几何阶段</code>和<code>光栅化阶段</code>, 如下图</li></ul><p><img src="渲染管线.png" alt="渲染管线流程图" style="zoom:50%;"></p><ul><li>三个阶段的操作对象的流程图可参考下图</li></ul><p><img src="渲染管线流程图.png" alt="渲染管线操作对象流程图" style="zoom:50%;"></p><h3 id="应用阶段"><a href="#应用阶段" class="headerlink" title="应用阶段"></a>应用阶段</h3><ul><li>这一阶段由CPU处理，主要任务是为接下来GPU的渲染操作<strong>提供所需要的几何信息</strong>，即输出<code>渲染图元（rending primitives）</code>以供后续阶段的使用。渲染图元就是由若干个顶点构成的几何形状，点，线，三角形，多边形面都可以是一个图元</li></ul><h4 id="数据的准备"><a href="#数据的准备" class="headerlink" title="数据的准备"></a>数据的准备</h4><ul><li><strong>第一步</strong>应先将不需要的数据剔除出去，如以包围盒为单位的视锥体（粗粒度）剔除，遮挡剔除，层级剔除等等</li><li><strong>第二步</strong>根据UI对象在Herachy面板深度值的顺序（DFS深度优先搜索）设置渲染的顺序，其余物体大体可以按照离摄像机先近后远的规则为后续循环绘制所有对象制定排队顺序</li><li><strong>第三步</strong>先将所有需要的渲染数据从硬盘读取到主存中，再把GPU渲染需要用到的数据打包发给显存（GPU一般没有对主存的访问权限，且与显存进行交换速度较快）</li><li>打包的数据详情见下图</li></ul><p><img src="打包数据.png" alt="打包的数据信息" style="zoom:50%;"></p><h4 id="设置渲染状态"><a href="#设置渲染状态" class="headerlink" title="设置渲染状态"></a>设置渲染状态</h4><ul><li>渲染状态包括着色器（Shader），纹理，材质，灯光等等。</li><li>设置渲染状态实质上就是，告诉GPU该使用哪个Shader，纹理，材质等去渲染模型网格体，这个过程也就是SetPassCall。当使用不同的材质或者相同材质下不同的Pass时就需要设置切换多个渲染状态，就会增加SetPassCall 所以SetPassCall的次数也能反映性能的优劣。</li></ul><h4 id="发送DrawCall"><a href="#发送DrawCall" class="headerlink" title="发送DrawCall"></a>发送DrawCall</h4><ul><li>当收到一个DrawCall时，GPU会按照命令，根据<strong>渲染状态</strong>和输入的顶点信息对<strong>指定</strong>的模（网格）进行计算渲染。</li><li>CPU通过调用图形API接口（ glDrawElements (OpenGl中的图元渲染函数) 或者 DrawIndexedPrimitive (DirectX中的顶点绘制方法) ）命令GPU对指定物体进行一次渲染的操作即为DrawCall。此过程实质上就是在告诉GPU该使用哪个模型的数据（图形API函数的功能就是将CPU计算出的顶点数据渲染出来）。</li></ul><blockquote><p>在应用阶段有三个衡量性能指标非常重要的名词</p><blockquote><p>DrawCall</p><blockquote><p>CPU每次调用图形API接口命令GPU进行渲染的操作称为一次DrawCall</p></blockquote><p>SetPassCall</p><blockquote><p>设置/切换一次渲染状态</p></blockquote><p>Batch</p><blockquote><p>把数据加载到显存，设置渲染状态，CPU调用GPU渲染的过程称之为一个Batch</p></blockquote></blockquote><p><strong>注意：一个Batch包含至少一个DrawCall</strong><br><strong>详情见 <a href="https://sleepyloser.github.io/2024/08/05/Unity/Performance_Optimization/Optimize_UI_Two/OptimizeUI_Two/">UGUI的优化方案(2)</a></strong></p></blockquote><h3 id="几何阶段"><a href="#几何阶段" class="headerlink" title="几何阶段"></a>几何阶段</h3><ul><li>几何阶段由GPU进行处理，其几乎要处理所有和几何相关的绘制事情, 如绘制的对象，位置，形状</li><li>几何阶段处理对象时<strong>渲染图元</strong>, 进行<strong>逐顶点</strong>和<strong>逐多边形</strong>的操作, 主要任务是把顶点坐标变换到屏幕空间中, 以供给接下来的光栅器进行处理</li><li>具体输出的信息有，变换后的屏幕二位顶点坐标，顶点的深度值，着色，法线等等信息</li></ul><blockquote><p><strong>接下来对几何阶段的主要流水线阶段进行一下解释：</strong></p></blockquote><h4 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h4><ul><li>流水线的第一个阶段，<strong>可以通过编程进行控制</strong>。</li><li>输入来自CPU发送的顶点信息，每个顶点都会调用一次顶点着色器。其主要工作为：<strong>坐标转换和逐顶点光照（可选，计算输出顶点的颜色值）</strong>。</li><li>坐标转换是必须完成的一个任务。它把顶点坐标从模型空间转换到齐次裁剪空间。（齐次裁剪空间不是屏幕空间，<strong>是xyz均放缩到-1到1的空间</strong>），具体过程可以参考下图</li><li><strong>注意</strong>：此时GPU处理的顶点并不清楚顶点之间的关系，只是无差别的对待每个顶点，能很好的体现各个部件的分离，降低耦合性</li><li><strong>一句话简单说，确定形状的点</strong></li></ul><p><img src="顶点着色器.png" alt="坐标转换" style="zoom:50%;"><br><img src="几何阶段着色器.png" alt="几何阶段着色器" style="zoom:50%;"></p><h4 id="裁剪"><a href="#裁剪" class="headerlink" title="裁剪"></a>裁剪</h4><ul><li>顾名思义，就是将不需要的数据对象剔除出去的过程。由于场景一般很大，摄像机的视野范围可能不会覆盖所有的场景物体，裁剪就是为了将那些在摄像机视野范围外的物体剔除出去而被提出来的</li><li>一个图元和摄像机的关系有三种：完全在视野内、部分在视野内、完全在视野外。完全在视野内的就传递给下一个流水线阶段，完全在视野外的就不会向下传递，而部分在视野内的就需要进行一次处理，就是裁剪。具体过程可以参考下图</li></ul><p><img src="裁剪.png" alt="裁剪过程" style="zoom:50%;"></p><ul><li>由上图可清楚的看出，除完全在空间内外的图元被保留和舍弃以外，部分在空间内的图元(黄色三角形)会被裁剪，新的顶点将在空间的边界处生成，原来在外部的顶点会被舍弃</li></ul><h4 id="屏幕映射"><a href="#屏幕映射" class="headerlink" title="屏幕映射"></a>屏幕映射</h4><ul><li>通过计算将实际场景的对象映射到屏幕上，本质上就是对坐标的放缩</li></ul><p><img src="屏幕映射.png" alt="屏幕映射" style="zoom:50%;"></p><h3 id="光栅化阶段"><a href="#光栅化阶段" class="headerlink" title="光栅化阶段"></a>光栅化阶段</h3><ul><li>此阶段仍然由GPU进行处理。这一阶段将会使用上个阶段传递的数据（屏幕坐标系下的顶点位置以及和它们相关的额外信息，如深度值（z坐标）、法线方向、视角方向等。）来产生屏幕上的像素，并渲染出最终的图像。光栅化的主要任务是<strong>决定渲染图元中的哪些像素应该被绘制在屏幕上，然后对其颜色进行合并混合</strong>。</li><li><strong>一句话简单说，将图转化为一个个实际屏幕像素</strong></li></ul><h4 id="三角形设置"><a href="#三角形设置" class="headerlink" title="三角形设置"></a>三角形设置</h4><ul><li><strong>主要任务是为后续光栅化提供所需要计算的信息</strong>。例如，后续阶段需要判断像素点是否被三角形网格覆盖，只靠上个阶段得到的顶点信息无法确定边界的覆盖情况，还需要三角形网格边的信息，所以在这个阶段需要<strong>计算出边的表达式</strong>以供后续判断的使用。其输出都是为了给下一阶段做相应的准备。</li></ul><h4 id="三角形遍历"><a href="#三角形遍历" class="headerlink" title="三角形遍历"></a>三角形遍历</h4><ul><li>三角形遍历阶段会根据上一个阶段的计算结果判断一个三角形网格覆盖了哪些像素，并使用三角网格三个顶点的顶点信息对整个覆盖区域进行插值。</li><li>此阶段会遍历所有的像素点，判断其是否被三角网格所覆盖 (用3-1计算的结果) ，如果被覆盖，则在此像素点上生成一个片元。片元不是单纯的像素点，其还包含很多状态的集合，这些状态用来最终计算检测筛选每个像素点最终的颜色。（部分状态包括：屏幕坐标，深度值，从几何阶段继承来的法线，纹理等等）。</li><li>片元状态的信息是由其所在三角形网格的三个顶点的信息的插值得到的，例如计算三角形网格重心位置片元的深度。如下图：</li></ul><p><img src="片元插值.png" alt="片元状态信息插值" style="zoom:50%;"></p><ul><li><strong>最终输出的是包含多个片元的片元序列</strong></li></ul><h4 id="片元着色器"><a href="#片元着色器" class="headerlink" title="片元着色器"></a>片元着色器</h4><ul><li>非常重要的可编程着色器阶段。片元着色器的输入是上一个阶段对顶点信息插值得到的结果，输出为每个片元的颜色值。这一阶段可以按需完成很多重要的渲染技术，最重要的技术之一就是<strong>纹理采样</strong>。</li></ul><blockquote><p><strong>纹理采样</strong></p><blockquote><ul><li>为了在片元着色器中进行纹理采样，先在顶点着色器阶段输出每个顶点对应的纹理坐标，然后经过光栅化阶段对三角形网格的三个顶点对应的纹理坐标进行插值后，就可以得到其覆盖的片元的纹理坐标了。</li><li>其局限在于仅可以影响单个片元。即执行片元着色器时，不能将结果直接发给旁边的邻居。片元着色器输出颜色的具体过程如下图<br><img src="纹理采样.png" alt="计算输出颜色" style="zoom:50%;"></li></ul></blockquote><p><strong>可参考 <a href="https://sleepyloser.github.io/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/">Unity Texture 基础</a> 中的纹理采样章节</strong></p></blockquote><h4 id="逐片元操作"><a href="#逐片元操作" class="headerlink" title="逐片元操作"></a>逐片元操作</h4><ul><li>这是OpenGL中的说法，在DirectX中，这阶段被称为输出合并阶段(Output-Merger)。</li><li><p>该阶段是对每一片 片元 进行操作，主要任务有：</p><ol><li>决定每个片元的可见性，如深度测试、模板测试</li><li>如果一个片元通过了所有测试，就把这个片元的颜色值和已经存储在颜色缓冲区的颜色进行合并，混合。</li></ol></li><li><p>该阶段是高度可配置的，我们可以设置每一步的操作细节。该阶段首先解决的是，每个片元的可见性问题。这需要进行一系列测试，只有通过了才能和颜色缓冲区进行合并。<strong>若没通过任意一个测试，片元都会被丢弃</strong>。</p></li></ul><p><img src="片元测试及合并.png" alt="片元测试及合并" style="zoom:50%;"></p><ul><li>测试过程是很复杂的，不同接口实现细节也不同，下面笔者将讲述一些常用的测试</li></ul><blockquote><p><strong>模板测试</strong></p><blockquote><ul><li>开启了模板测试，GPU就会使用读取掩码<strong>读取模板缓冲区中该片元的模板值，将该值和读取到的参考值进行比较</strong>。这个比较函数可以是开发者指定的，例如小于模板值时则舍弃该片元或者大于模板值时舍弃该片元。片元无论有没有通过模板测试都可以根据模板测试和下面的深度测试结果来修改模板缓冲区。这个修改操作也是由开发者指定的。<strong>模板测试通常用于限制渲染的区域</strong>。</li></ul></blockquote><p><strong>深度测试</strong></p><blockquote><ul><li>通过模板测试后，片元就会进行深度测试。其同样是高度可配置的。</li><li>开启后，<strong>GPU会把该片元深度值和已存在与深度缓冲区的深度值进行比较</strong>，这个比较函数也是开发者设置的。例如小于缓冲区深度值时舍弃该片元，或者大于缓冲区深度值等于时舍弃该片元。通常人们更希望显示离摄像机最近的物体，所以一般比较函数设置为当前片元深度值要小于缓冲区深度值，深度值大无法通过测试。如果片元没有通过测试，则会被丢弃掉。</li><li>与模板测试不同，<strong>只有通过之后开发者才能指定是否用该片元的深度值覆盖原有缓冲区的深度值</strong>。这是通过<strong>开启/关闭深度写入</strong>做到的</li></ul></blockquote><p><strong>合并操作</strong></p><blockquote><ul><li>通过了所有测试后，片元就来到了合并操作。</li><li>每个像素的信息被存储在一个名为颜色缓冲区的地方，因此执行此次渲染时，颜色缓冲区中往往已经有了上次渲染之后的结果。所以需要合并的方式使其达到一种均衡状态。</li><li><strong>对于不透明物体</strong>，开发者可以选择关闭混合操作。这样片元着色器计算得到的颜色值就会直接覆盖原来颜色缓冲区中的像素值。</li><li><strong>对于半透明物体</strong>，需要使用混合操作来让这个物体看起来是透明的。</li><li>混合操作也是可以高度配置的。开启了混合，GPU会取出源颜色和目标颜色将两者混合。</li><li><strong>源颜色是片元着色器得到的颜色，目标颜色是已经存在于颜色缓冲区中的颜色值</strong>。</li></ul></blockquote><p><strong>提前测试</strong></p><blockquote><ul><li>提前测试的目的主要是为了提高性能。</li><li>虽然逻辑上这些测试是在片元着色器之后进行的，但对于大多数GPU来说，他们会尽可能在执行片元着色器之前进行这些测试。</li><li><strong>尽可能早知道哪些片元会被舍弃可以提高性能</strong>，比如Unity的渲染流水线中的深度测试就在片元着色器之前。这种将深度测试提前的技术被称为Early-Z技术。</li><li>但如果将这些测试提前, 检验结果可能会与片元着色器中一些操作产生冲突。</li></ul></blockquote></blockquote>]]></content>
       
       
       <categories>
@@ -580,11 +580,11 @@
     
     
     <entry>
-      <title>渲染管线</title>
-      <link href="/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/"/>
-      <url>/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/</url>
+      <title>继 渲染管线</title>
+      <link href="/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/"/>
+      <url>/2025/01/16/Unity/Graphics/Rendering_Pipeline/RenderingPipeline_Two/</url>
       
-        <content type="html"><![CDATA[<h2 id="渲染管线"><a href="#渲染管线" class="headerlink" title="渲染管线"></a>渲染管线</h2><ul><li>渲染的三个阶段一般分为：<code>应用阶段</code>、<code>几何阶段</code>和<code>光栅化阶段</code>, 如下图</li></ul><p><img src="渲染管线.png" alt="渲染管线流程图" style="zoom:50%;"></p><ul><li>三个阶段的操作对象的流程图可参考下图</li></ul><p><img src="渲染管线流程图.png" alt="渲染管线操作对象流程图" style="zoom:50%;"></p><h3 id="应用阶段"><a href="#应用阶段" class="headerlink" title="应用阶段"></a>应用阶段</h3><ul><li>这一阶段由CPU处理，主要任务是为接下来GPU的渲染操作<strong>提供所需要的几何信息</strong>，即输出<code>渲染图元（rending primitives）</code>以供后续阶段的使用。渲染图元就是由若干个顶点构成的几何形状，点，线，三角形，多边形面都可以是一个图元</li></ul><h4 id="数据的准备"><a href="#数据的准备" class="headerlink" title="数据的准备"></a>数据的准备</h4><ul><li><strong>第一步</strong>应先将不需要的数据剔除出去，如以包围盒为单位的视锥体（粗粒度）剔除，遮挡剔除，层级剔除等等</li><li><strong>第二步</strong>根据UI对象在Herachy面板深度值的顺序（DFS深度优先搜索）设置渲染的顺序，其余物体大体可以按照离摄像机先近后远的规则为后续循环绘制所有对象制定排队顺序</li><li><strong>第三步</strong>先将所有需要的渲染数据从硬盘读取到主存中，再把GPU渲染需要用到的数据打包发给显存（GPU一般没有对主存的访问权限，且与显存进行交换速度较快）</li><li>打包的数据详情见下图</li></ul><p><img src="打包数据.png" alt="打包的数据信息" style="zoom:50%;"></p><h4 id="设置渲染状态"><a href="#设置渲染状态" class="headerlink" title="设置渲染状态"></a>设置渲染状态</h4><ul><li>渲染状态包括着色器（Shader），纹理，材质，灯光等等。</li><li>设置渲染状态实质上就是，告诉GPU该使用哪个Shader，纹理，材质等去渲染模型网格体，这个过程也就是SetPassCall。当使用不同的材质或者相同材质下不同的Pass时就需要设置切换多个渲染状态，就会增加SetPassCall 所以SetPassCall的次数也能反映性能的优劣。</li></ul><h4 id="发送DrawCall"><a href="#发送DrawCall" class="headerlink" title="发送DrawCall"></a>发送DrawCall</h4><ul><li>当收到一个DrawCall时，GPU会按照命令，根据<strong>渲染状态</strong>和输入的顶点信息对<strong>指定</strong>的模（网格）进行计算渲染。</li><li>CPU通过调用图形API接口（ glDrawElements (OpenGl中的图元渲染函数) 或者 DrawIndexedPrimitive (DirectX中的顶点绘制方法) ）命令GPU对指定物体进行一次渲染的操作即为DrawCall。此过程实质上就是在告诉GPU该使用哪个模型的数据（图形API函数的功能就是将CPU计算出的顶点数据渲染出来）。</li></ul><blockquote><p>在应用阶段有三个衡量性能指标非常重要的名词</p><blockquote><p>DrawCall</p><blockquote><p>CPU每次调用图形API接口命令GPU进行渲染的操作称为一次DrawCall</p></blockquote><p>SetPassCall</p><blockquote><p>设置/切换一次渲染状态</p></blockquote><p>Batch</p><blockquote><p>把数据加载到显存，设置渲染状态，CPU调用GPU渲染的过程称之为一个Batch</p></blockquote></blockquote><p><strong>注意：一个Batch包含至少一个DrawCall</strong><br><strong>详情见 <a href="https://sleepyloser.github.io/2024/08/05/Unity/Performance_Optimization/Optimize_UI_Two/OptimizeUI_Two/">UGUI的优化方案(2)</a></strong></p></blockquote><h3 id="几何阶段"><a href="#几何阶段" class="headerlink" title="几何阶段"></a>几何阶段</h3><ul><li>几何阶段由GPU进行处理，其几乎要处理所有和几何相关的绘制事情, 如绘制的对象，位置，形状</li><li>几何阶段处理对象时<strong>渲染图元</strong>, 进行<strong>逐顶点</strong>和<strong>逐多边形</strong>的操作, 主要任务是把顶点坐标变换到屏幕空间中, 以供给接下来的光栅器进行处理</li><li>具体输出的信息有，变换后的屏幕二位顶点坐标，顶点的深度值，着色，法线等等信息</li></ul><blockquote><p><strong>接下来对几何阶段的主要流水线阶段进行一下解释：</strong></p></blockquote><h4 id="顶点着色器"><a href="#顶点着色器" class="headerlink" title="顶点着色器"></a>顶点着色器</h4><ul><li>流水线的第一个阶段，<strong>可以通过编程进行控制</strong>。</li><li>输入来自CPU发送的顶点信息，每个顶点都会调用一次顶点着色器。其主要工作为：<strong>坐标转换和逐顶点光照（可选，计算输出顶点的颜色值）</strong>。</li><li>坐标转换是必须完成的一个任务。它把顶点坐标从模型空间转换到齐次裁剪空间。（齐次裁剪空间不是屏幕空间，<strong>是xyz均放缩到-1到1的空间</strong>），具体过程可以参考下图</li><li><strong>注意</strong>：此时GPU处理的顶点并不清楚顶点之间的关系，只是无差别的对待每个顶点，能很好的体现各个部件的分离，降低耦合性</li><li><strong>一句话简单说，确定形状的点</strong></li></ul><p><img src="顶点着色器.png" alt="坐标转换" style="zoom:50%;"><br><img src="几何阶段着色器.png" alt="几何阶段着色器" style="zoom:50%;"></p><h4 id="裁剪"><a href="#裁剪" class="headerlink" title="裁剪"></a>裁剪</h4><ul><li>顾名思义，就是将不需要的数据对象剔除出去的过程。由于场景一般很大，摄像机的视野范围可能不会覆盖所有的场景物体，裁剪就是为了将那些在摄像机视野范围外的物体剔除出去而被提出来的</li><li>一个图元和摄像机的关系有三种：完全在视野内、部分在视野内、完全在视野外。完全在视野内的就传递给下一个流水线阶段，完全在视野外的就不会向下传递，而部分在视野内的就需要进行一次处理，就是裁剪。具体过程可以参考下图</li></ul><p><img src="裁剪.png" alt="裁剪过程" style="zoom:50%;"></p><ul><li>由上图可清楚的看出，除完全在空间内外的图元被保留和舍弃以外，部分在空间内的图元(黄色三角形)会被裁剪，新的顶点将在空间的边界处生成，原来在外部的顶点会被舍弃</li></ul><h4 id="屏幕映射"><a href="#屏幕映射" class="headerlink" title="屏幕映射"></a>屏幕映射</h4><ul><li>通过计算将实际场景的对象映射到屏幕上，本质上就是对坐标的放缩</li></ul><p><img src="屏幕映射.png" alt="屏幕映射" style="zoom:50%;"></p><h3 id="光栅化阶段"><a href="#光栅化阶段" class="headerlink" title="光栅化阶段"></a>光栅化阶段</h3><ul><li>此阶段仍然由GPU进行处理。这一阶段将会使用上个阶段传递的数据（屏幕坐标系下的顶点位置以及和它们相关的额外信息，如深度值（z坐标）、法线方向、视角方向等。）来产生屏幕上的像素，并渲染出最终的图像。光栅化的主要任务是<strong>决定渲染图元中的哪些像素应该被绘制在屏幕上，然后对其颜色进行合并混合</strong>。</li><li><strong>一句话简单说，将图转化为一个个实际屏幕像素</strong></li></ul><h4 id="三角形设置"><a href="#三角形设置" class="headerlink" title="三角形设置"></a>三角形设置</h4><ul><li><strong>主要任务是为后续光栅化提供所需要计算的信息</strong>。例如，后续阶段需要判断像素点是否被三角形网格覆盖，只靠上个阶段得到的顶点信息无法确定边界的覆盖情况，还需要三角形网格边的信息，所以在这个阶段需要<strong>计算出边的表达式</strong>以供后续判断的使用。其输出都是为了给下一阶段做相应的准备。</li></ul><h4 id="三角形遍历"><a href="#三角形遍历" class="headerlink" title="三角形遍历"></a>三角形遍历</h4><ul><li>三角形遍历阶段会根据上一个阶段的计算结果判断一个三角形网格覆盖了哪些像素，并使用三角网格三个顶点的顶点信息对整个覆盖区域进行插值。</li><li>此阶段会遍历所有的像素点，判断其是否被三角网格所覆盖 (用3-1计算的结果) ，如果被覆盖，则在此像素点上生成一个片元。片元不是单纯的像素点，其还包含很多状态的集合，这些状态用来最终计算检测筛选每个像素点最终的颜色。（部分状态包括：屏幕坐标，深度值，从几何阶段继承来的法线，纹理等等）。</li><li>片元状态的信息是由其所在三角形网格的三个顶点的信息的插值得到的，例如计算三角形网格重心位置片元的深度。如下图：</li></ul><p><img src="片元插值.png" alt="片元状态信息插值" style="zoom:50%;"></p><ul><li><strong>最终输出的是包含多个片元的片元序列</strong></li></ul><h4 id="片元着色器"><a href="#片元着色器" class="headerlink" title="片元着色器"></a>片元着色器</h4><ul><li>非常重要的可编程着色器阶段。片元着色器的输入是上一个阶段对顶点信息插值得到的结果，输出为每个片元的颜色值。这一阶段可以按需完成很多重要的渲染技术，最重要的技术之一就是<strong>纹理采样</strong>。</li></ul><blockquote><p><strong>纹理采样</strong></p><blockquote><ul><li>为了在片元着色器中进行纹理采样，先在顶点着色器阶段输出每个顶点对应的纹理坐标，然后经过光栅化阶段对三角形网格的三个顶点对应的纹理坐标进行插值后，就可以得到其覆盖的片元的纹理坐标了。</li><li>其局限在于仅可以影响单个片元。即执行片元着色器时，不能将结果直接发给旁边的邻居。片元着色器输出颜色的具体过程如下图<br><img src="纹理采样.png" alt="计算输出颜色" style="zoom:50%;"></li></ul></blockquote><p><strong>可参考 <a href="https://sleepyloser.github.io/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/">Unity Texture 基础</a> 中的纹理采样章节</strong></p></blockquote><h4 id="逐片元操作"><a href="#逐片元操作" class="headerlink" title="逐片元操作"></a>逐片元操作</h4><ul><li>这是OpenGL中的说法，在DirectX中，这阶段被称为输出合并阶段(Output-Merger)。</li><li><p>该阶段是对每一片 片元 进行操作，主要任务有：</p><ol><li>决定每个片元的可见性，如深度测试、模板测试</li><li>如果一个片元通过了所有测试，就把这个片元的颜色值和已经存储在颜色缓冲区的颜色进行合并，混合。</li></ol></li><li><p>该阶段是高度可配置的，我们可以设置每一步的操作细节。该阶段首先解决的是，每个片元的可见性问题。这需要进行一系列测试，只有通过了才能和颜色缓冲区进行合并。<strong>若没通过任意一个测试，片元都会被丢弃</strong>。</p></li></ul><p><img src="片元测试及合并.png" alt="片元测试及合并" style="zoom:50%;"></p><ul><li>测试过程是很复杂的，不同接口实现细节也不同，下面笔者将讲述一些常用的测试</li></ul><blockquote><p><strong>模板测试</strong></p><blockquote><ul><li>开启了模板测试，GPU就会使用读取掩码<strong>读取模板缓冲区中该片元的模板值，将该值和读取到的参考值进行比较</strong>。这个比较函数可以是开发者指定的，例如小于模板值时则舍弃该片元或者大于模板值时舍弃该片元。片元无论有没有通过模板测试都可以根据模板测试和下面的深度测试结果来修改模板缓冲区。这个修改操作也是由开发者指定的。<strong>模板测试通常用于限制渲染的区域</strong>。</li></ul></blockquote><p><strong>深度测试</strong></p><blockquote><ul><li>通过模板测试后，片元就会进行深度测试。其同样是高度可配置的。</li><li>开启后，<strong>GPU会把该片元深度值和已存在与深度缓冲区的深度值进行比较</strong>，这个比较函数也是开发者设置的。例如小于缓冲区深度值时舍弃该片元，或者大于缓冲区深度值等于时舍弃该片元。通常人们更希望显示离摄像机最近的物体，所以一般比较函数设置为当前片元深度值要小于缓冲区深度值，深度值大无法通过测试。如果片元没有通过测试，则会被丢弃掉。</li><li>与模板测试不同，<strong>只有通过之后开发者才能指定是否用该片元的深度值覆盖原有缓冲区的深度值</strong>。这是通过<strong>开启/关闭深度写入</strong>做到的</li></ul></blockquote><p><strong>合并操作</strong></p><blockquote><ul><li>通过了所有测试后，片元就来到了合并操作。</li><li>每个像素的信息被存储在一个名为颜色缓冲区的地方，因此执行此次渲染时，颜色缓冲区中往往已经有了上次渲染之后的结果。所以需要合并的方式使其达到一种均衡状态。</li><li><strong>对于不透明物体</strong>，开发者可以选择关闭混合操作。这样片元着色器计算得到的颜色值就会直接覆盖原来颜色缓冲区中的像素值。</li><li><strong>对于半透明物体</strong>，需要使用混合操作来让这个物体看起来是透明的。</li><li>混合操作也是可以高度配置的。开启了混合，GPU会取出源颜色和目标颜色将两者混合。</li><li><strong>源颜色是片元着色器得到的颜色，目标颜色是已经存在于颜色缓冲区中的颜色值</strong>。</li></ul></blockquote><p><strong>提前测试</strong></p><blockquote><ul><li>提前测试的目的主要是为了提高性能。</li><li>虽然逻辑上这些测试是在片元着色器之后进行的，但对于大多数GPU来说，他们会尽可能在执行片元着色器之前进行这些测试。</li><li><strong>尽可能早知道哪些片元会被舍弃可以提高性能</strong>，比如Unity的渲染流水线中的深度测试就在片元着色器之前。这种将深度测试提前的技术被称为Early-Z技术。</li><li>但如果将这些测试提前, 检验结果可能会与片元着色器中一些操作产生冲突。</li></ul></blockquote></blockquote>]]></content>
+        <content type="html"><![CDATA[<h2 id="渲染管线中各个阶段的可控性"><a href="#渲染管线中各个阶段的可控性" class="headerlink" title="渲染管线中各个阶段的可控性"></a>渲染管线中各个阶段的可控性</h2><div class="table-container"><table><thead><tr><th>阶段名</th><th>具体步骤</th><th>可控程度</th><th>由谁控制</th></tr></thead><tbody><tr><td>应用阶段</td><td></td><td>完全可控</td><td>应用程序编程</td></tr><tr><td>几何阶段</td><td>顶点着色</td><td>完全可控</td><td>Vertex Shader</td></tr><tr><td></td><td>几何着色</td><td>完全可控</td><td>Geometry Shader</td></tr><tr><td></td><td>投影</td><td>完全可控</td><td>Vertex Shader 中编程</td></tr><tr><td></td><td>视锥体裁剪</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>屏幕映射</td><td>不可控</td><td>硬件中的 ViewPort Transform 组件负责</td></tr><tr><td></td><td>背面剔除</td><td>可配置</td><td>Shader 中的选项，cull back</td></tr><tr><td>光栅化</td><td>三角形设置</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>三角形遍历</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td>逐像素阶段</td><td>顶点属性插值</td><td>不可控</td><td>硬件中的 Attribute Setup 组件负责</td></tr><tr><td></td><td>Early Z-Test（深度测试）</td><td>不可控</td><td>硬件中的 Raster Engine 组件负责</td></tr><tr><td></td><td>片元着色</td><td>完全可控</td><td>Fragment Shader</td></tr><tr><td></td><td>混合</td><td>可配置</td><td>Shader中的选项，blend命令等</td></tr></tbody></table></div>]]></content>
       
       
       <categories>
@@ -650,9 +650,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -677,9 +677,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -704,9 +704,9 @@
       
         <tags>
             
-            <tag> Cache </tag>
-            
             <tag> 计算机组成原理 </tag>
+            
+            <tag> Cache </tag>
             
         </tags>
       
@@ -881,7 +881,7 @@
       
         <tags>
             
-            <tag> 计算机网路 </tag>
+            <tag> 计算机网络 </tag>
             
         </tags>
       
@@ -906,7 +906,7 @@
       
         <tags>
             
-            <tag> 计算机网路 </tag>
+            <tag> 计算机网络 </tag>
             
         </tags>
       
@@ -931,7 +931,7 @@
       
         <tags>
             
-            <tag> 计算机网路 </tag>
+            <tag> 计算机网络 </tag>
             
         </tags>
       
@@ -956,7 +956,7 @@
       
         <tags>
             
-            <tag> 计算机网路 </tag>
+            <tag> 计算机网络 </tag>
             
         </tags>
       
@@ -1235,9 +1235,9 @@
     
     
     <entry>
-      <title>文章分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>友情链接</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1246,11 +1246,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <title>文章分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
-        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -1268,55 +1268,11 @@
     
     
     <entry>
-      <title>友情链接</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>图集</title>
-      <link href="/mapdepot/index.html"/>
-      <url>/mapdepot/index.html</url>
-      
-        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>电影</title>
-      <link href="/movie/index.html"/>
-      <url>/movie/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>子页面</title>
-      <link href="/subinterface/index.html"/>
-      <url>/subinterface/index.html</url>
-      
-        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
@@ -1334,11 +1290,55 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>图集</title>
+      <link href="/mapdepot/index.html"/>
+      <url>/mapdepot/index.html</url>
+      
+        <content type="html"><![CDATA[<div class = "gallery-group-main"><figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/default_cover_61.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">封面专区</div>  <p>本站用作文章封面的图片，不保证分辨率</p>  <a href='/box/Gallery/photo'></a>  </figcaption>  </figure>  <figure class="gallery-group">  <img class="gallery-group-img no-lightbox" src='/%3Chttps:/source.fomal.cc/img/dm11.webp%3E' alt="Group Image Gallery">  <figcaption>  <div class="gallery-group-name">背景专区</div>  <p>收藏的一些的背景与壁纸，分辨率很高</p>  <a href='/box/Gallery/wallpaper'></a>  </figcaption>  </figure>  </div>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[/* 鼠标样式 */#cursor {    position: fixed;    width: 16px;    height: 16px;    /* 这里改变跟随的底色 */    background: rgb(57, 197, 187);    border-radius: 8px;    opacity: 0.25;    z-index: 10086;    pointer-events: none;    transition: 0.2s ease-in-out;    transition-property: background, opacity, transform;  }    #cursor.hidden {    opacity: 0;  }    #cursor.hover {    opacity: 0.1;    transform: scale(2.5);    -webkit-transform: scale(2.5);    -moz-transform: scale(2.5);    -ms-transform: scale(2.5);    -o-transform: scale(2.5);  }    #cursor.active {    opacity: 0.5;    transform: scale(0.5);    -webkit-transform: scale(0.5);    -moz-transform: scale(0.5);    -ms-transform: scale(0.5);    -o-transform: scale(0.5);  }]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>电影</title>
+      <link href="/movie/index.html"/>
+      <url>/movie/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>子页面</title>
+      <link href="/subinterface/index.html"/>
+      <url>/subinterface/index.html</url>
+      
+        <content type="html"><![CDATA[<div class="gallery-container" data-type="data" data-button="">      <div class="gallery-data">[]</div>      <div class="gallery-items">      </div>    </div>]]></content>
       
     </entry>
     
