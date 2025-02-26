@@ -66,7 +66,7 @@ const char* str = GetString();
 ``` CPP
 class A
 {
-　　A& operate = (const A &other); // 赋值函数
+　　A& operater = (const A &other); // 赋值函数
 };
 A  a, b, c;   // a, b, c 为A的对象
  

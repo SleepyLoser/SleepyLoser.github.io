@@ -11,8 +11,17 @@ tags:
 
 ## unique_ptr
 
-* 独占资源所有权的指针。
+* 独占资源所有权的指针。由于没有引用计数，因此性能较好。
 * 离开 `unique_ptr` 对象的作用域时，会自动释放资源。
+* `unique_ptr` 本质是一个类，将复制构造函数和赋值构造函数声明为 `delete` 就可以实现独占式，
+只允许移动构造和移动赋值。`unique_ptr` 所持有的对象只能通过 `转移语义(move)` 将所有权转移
+到另外一个 `unique_ptr` 。
+
+``` CPP
+// 自定义实现 unique_ptr
+UniquePtr(UniquePtr<T> const &) = delete;
+UniquePtr & operator=(UniquePtr<T> const &) = delete;
+```
 
 ``` CPP
 std::unique_ptr<int> uptr = std::make_unique<int>(200);
@@ -48,12 +57,76 @@ for (int i = 0; i < 10; i++)
 
 * `std::shared_ptr` 其实就是对资源做引用计数——当引用计数为 `0` 的时候，自动释放资源。
 
+### C++ 智能指针的实现（手撕 shared_ptr）
+
+``` CPP
+#include <iostream>
+#include <vector>
+#include <unordered_set>
+
+template <typename T>
+class shared_ptr 
+{
+private:
+    T* ptr;
+    int* ref_count;
+    // 释放方法为内置方法
+    void release() 
+    {
+        if (ref_count) 
+        {
+            --(*ref_count);
+            if (*ref_count == 0) 
+            {
+                delete ptr;
+                delete ref_count;
+            }
+            ptr = nullptr;
+            ref_count = nullptr;
+        }
+    }
+public:
+    // shared_ptr
+    shared_ptr() : ptr(nullptr), ref_count(nullptr) {}
+    // 用初始指针,new
+    shared_ptr(T* p) : ptr(p), ref_count(new int(1)) {}
+    // 拷贝构造
+    shared_ptr(const shared_ptr& other) : ptr(other.ptr), ref_count(other.ref_count) 
+    {
+        if (ref_count) { ++(*ref_count); }
+    }
+    ~shared_ptr() { release(); }
+    shared_ptr& operator=(const shared_ptr& other) 
+    {
+        if (this != &other) 
+        {
+            release();
+            ptr = other.ptr;
+            ref_count = other.ref_count;
+            if (ref_count) { ++(*ref_count); }
+        }
+        return *this;
+    }
+    T* get() const { return ptr; }
+    int use_count() const { return ref_count ? *ref_count : 0; }
+    void reset() { release(); }
+    void reset(T* p) 
+    {
+        release();
+        ptr = p;
+        ref_count = new int(1);
+    }
+    T& operator * () const { return *ptr; }
+    T* operator -> () const { return ptr; }
+};
+```
+
 ### std::shared_ptr 的实现原理
 
 * `shared_ptr` 需要维护的信息有两部分：
   1. 指向共享资源的指针
   2. 引用计数等共享资源的控制信息——实现上是维护一个指向控制信息的指针。
-* 所以，`shared_ptr` 对象**需要保存两个指针**。`shared_ptr` 的 `deleter` 是保存在控制信息中，所以，是否有自定义 `deleter` 不影响 `shared_ptr` 对象的大小。
+* 所以，`shared_ptr` 对象**需要保存两个指针（shared_ptr 大小为 16 ）**。`shared_ptr` 的 `deleter` 是保存在控制信息中，所以，是否有自定义 `deleter` 不影响 `shared_ptr` 对象的大小。
 * 当我们创建一个 shared_ptr 时，其实现一般如下：
 
 ``` CPP

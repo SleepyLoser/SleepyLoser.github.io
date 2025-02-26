@@ -14,8 +14,8 @@ tags:
 
 ### 前言
 
-* [Unity Texture 基础](https://sleepyloser.github.io/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/)
-* [如何正确序列化Texture](https://sleepyloser.github.io/2024/07/29/Unity/Utils/Texture_To_Json/TextureToJson/)
+* [Unity Texture 基础](https://sleepyloser.github.io/2025/01/16/Unity/Graphics/Texture_Fundamentals/Texture/)
+* [如何正确序列化Texture](https://sleepyloser.github.io/2025/01/16/Unity/Utils/Texture_To_Json/TextureToJson/)
 
 #### Texture（UI）和Sprite（UI）的区别
 
