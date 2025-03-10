@@ -32,7 +32,7 @@ Unity 提供以下渲染管线：
 * **高清渲染管线** (HDRP) 是一种可编程渲染管线，可让您在`高端平台`上创建出色的高保真图形。
 * 可以使用 Unity 的**可编程渲染管线** API 来创建自定义的可编程渲染管线 (SRP)。这个过程可以从头开始，也可以修改 URP 或 HDRP 来适应具体需求。
 
-### 详情可参考 [渲染管线](https://sleepyloser.github.io/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/)
+### 详情可参考 [渲染管线](/Unity/Graphics/Rendering_Pipeline_One/)
   
 ***
 
@@ -242,7 +242,7 @@ Shader "Custom/TestShader"
 * 我们现在有3个语义想用：
     1. :POSITION 顶点坐标
     2. :NORMAL 法线坐标
-    3. :TEXCOORD0 第一套纹理坐标 // 纹理坐标即UV坐标。可参考 [Unity Texture 基础](https://sleepyloser.github.io/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/)
+    3. :TEXCOORD0 第一套纹理坐标 // 纹理坐标即UV坐标。可参考 [Unity Texture 基础](/Unity/Graphics/Texture_Fundamentals/)
 
 * 用结构体把这些数据保存起来
 

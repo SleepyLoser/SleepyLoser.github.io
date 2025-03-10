@@ -2,6 +2,7 @@
 title: UGUI的优化方案(2)
 top_img: '121106160_p0.jpg'
 cover: '109951165836194238.jpg'
+permalink: /Unity/Performance_Optimization/Optimize_UI_Two/
 categories: 
     - Unity
       - 性能优化

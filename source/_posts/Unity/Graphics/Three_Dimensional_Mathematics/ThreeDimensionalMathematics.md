@@ -12,7 +12,7 @@ tags:
 
 ## 基础知识
 
-* **[三维数学基础知识](https://sleepyloser.github.io/2024/08/31/Unity/Graphics/Fundamentals_Of_3D_Mathematics/FundamentalsOf3DMathematics/)**
+* **[三维数学基础知识](/Unity/Graphics/Fundamentals_Of_3D_Mathematics/)**
 
 ## 如何判断一个点在三角形（矩形、扇形）内
 

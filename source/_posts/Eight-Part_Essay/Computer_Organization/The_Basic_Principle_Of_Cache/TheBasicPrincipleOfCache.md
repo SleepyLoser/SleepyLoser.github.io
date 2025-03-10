@@ -2,6 +2,7 @@
 title: Cache的基本原理
 top_img: '116763500_p1.jpg'
 cover: '101048953_p0.png'
+permalink: /Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/
 categories: 
     - 八股文
       - 计算机组成原理
@@ -183,4 +184,4 @@ tags:
 ## 后记
 
 * 我们一直避开了一个关键问题。我们都知道cache控制器根据地址查找判断是否命中，这里的地址究竟是虚拟地址(virtual address，VA)还是物理地址(physical address，PA)？
-* 详情参考下一篇博客 [Cache组织方式](https://sleepyloser.github.io/2024/08/30/Eight-Part_Essay/Computer_Organization/Cache_Organization_Method/CacheOrganizationMethod/)
+* 详情参考下一篇博客 [Cache组织方式](/Eight-Part_Essay/Computer_Organization/Cache_Organization_Method/)

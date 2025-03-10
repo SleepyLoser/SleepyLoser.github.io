@@ -2,6 +2,7 @@
 title: 三维数学基础知识
 top_img: '93990522_p0.png'
 cover: '121986241_p0.jpg'
+permalink: /Unity/Graphics/Fundamentals_Of_3D_Mathematics/
 categories: 
     - Unity
       - 数学

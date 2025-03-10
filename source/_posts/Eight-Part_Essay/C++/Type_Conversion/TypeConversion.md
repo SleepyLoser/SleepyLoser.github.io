@@ -2,6 +2,7 @@
 title: C++ 的几种类型转换
 top_img: '119083349_p0.png'
 cover: '115480546_p0.png'
+permalink: /Eight-Part_Essay/C++/Type_Conversion/
 categories: 
     - 八股文
       - C++
@@ -158,7 +159,7 @@ int* mutable_ptr = const_cast<int*>(&a); // 删除 const 属性，使得可以�
 
 ##### 使用 volatile 关键字
 
-* [碎玉零珠 —— C++](https://sleepyloser.github.io/2024/08/23/Eight-Part_Essay/C++/Broken_Jade_Beads/BrokenJadeBeads/) 中有详细介绍，就不赘述了。
+* [碎玉零珠 —— C++](/Eight-Part_Essay/C++/Broken_Jade_Beads/) 中有详细介绍，就不赘述了。
 
 #### const对象调用非const成员函数
 

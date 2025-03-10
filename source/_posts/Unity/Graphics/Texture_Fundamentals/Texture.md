@@ -2,6 +2,7 @@
 title: Unity Texture
 top_img: '114291391_p0.png'
 cover: '109115574_p0.png'
+permalink: /Unity/Graphics/Texture_Fundamentals/
 categories: 
     - Unity
       - Texture
@@ -117,4 +118,4 @@ RenderTexture.active = currentActiveRT;
 ## UI纹理采样
 
 * 在着色器里**采集纹理样本**是最常见的 **GPU 像素数据处理操作**。要想**修改**这段数据，可以**复制修改后的纹理**，或用**着色器**把修改渲染到一张纹理上。
-* 附 [Unity 渲染管线](https://sleepyloser.github.io/2024/08/05/Unity/Graphics/Rendering_Pipeline/RenderingPipeline/) 和 [纹理采样代码示例](https://sleepyloser.github.io/2024/08/15/Unity/Utils/TextureUtils/TextureUtil/) 供理解参考
+* 附 [Unity 渲染管线](/Unity/Graphics/Rendering_Pipeline_One/) 和 [纹理采样代码示例](/Unity/Utils/TextureUtils/) 供理解参考

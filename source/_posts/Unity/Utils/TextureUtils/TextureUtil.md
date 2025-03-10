@@ -2,6 +2,7 @@
 title: 纹理工具 
 top_img: '121250572_p0.png'
 cover: '74451735_p0.png'
+permalink: /Unity/Utils/TextureUtils/
 categories: 
     - Unity
       - 工具类 
@@ -14,8 +15,8 @@ tags:
 
 ### 前言
 
-* [Unity Texture 基础](https://sleepyloser.github.io/2025/01/16/Unity/Graphics/Texture_Fundamentals/Texture/)
-* [如何正确序列化Texture](https://sleepyloser.github.io/2025/01/16/Unity/Utils/Texture_To_Json/TextureToJson/)
+* [Unity Texture 基础](/Unity/Graphics/Texture_Fundamentals/)
+* [如何正确序列化Texture](/Unity/Utils/Texture_To_Json/)
 
 #### Texture（UI）和Sprite（UI）的区别
 

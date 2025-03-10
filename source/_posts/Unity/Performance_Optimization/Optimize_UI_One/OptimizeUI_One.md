@@ -2,6 +2,7 @@
 title: UGUI的优化方案(1)
 top_img: '109951169086186923.jpg'
 cover: '109951165311290979.jpg'
+permalink: /Unity/Performance_Optimization/Optimize_UI_One/
 categories: 
     - Unity
       - 性能优化
@@ -77,7 +78,7 @@ tags:
 
 ### Outline描边优化
 
-* 详情见[一种UGUI的Outline描边优化方案](https://sleepyloser.github.io/2024/08/09/Unity/Performance_Optimization/Outline_Stroke_Optimization/OutlineStrokeOptimization/)
+* 详情见[一种UGUI的Outline描边优化方案](../Outline_Stroke_Optimization/OutlineStrokeOptimization/)
 * 实际上在后续进一步优化中，我们将描边Shader中原始纹理与描边融合的部分写到了一个Pass中，所以此处性能得到了进一步的提升。数据如下：
 
 <img src="Outline.png" alt="进一步优化Outline" style="zoom:50%;">

@@ -2,6 +2,7 @@
 title: 将纹理批量转换成Json文件
 top_img: '120498462_p0.jpg'
 cover: '109951168016315868.jpg'
+permalink: /Unity/Utils/Texture_To_Json/
 categories: 
     - Unity
       - 工具类

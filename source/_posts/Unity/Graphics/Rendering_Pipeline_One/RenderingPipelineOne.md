@@ -2,6 +2,7 @@
 title: 渲染管线
 top_img: '118645167_p0.png'
 cover: '116535516_p0.png'
+permalink: /Unity/Graphics/Rendering_Pipeline_One/
 categories: 
     - Unity
       - 渲染管线
@@ -54,7 +55,7 @@ tags:
 > > > 把数据加载到显存，设置渲染状态，CPU调用GPU渲染的过程称之为一个Batch
 >
 > **注意：一个Batch包含至少一个DrawCall**
-> **详情见 [UGUI的优化方案(2)](https://sleepyloser.github.io/2024/08/05/Unity/Performance_Optimization/Optimize_UI_Two/OptimizeUI_Two/)**
+> **详情见 [UGUI的优化方案(2)](/Unity/Performance_Optimization/Optimize_UI_Two/)**
 
 ### 几何阶段
 
@@ -119,7 +120,7 @@ tags:
 > > * 其局限在于仅可以影响单个片元。即执行片元着色器时，不能将结果直接发给旁边的邻居。片元着色器输出颜色的具体过程如下图
 > > <img src="纹理采样.png" alt="计算输出颜色" style="zoom:50%;">
 >
-> **可参考 [Unity Texture 基础](https://sleepyloser.github.io/2024/07/15/Unity/Graphics/Texture_Fundamentals/Texture/) 中的纹理采样章节**
+> **可参考 [Unity Texture 基础](/Unity/Graphics/Texture_Fundamentals/) 中的纹理采样章节**
 
 #### 逐片元操作
 

@@ -2,6 +2,7 @@
 title: 左值、右值、纯右值、将亡值
 top_img: '114291323_p0.png'
 cover: '107162316_p0.png'
+permalink: /Eight-Part_Essay/C++/Left_Right_Value/
 categories: 
     - 八股文
       - C++ 

@@ -2,6 +2,7 @@
 title: 一种UGUI的Outline描边优化方案
 top_img: '118435175_p0.jpg'
 cover: '98639154_p0.png'
+permalink: /Unity/Performance_Optimization/Outline_Stroke_Optimization/
 categories: 
     - Unity
       - 性能优化
@@ -105,4 +106,4 @@ tags:
 <img src="效果图.png" alt="描边2像素、15像素效果及对应数据" style="zoom:100%;">
 <img src="MeshOutline.png" alt="MeshOutline与其他效果对比数据" style="zoom:50%;">
 
-**使用MeshOutline后Batches数量为2，而Outline因为是复制的原顶点信息，所以无论复制多少份Batches数量都为1（如果不理解的话可参考[UGUI的优化方案(1)](https://sleepyloser.github.io/2024/07/24/Unity/Performance_Optimization/Optimize_UI_One/OptimizeUI_One/)和[UGUI的优化方案(2)](https://sleepyloser.github.io/2024/08/05/Unity/Performance_Optimization/Optimize_UI_Two/OptimizeUI_Two/)）.总的来说，这种优化方式带来的是采样次数的增加及顶点数量的相对减少。**
+**使用MeshOutline后Batches数量为2，而Outline因为是复制的原顶点信息，所以无论复制多少份Batches数量都为1（如果不理解的话可参考[UGUI的优化方案(1)](/Unity/Performance_Optimization/Optimize_UI_One/)和[UGUI的优化方案(2)](/Unity/Performance_Optimization/Optimize_UI_Two/)）.总的来说，这种优化方式带来的是采样次数的增加及顶点数量的相对减少。**

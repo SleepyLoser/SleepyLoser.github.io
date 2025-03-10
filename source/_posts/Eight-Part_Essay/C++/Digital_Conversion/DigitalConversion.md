@@ -2,6 +2,7 @@
 title: 数字大写转换
 top_img: '114477944_p0.png'
 cover: '122650009_p0.png'
+permalink: /Eight-Part_Essay/C++/Digital_Conversion/
 categories: 
     - 八股文
       - C++

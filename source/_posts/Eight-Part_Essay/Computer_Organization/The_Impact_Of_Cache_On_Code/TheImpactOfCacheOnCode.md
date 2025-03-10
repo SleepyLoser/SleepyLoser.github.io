@@ -53,4 +53,4 @@ for (i = 0; i < 128; i++)
 ## 总结
 
 * 在大多数情况下，`片段1` 代码的性能比 `片段2` 好。因此我们倾向 `片段1` 代码的写法。
-* 附 [Cache 的基本原理](https://sleepyloser.github.io/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/)
+* 附 [Cache 的基本原理](/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/)

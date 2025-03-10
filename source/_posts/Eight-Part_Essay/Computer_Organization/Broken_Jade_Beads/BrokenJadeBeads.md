@@ -15,7 +15,7 @@ tags:
 * 由于CPU的计算速度远远大于从CPU向内存取数据的速度，如果每次都让CPU去内存取数据，会导致CPU计算能力的浪费，所以人们设计了缓存，CPU通过读写缓存来获取操作数，结果也通过缓存写入内存；
 * 注意程序的**局部性原理**，在遍历数组时按照内存顺序访问；充分利用**CPU分支预测功能**，将预测的指令放到缓存中执行；此外缓存的容量和块长是影响缓存效率的重要因素。
 * 缓存不是最快的，寄存器更快。
-* 附 [Cache 的基本原理](https://sleepyloser.github.io/2024/08/27/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/TheBasicPrincipleOfCache/)
+* 附 [Cache 的基本原理](/Eight-Part_Essay/Computer_Organization/The_Basic_Principle_Of_Cache/)
 
 ## 编译器、汇编器和链接器的基本概念
 

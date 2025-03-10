@@ -2,6 +2,7 @@
 title: 智能指针
 top_img: '111557774_p0.png'
 cover: '101188292_p0.png'
+permalink: /Eight-Part_Essay/C++/Smart_Pointer/
 categories: 
     - 八股文
       - C++

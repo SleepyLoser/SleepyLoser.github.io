@@ -2,6 +2,7 @@
 title: 手撕队列（queue）
 top_img: '66974323_p0.jpg'
 cover: '72027189_p0.png'
+permalink: /Eight-Part_Essay/C++/Custom_Queue/
 categories: 
     - 八股文
       - C++ 

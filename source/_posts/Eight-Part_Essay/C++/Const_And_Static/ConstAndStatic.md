@@ -2,6 +2,7 @@
 title: const 与 static
 top_img: '109039478_p0.jpg'
 cover: '71645696_p0.png'
+permalink: /Eight-Part_Essay/C++/Const_And_Static/
 categories: 
     - 八股文
       - C++

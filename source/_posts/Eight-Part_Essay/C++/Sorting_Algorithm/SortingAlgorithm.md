@@ -2,6 +2,7 @@
 title: 排序算法
 top_img: '100723659_p0.jpg'
 cover: '74182068_p0.jpg'
+permalink: /Eight-Part_Essay/C++/Sorting_Algorithm/
 categories: 
     - 八股文
       - C++
