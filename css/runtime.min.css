@@ -1,0 +1,219 @@
+/* 页脚计时器与徽标样式 - 玻璃态设计 */
+
+:root {
+  --primary-bg: rgba(255, 255, 255, 0.75);
+  --primary-text: #2c3e50;
+  --accent-color: #3498db;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --card-border: rgba(255, 255, 255, 0.9);
+  --badge-bg: rgba(255, 255, 255, 0.9);
+  --transition-speed: 0.3s;
+}
+
+[data-theme="dark"] {
+  --primary-bg: rgba(30, 30, 30, 0.8);
+  --primary-text: #f8f8f2;
+  --accent-color: #6cb6ff;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --card-border: rgba(100, 100, 100, 0.3);
+  --badge-bg: rgba(50, 50, 50, 0.9);
+}
+
+/* 计时器容器样式 */
+#runtime {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--primary-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px var(--card-shadow);
+  transition: all var(--transition-speed) ease;
+}
+
+#runtime:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px var(--card-shadow);
+}
+
+/* 计时器文本 */
+#runtime-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary-text);
+  margin-right: 0.5rem;
+}
+
+/* 计时器数字 */
+#runtime {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+/* 徽标容器样式 */
+.footer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 16px;
+  background: var(--primary-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px var(--card-shadow);
+  transition: all var(--transition-speed) ease;
+}
+
+.footer-badges:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px var(--card-shadow);
+}
+
+/* 单个徽标样式 */
+.badge-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  background: var(--badge-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 4px 12px var(--card-shadow);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: var(--primary-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge-item:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px var(--card-shadow);
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+/* 徽标图片样式 */
+.badge-item img {
+  height: 20px;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.badge-item:hover img {
+  transform: scale(1.1);
+}
+
+/* 工具提示样式 */
+.badge-item {
+  position: relative;
+}
+
+.badge-item::after {
+  content: attr(data-message);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.badge-item:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  #runtime {
+    flex-direction: column;
+    padding: 0.8rem;
+  }
+  
+  #runtime-text {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer-badges {
+    gap: 0.6rem;
+    padding: 0.8rem;
+  }
+  
+  .badge-item {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .badge-item img {
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-badges {
+    gap: 0.4rem;
+  }
+  
+  .badge-item {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .badge-item img {
+    height: 16px;
+    margin-right: 0.3rem;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#runtime, .footer-badges {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* 轮播模式下的样式调整 */
+.footer-badges.swiper-mode {
+  overflow: hidden;
+}
+
+.footer-badges.swiper-mode .badge-item {
+  flex: 0 0 auto;
+}
+
+/* 打印样式 */
+@media print {
+  #runtime, .footer-badges {
+    display: none;
+  }
+}
