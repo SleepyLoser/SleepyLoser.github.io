@@ -128,85 +128,119 @@
   text-shadow: 0 0 2px rgb(179, 71, 241) !important;
 }
 
-/* 侧边栏个人信息卡片动态渐变色 */
-#aside-content > .card-widget .card-info {
-  background: linear-gradient(
-    -45deg, 
-    #e8d8b9, 
-    #eccec5, 
-    #a3e9eb, 
-    #bdbdf0, 
-    #eec1ea
-  );
-  box-shadow: 0 0 5px rgb(66, 68, 68);
+/* Butterfly 个人卡片：从左下到右上自然流动的渐变 */
+:root{
+  --card-pink: #FFADF7;
+  --card-green: #B1FF96;
+  --card-anim-duration: 15s; /* 更长的动画时间使流动更自然 */
+  --card-text-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+
+html[data-theme="dark"]{
+  --card-pink: #203a43;
+  --card-green: #2c5364;
+  --card-anim-duration: 15s;
+}
+
+#aside-content .card-widget.card-info{
   position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.08);
+  
+  /* 使用多层渐变创造更丰富的效果 */
+  background: 
+    linear-gradient(135deg, var(--card-pink), transparent 70%),
+    linear-gradient(225deg, var(--card-green), transparent 70%),
+    linear-gradient(315deg, var(--card-pink), transparent 70%),
+    linear-gradient(45deg, var(--card-green), transparent 70%);
+  
   background-size: 400% 400%;
-  -webkit-animation: Gradient 10s ease infinite;
-  -moz-animation: Gradient 10s ease infinite;
-  animation: Gradient 10s ease infinite;
-  padding: 15px;
-  border-radius: 8px;
-  color: #333;
+  animation: cardFlow var(--card-anim-duration) ease-in-out infinite;
+  
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0,0,0,.16);
+  will-change: background-position;
 }
 
-@-webkit-keyframes Gradient {
+/* 柔光层提升质感 */
+#aside-content .card-widget.card-info::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at left bottom, rgba(255,255,255,.4) 0%, transparent 60%),
+    radial-gradient(ellipse at right top, rgba(255,255,255,.2) 0%, transparent 40%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* 悬停微动效 */
+#aside-content .card-widget.card-info:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.22);
+}
+
+/* 卡片内文字样式 */
+#aside-content .card-widget.card-info,
+#aside-content .card-widget.card-info a,
+#aside-content .card-widget.card-info .author-info__name,
+#aside-content .card-widget.card-info .author-name,
+#aside-content .card-widget.card-info .info,
+#aside-content .card-widget.card-info .item-headline{
+  color: #fff !important;
+  text-shadow: var(--card-text-shadow);
+}
+
+/* 头像样式 */
+/* #aside-content .card-widget.card-info .avatar-img img,
+#aside-content .card-widget.card-info .avatar-img,
+#aside-content .card-widget.card-info .author-avatar img,
+#aside-content .card-widget.card-info .author-avatar{
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.75);
+  box-shadow: 0 10px 22px rgba(0,0,0,.28);
+} */
+
+/* 关键帧动画 - 更复杂的流动效果 */
+@keyframes cardFlow{
   0% {
-    background-position: 0% 50%;
+    background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%;
+  }
+  25% {
+    background-position: 50% 50%, 50% 50%, 100% 0%, 0% 100%;
   }
   50% {
-    background-position: 100% 50%;
+    background-position: 100% 100%, 0% 0%, 50% 50%, 50% 50%;
+  }
+  75% {
+    background-position: 50% 50%, 100% 0%, 0% 100%, 50% 50%;
   }
   100% {
-    background-position: 0% 50%;
+    background-position: 0% 0%, 100% 100%, 0% 100%, 100% 0%;
   }
 }
 
-@-moz-keyframes Gradient {
+/* 添加一个额外的伪元素来增强流动感 */
+#aside-content .card-widget.card-info::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    transparent 0%, 
+    rgba(255,255,255,.1) 50%, 
+    transparent 100%);
+  animation: shineEffect calc(var(--card-anim-duration) * 2) ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes shineEffect{
   0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
   100% {
-    background-position: 0% 50%;
+    transform: translateX(100%) translateY(100%) rotate(45deg);
   }
-}
-
-@keyframes Gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* 黑夜模式适配 */
-[data-theme="dark"] #aside-content > .card-widget .card-info {
-  background: #191919ee;
-  color: #f0f0f0;
-}
-
-/* 个人信息Follow me按钮 */
-#aside-content > .card-widget .card-info > #card-info-btn {
-  background-color: #3eb8be;
-  border-radius: 8px;
-  padding: 8px 16px;
-  color: white;
-  border: none;
-  margin-top: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  display: inline-block;
-  transition: background-color 0.3s ease;
-}
-
-#aside-content > .card-widget .card-info > #card-info-btn:hover {
-  background-color: #2a9da3;
 }
 
 /* 页面样式调节 */
@@ -283,4 +317,22 @@ div#archive {
 [data-theme="dark"] .read-mode div#post {
   background: rgba(25, 25, 25, 0.9) !important; /* 深色背景 */
   color: #ffffff; /* 白色文字 */
+}
+
+/* 菜单栏图标大小 */
+svg.menu_icon {
+  width: 1.28em;
+  height: 1.28em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+/* 社交图标大小 */
+svg.social_icon {
+  width: 1.28em;
+  height: 1.28em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
 }
