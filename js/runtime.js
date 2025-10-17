@@ -4,7 +4,7 @@ function createtime() {
     var e = new Date("08/01/2022 00:00:00"),
         t = Math.trunc(234e8 + (now - e) / 1000 * 17),
         a = (t / 1496e5).toFixed(6),
-        o = new Date("08/28/2024 00:00:00"),
+        o = new Date("07/10/2024 00:00:00"),
         n = (now - o) / 1000 / 60 / 60 / 24,
         r = Math.floor(n),
         i = (now - o) / 1000 / 60 / 60 - 24 * r,
