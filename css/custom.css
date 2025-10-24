@@ -1,7 +1,7 @@
 /* 定义CSS变量，方便统一修改 */
 :root {
-  --trans-light: rgba(255, 255, 255, 0.75); /* 白天模式带透明度的背景色 */
-  --trans-dark: rgba(25, 25, 25, 0.6); /* 夜间模式带透明度的背景色 */
+  --trans-light: rgba(255, 255, 255, 0.6); /* 白天模式带透明度的背景色 */
+  --trans-dark: rgba(25, 25, 25, 0.0); /* 夜间模式带透明度的背景色 */
   --border-style: 1px solid rgb(169, 169, 169); /* 边框样式 */
   --backdrop-filter: blur(15px) saturate(150%); /* 背景过滤器，实现亚克力效果 */
 }
@@ -238,7 +238,7 @@ html[data-theme="dark"]{
 /* 首页文章卡片样式 */
 #recent-posts > .recent-post-item {
   background: var(--trans-light); /* 使用白天模式透明背景 */
-  backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
+  /* backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
   border-radius: 25px; /* 圆角大小 */
   border: var(--border-style); /* 边框样式 */
 }
@@ -246,7 +246,7 @@ html[data-theme="dark"]{
 /* 首页侧栏卡片样式 */
 #aside-content .card-widget {
   background: var(--trans-light); /* 使用白天模式透明背景 */
-  backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
+  /* backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
   border-radius: 18px; /* 圆角大小 */
   border: var(--border-style); /* 边框样式 */
 }
@@ -256,7 +256,7 @@ div#post,
 div#page,
 div#archive {
   background: var(--trans-light); /* 使用白天模式透明背景 */
-  backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
+  /* backdrop-filter: var(--backdrop-filter); /* 应用背景过滤器 */
   border: var(--border-style); /* 边框样式 */
   border-radius: 20px; /* 圆角大小 */
 }
