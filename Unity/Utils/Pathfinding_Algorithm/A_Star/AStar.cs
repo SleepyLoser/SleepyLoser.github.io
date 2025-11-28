@@ -12,7 +12,7 @@ public sealed class AStar
     private static readonly Dictionary<GlobalEnum.DistanceCalculationMethod, Func<Vector2, Vector2, float>> m_DistanceCalculators = new Dictionary<GlobalEnum.DistanceCalculationMethod, Func<Vector2, Vector2, float>>()
     {
         { GlobalEnum.DistanceCalculationMethod.Manhattan, (v1, v2) => ManhattanDistance(v1, v2) },
-        { GlobalEnum.DistanceCalculationMethod.Euler, (v1, v2) => EulerDistance(v1, v2, false) },
+        { GlobalEnum.DistanceCalculationMethod.Euclidean, (v1, v2) => EuclideanDistance(v1, v2, true) },
         { GlobalEnum.DistanceCalculationMethod.Chebyshev, (v1, v2) => ChebyshevDistance(v1, v2) },
     };
     
@@ -28,17 +28,17 @@ public sealed class AStar
     }
 
     /// <summary>
-    /// 欧拉距离的平方
+    /// 欧几里得距离
     /// </summary>
     /// <param name="v1">坐标1</param>
     /// <param name="v2">坐标2</param>
-    /// <param name="isSquareRootRequired">是否需要开根的欧拉距离（不开根精度更高）</param>
-    /// <returns>两个坐标之间的欧拉距离或欧拉距离的平方</returns>
-    private static float EulerDistance(Vector2 v1, Vector2 v2, bool isSquareRootRequired = true)
+    /// <param name="isSquareRootRequired">欧几里得距离是否需要开根（不开根性能更好, 但会导致算法无法找到最优路径）</param>
+    /// <returns>两个坐标之间的欧几里得距离或欧几里得距离的平方</returns>
+    private static float EuclideanDistance(Vector2 v1, Vector2 v2, bool isSquareRootRequired = true)
     {
         Vector2 difference = v1 - v2;
-        float eulerDistance = Vector2.Dot(difference, difference);
-        return isSquareRootRequired ? Mathf.Sqrt(eulerDistance) : eulerDistance;
+        float euclideanDistance = Vector2.Dot(difference, difference);
+        return isSquareRootRequired ? Mathf.Sqrt(euclideanDistance) : euclideanDistance;
     }
 
     /// <summary>
@@ -101,7 +101,9 @@ public sealed class AStar
         }
 
         startNode.father = null;
-        startNode.f = startNode.g = startNode.h = 0;
+        startNode.g = 0;
+        startNode.h = CalculateH(startNode, endNode, GlobalEnum.DistanceCalculationMethod.Euclidean);
+        startNode.f = startNode.g + startNode.h;
 
         m_OpenList.Enqueue(startNode, startNode);
         while (!m_OpenList.IsEmpty)
@@ -130,13 +132,11 @@ public sealed class AStar
             (int currentX, int currentY) = WorldPositionToAStarPosition(currentNode.position);
 
             // 评估所有邻居节点
-            bool reverseOrder = UnityEngine.Random.Range(0, 100) < 50;
             for (int i = 0; i < 8; ++i)
             {
-                int directionIndex = reverseOrder ? 7 - i : i;
-                int x = currentX + m_Direction[directionIndex, 0];
-                int y = currentY + m_Direction[directionIndex, 1];
-                EvaluateNeighbor(x, y, directionIndex, currentNode, endNode, map);
+                int x = currentX + m_Direction[i, 0];
+                int y = currentY + m_Direction[i, 1];
+                EvaluateNeighbor(x, y, i, currentNode, endNode, map);
             }
         }
 
@@ -202,8 +202,8 @@ public sealed class AStar
         }
 
         node.father = father;
-        node.g = CalculateG(father, node, GlobalEnum.DistanceCalculationMethod.Euler);
-        node.h = CalculateH(node, end, GlobalEnum.DistanceCalculationMethod.Euler);
+        node.g = CalculateG(father, node, GlobalEnum.DistanceCalculationMethod.Euclidean);
+        node.h = CalculateH(node, end, GlobalEnum.DistanceCalculationMethod.Euclidean);
         node.f = node.g + node.h;
 
         m_OpenList.Enqueue(node, node);

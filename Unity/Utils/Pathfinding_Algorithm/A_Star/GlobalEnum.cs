@@ -25,9 +25,9 @@ public static class GlobalEnum
         /// </summary>
         Manhattan,
         /// <summary>
-        /// 欧拉距离
+        /// 欧几里得距离
         /// </summary>
-        Euler,
+        Euclidean,
         /// <summary>
         /// 切比雪夫距离 
         /// </summary>
