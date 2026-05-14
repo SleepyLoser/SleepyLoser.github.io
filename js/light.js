@@ -79,9 +79,15 @@ function changeColor() {
 }
 
 // 确保DOM完全加载后再执行
-document.addEventListener('DOMContentLoaded', function() {
+function initLight() {
   // 初始检查一次
   changeColor();
   // 开启计时器
-  setInterval(changeColor, 1200);
-});
+  if (window.lightInterval) {
+    clearInterval(window.lightInterval);
+  }
+  window.lightInterval = setInterval(changeColor, 1200);
+}
+
+document.addEventListener('DOMContentLoaded', initLight);
+document.addEventListener('pjax:complete', initLight);
